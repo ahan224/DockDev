@@ -1,5 +1,6 @@
 var fs = require('fs');
 var path = require('path');
+window.$ = window.jQuery = require('./node_modules/jquery/dist/jquery.js');
 
 
 var fileTree = [];
