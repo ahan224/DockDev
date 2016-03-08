@@ -5,9 +5,37 @@
 		<meta charset="utf-8">
 		<title>DocDev</title>
 	</head>
+	<link rel="stylesheet" href="bower_components/photon/dist/css/photon.css" media="screen" title="no title" charset="utf-8">
+	<link rel="stylesheet" href="node_modules/tether/dist/css/tether.css" media="screen" title="no title" charset="utf-8">
+	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" media="screen" title="no title" charset="utf-8">
 
 	<body>
-		<h1>Welcome <small>hello world</small></h1>
+		<div class="window">
+			<div class="window-content">
+				<div class="pane-group">
+					<div class="pane-sm sidebar">
+						<h6>Create your Container</h6>
+					</div>
+					<div class="pane">
+						<h1>Welcome to DockDev</h1>
+					</div>
+				</div>
+			</div>
+		</div>
 	</body>
+	<script src="./bower_components/jquery/dist/jquery.min.js"></script>
+	<script>
+		window.jQuery = window.$ = typeof module === 'object' ? module.exports : jQuery
+
+	</script>
+	<!-- <script>window.jQuery = window.$ = module.exports;</script> -->
+
+	<script src="node_modules/tether/dist/js/tether.js"></script>
+	<script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+
+	<!-- <script type="text/javascript" src="bower_components/dist/js/bootstrap.js">
+
+
+	</script> -->
 
 </html>
