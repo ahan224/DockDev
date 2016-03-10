@@ -1,0 +1,40 @@
+***Break things into their smallest pieces
+***Focus on writing reusable code
+***Learn TDD before writing any code
+
+Functions:
+  - initialize project folder
+    - design json file
+    - add uuid
+    - folder structure (dependent on dockerfile context)
+  - start folder syncing (will test w/o docker)
+  - add image(s) to projects
+
+
+
+
+
+- add file watching
+- design json file for dockdev folder
+
+- work through the creation of a project folder
+  - create dockdev folder and pre-populate with JSON
+  - create function to read/write to json file
+  - figure out what needs to be stored in the json file
+
+- start the folder watch system
+  - need ability to turnoff file watching
+  - handle if the root folder name is changed (need new watch)
+  - handle multiple project watches simultaneously
+  - use closure to avoid getting machine inspect 2x (same for volume)
+  - create one watcher and then reference root directory
+
+- closure with Promise
+  - put the promise that resolves machine ip, ssh, volume location, etc in closure
+  - return a function that requires no parameters, but will rsync after promise resolves
+  - need to consider error handling, but otherwise this solution should work great
+
+- questions
+  - should you rsync only the file or folder that changed or everything
+  - handle when a root folder is renamed (reason to track by project id)
+  - assign UUID to each project, have in memory object keyed with these ids

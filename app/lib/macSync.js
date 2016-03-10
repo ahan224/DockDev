@@ -1,5 +1,6 @@
+'use strict';
+
 const R = require('ramda');
-const spawn = require('child_process').spawn;
 const exec = require('child_process').exec;
 
 // cmdLine :: string -> [string] -> object
@@ -11,7 +12,7 @@ const cmdLine = R.curry((cmd, args) => {
       if (err) reject(err);
       resolve(stdout);
     });
-  })
+  });
 });
 
 const dockerMachine = cmdLine('docker-machine');
@@ -22,7 +23,7 @@ const selectWithin = R.curry((array, key, obj) => {
   var result = {};
   array.forEach(val => result[val] = obj[key][val]);
   return result;
-})
+});
 
 // createRsyncArgs :: string -> string -> object -> [string]
 // accepts source, destination, and machine info
@@ -32,22 +33,15 @@ const createRsyncArgs = R.curry((source, dest, machine) => {
   result.push(`"ssh -i ${ machine.SSHKeyPath } -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"`);
   result.push('--delete');
   result.push(source);
-  result.push(`docker@${ machine.IPAddress }:${ dest }`)
+  result.push(`docker@${ machine.IPAddress }:${ dest }`);
   return result;
 });
 
 // selects ssh and ip address from object (docker-machine inspect)
-const selectSSHandIP = R.compose(
-  selectWithin(['SSHKeyPath', 'IPAddress'], 'Driver'),
-  JSON.parse
-);
+const selectSSHandIP = R.compose(selectWithin(['SSHKeyPath', 'IPAddress'], 'Driver'), JSON.parse);
 
 const runRsync = (source, dest, machineName) => {
-  dockerMachine(['inspect', machineName])
-  .then(selectSSHandIP)
-  .then(createRsyncArgs(source, dest))
-  .then(rsync)
-  .catch(console.log)
-}
+  dockerMachine(['inspect', machineName]).then(selectSSHandIP).then(createRsyncArgs(source, dest)).then(rsync).catch(console.log);
+};
 
 runRsync('./dir1', '~/test', 'sandbox');
