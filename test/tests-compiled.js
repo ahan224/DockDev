@@ -39,7 +39,6 @@ describe('initiate new DockDev project', () => {
   it('createDockDev should fail when the folder already exists', () => {
     var tryAgain = utils.createDockDev(path);
     return tryAgain.then(data => (0, _chai.expect)(data).to.equal(undefined), err => (0, _chai.expect)(err.code).to.equal('EEXIST'));
-    // .catch(err => expect(err.code).to.equal('EEXIST'))
   });
 
   it('createConfig should create a config object with a unique id and project name', () => {
@@ -51,7 +50,9 @@ describe('initiate new DockDev project', () => {
   it('writeConfig should write a specified object to the configFile', () => {
     return result.then(utils.writeConfig(configObj)).then(_fs.readFileSync).then(_ramda2.default.toString).then(JSON.parse).then(data => (0, _chai.expect)(data).to.deep.equal(configObj));
   });
+});
 
+xdescribe('read and modify an existing project', () => {
   // this should probably be moved to the existing project tests (project2)
   it('readConfig should read an existing config file returning an object', () => {
     return result.then(utils.readConfig).then(data => (0, _chai.expect)(data).to.deep.equal(configObj));
