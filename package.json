@@ -10,20 +10,10 @@
     "babel": "npm run babel:test & npm run babel:watch",
     "test": "mocha \"./test/tests-compiled.js\""
   },
-  "repository": {
-    "type": "git",
-    "url": ""
-  },
-  "keywords": [],
-  "author": "GitHub",
-  "license": "CC0-1.0",
-  "bugs": {
-    "url": ""
-  },
-  "homepage": "",
   "devDependencies": {
     "babel-cli": "^6.6.5",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.7.0",
+    "babel-plugin-transform-es2015-shorthand-properties": "^6.5.0",
     "chai": "^3.5.0",
     "electron-prebuilt": "^0.36.0",
     "mocha": "^2.4.5",
