@@ -5,67 +5,119 @@ import R from 'ramda';
 import uuid from 'node-uuid';
 import exec from 'child_process';
 
-// config file names
+// config variables
 const configFolder = '.dockdev';
 const configFile = 'dockdev.json';
 
+// object to store all projects (active and inactive)
+export const memory = {};
 
-// createFolder :: string -> string -> object
+// list of the parameters from the configObj that should be
+// written to dockdev.json.  Remaining parameters are in-memory only.
+// this needs to be updated for properties that should be stored on disk
+export const configWriteParams = ['uuid', 'projectName']
+
+// JSONStringifyPretty :: a -> string
+// predefines JSON stringify with formatting
+const JSONStringifyPretty = (obj) => JSON.stringify(obj, null, 2);
+
+// createConfig :: string -> string -> object
+// accepts a project name & basePath, returns object with uuid
+export const createConfig = (basePath, projectName) => ({
+  uuid: uuid.v4(),
+  projectName,
+  basePath
+});
+
+// createFolder :: string -> object -> promise(object)
 // wraps mkdir in a promise and splits new folder from base path
-const createFolder = R.curry((folderName, path) => {
-  path = join(path, folderName);
+const createFolder = R.curry((folderName, configObj) => {
+  const path = join(configObj.basePath, folderName);
   return new Promise((resolve, reject) => {
     mkdir(path, err => {
       if (err) return reject(err);
-      return resolve(path);
+      return resolve(configObj);
     });
   });
 });
 
-// createDockDev :: string -> string -> object
+// createDockDev :: object -> promise(object)
 // initializes a new DockDev project by adding a .dockdev
 export const createDockDev = createFolder(configFolder);
 
-// writeJSON :: string -> object -> string -> object
-// wraps writeFile in a promise, accepts an object and stringifies it
-const writeJSON = R.curry((fileName, obj, path) => {
-  path = join(path, fileName);
+// writeFileProm :: string -> function -> object -> promise(object)
+// wraps writeFile in a promise, accepts an object and a transformation
+const writeFileProm = R.curry((fileName, transform, configObj) => {
+  const path = join(configObj.basePath, fileName);
   return new Promise((resolve, reject) => {
-    writeFile(path, JSON.stringify(obj, null, 2), err => {
+    writeFile(path, transform(configObj), err => {
       if (err) return reject(err);
-      return resolve(path);
+      return resolve(configObj);
     });
   });
 });
 
-// writeConfig :: object -> string -> object
+// cleanConfigToWrite :: object -> string
+// removes in-memory properties to write config to dockdev.json
+// also JSON stringifies with indent formatting
+const cleanConfigToWrite = R.compose(
+  JSONStringifyPretty,
+  R.pick(configWriteParams)
+)
+
+// writeConfig :: string -> function -> object -> promise(object)
 // writes the config object to the specified path
 // it will overwrite any existing file.
 // should be used with readConfig for existing projects
-export const writeConfig = writeJSON(configFile);
+export const writeConfig = writeFileProm(join(configFolder, configFile), cleanConfigToWrite);
 
-// readJSON :: string -> string -> object
+// readJSON :: string -> string -> promise(object)
 // wraps readFile in a promise and splits filename from base path
-const readJSON = R.curry((fileName, path) => {
-  path = join(path, fileName);
+// returns the config object with the basePath added
+// transform is a function that takes the JSON string and basePath
+// other transform functions can be created if they follow that structure
+const readJSON = R.curry((fileName, transform, basePath) => {
+  const path = join(basePath, fileName);
   return new Promise((resolve, reject) => {
     readFile(path, 'utf-8', (err, data) => {
       if (err) return reject(err);
-      return resolve(JSON.parse(data));
+      return resolve(transform(data, basePath));
     });
   });
 })
 
-// readConfig :: string -> object
-// given a base path it will return the parsed JSON file
-export const readConfig = readJSON(configFile);
+// addBasePath :: string -> string -> object
+// takes a json string, parses it, and returns a new object with the basePath included
+const addBasePath = (jsonObj, basePath) => R.merge(JSON.parse(jsonObj), { basePath });
 
-// createConfig :: string -> object
-// accepts a project name and returns an object with uuid and projectName properties
-export const createConfig = projectName => ({
-  uuid: uuid.v4(),
-  projectName
+// readConfig :: string -> promise(object)
+// given a base path it will return the parsed JSON file
+export const readConfig = readJSON(join(configFolder, configFile), addBasePath);
+
+// extendConfig :: object -> object
+// accepts the existing config as first paramater
+// and merges/overwrites with the second object
+const extendConfig = R.merge;
+
+// addConfigToMemory :: object -> object -> object
+// adds the configObj for the project to the memory object
+export const addConfigToMemory = R.curry((memory, configObj) => {
+  memory[configObj.uuid] = configObj;
+  return configObj
 })
+
+export const addToAppMemory = addConfigToMemory(memory);
+
+// initiateProject :: string -> string -> promise(object)
+// combines the sequence of functions to initiate a new projects
+// takes a path and a project name and returns the config object
+export const initiateProject = (basePath, projectName) => {
+  const configObj = createConfig(basePath, projectName);
+
+  return createDockDev(configObj)
+    .then(writeConfig)
+    .then(addToAppMemory)
+}
 
 // cmdLine :: string -> [string] -> object
 // returns the stdout of the command line call within a promise
