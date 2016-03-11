@@ -26,7 +26,6 @@ describe('initiate new DockDev project', () => {
           data => expect(data).to.equal(undefined),
           err => expect(err.code).to.equal('EEXIST')
         )
-      // .catch(err => expect(err.code).to.equal('EEXIST'))
   })
 
   it('createConfig should create a config object with a unique id and project name', () => {
@@ -43,12 +42,14 @@ describe('initiate new DockDev project', () => {
       .then(JSON.parse)
       .then(data => expect(data).to.deep.equal(configObj));
   })
+});
 
+xdescribe('read and modify an existing project', () => {
   // this should probably be moved to the existing project tests (project2)
   it('readConfig should read an existing config file returning an object', () => {
     return result
-      .then(utils.readConfig)
-      .then(data => expect(data).to.deep.equal(configObj))
+    .then(utils.readConfig)
+    .then(data => expect(data).to.deep.equal(configObj))
   })
 
-});
+})
