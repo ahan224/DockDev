@@ -92,7 +92,7 @@ export const rsync = cmdLine('rsync');
 // selectWithin :: [string] -> string -> object
 // helper function to select specified props from a nested object
 const selectWithin = R.curry((array, key, obj) => {
-  var result = {};
+  const result = {};
   array.forEach(val => result[val] = obj[key][val]);
   return result;
 })
@@ -123,3 +123,12 @@ const selectSSHandIP = R.compose(
 //   .then(rsync)
 //   .catch(console.log)
 // }
+
+
+// generateRsync :: object -> function
+// accepts a config object and returns a function that is
+// called when files change in the base directory of project
+export const generateRsync = config => {
+
+
+}
