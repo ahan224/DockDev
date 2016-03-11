@@ -9,10 +9,10 @@ Functions:
     - folder structure (dependent on dockerfile context)
   - start folder syncing (will test w/o docker)
   - add image(s) to projects
-
-
-
-
+  - app will be structured around an array of projects (objects)
+    - certain portions will be written to dockdev.json
+    - others are in memory only while running
+    - need to consider a 'root' level .dockdev folder to store app-level config
 
 - add file watching
 - design json file for dockdev folder

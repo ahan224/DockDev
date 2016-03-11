@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.rsync = exports.dockerMachine = exports.createConfig = exports.readConfig = exports.writeConfig = exports.createDockDev = undefined;
+exports.generateRsync = exports.rsync = exports.dockerMachine = exports.createConfig = exports.readConfig = exports.writeConfig = exports.createDockDev = undefined;
 
 var _fs = require('fs');
 
@@ -141,3 +141,8 @@ const selectSSHandIP = _ramda2.default.compose(selectWithin(['SSHKeyPath', 'IPAd
 //   .then(rsync)
 //   .catch(console.log)
 // }
+
+// generateRsync :: object -> function
+// accepts a config object and returns a function that is
+// called when files change in the base directory of project
+const generateRsync = exports.generateRsync = config => {};
