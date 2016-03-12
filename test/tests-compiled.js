@@ -23,11 +23,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 describe('initiate new DockDev project via individual functions', () => {
-  var projectName = 'project1';
-  var basePath = (0, _path.join)(__dirname, 'userFolder', projectName);
-  var dockDevPath = (0, _path.join)(basePath, '.dockdev');
-  var result = void 0;
-  var configObj = void 0;
+  const projectName = 'project1';
+  const basePath = (0, _path.join)(__dirname, 'userFolder', projectName);
+  const dockDevPath = (0, _path.join)(basePath, '.dockdev');
+  let result;
+  let configObj;
 
   before(() => {
     // make sure there is a userFolder
@@ -64,16 +64,16 @@ describe('initiate new DockDev project via individual functions', () => {
   });
 
   it('createDockDev should fail when the folder already exists', () => {
-    var tryAgain = utils.createDockDev(configObj);
+    const tryAgain = utils.createDockDev(configObj);
     return tryAgain.then(data => (0, _chai.expect)(data).to.equal(undefined), err => (0, _chai.expect)(err.code).to.equal('EEXIST'));
   });
 });
 
 describe('initiate new DockDev project via initiateProject', () => {
-  var projectName = 'project2';
-  var basePath = (0, _path.join)(__dirname, 'userFolder', projectName);
-  var dockDevPath = (0, _path.join)(basePath, '.dockdev');
-  var result = void 0;
+  const projectName = 'project2';
+  const basePath = (0, _path.join)(__dirname, 'userFolder', projectName);
+  const dockDevPath = (0, _path.join)(basePath, '.dockdev');
+  let result;
 
   before(() => {
     // make sure there is a userFolder
@@ -112,10 +112,10 @@ describe('initiate new DockDev project via initiateProject', () => {
 });
 
 describe('read and modify an existing project', () => {
-  var projectName = 'project3';
-  var basePath = (0, _path.join)(__dirname, 'userFolder', projectName);
-  var dockDevPath = (0, _path.join)(basePath, '.dockdev');
-  var result = void 0;
+  const projectName = 'project3';
+  const basePath = (0, _path.join)(__dirname, 'userFolder', projectName);
+  const dockDevPath = (0, _path.join)(basePath, '.dockdev');
+  let result;
 
   before(() => {
     // make sure there is a userFolder

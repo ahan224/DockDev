@@ -28,24 +28,24 @@ var _child_process2 = _interopRequireDefault(_child_process);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // config variables
-var configFolder = '.dockdev';
-var configFile = 'dockdev.json';
+const configFolder = '.dockdev';
+const configFile = 'dockdev.json';
 
 // object to store all projects
-var memory = exports.memory = {};
+const memory = exports.memory = {};
 
 // list of the parameters from the configObj that should be
 // written to dockdev.json.  Remaining parameters are in-memory only.
 // this needs to be updated for properties that should be stored on disk
-var configWriteParams = exports.configWriteParams = ['uuid', 'projectName'];
+const configWriteParams = exports.configWriteParams = ['uuid', 'projectName'];
 
 // JSONStringifyPretty :: a -> string
 // predefines JSON stringify with formatting
-var JSONStringifyPretty = obj => JSON.stringify(obj, null, 2);
+const JSONStringifyPretty = obj => JSON.stringify(obj, null, 2);
 
 // createConfig :: string -> string -> object
 // accepts a project name & basePath, returns object with uuid
-var createConfig = exports.createConfig = (basePath, projectName) => ({
+const createConfig = exports.createConfig = (basePath, projectName) => ({
   uuid: _nodeUuid2.default.v4(),
   projectName: projectName,
   basePath: basePath
@@ -53,8 +53,8 @@ var createConfig = exports.createConfig = (basePath, projectName) => ({
 
 // createFolder :: string -> object -> promise(object)
 // wraps mkdir in a promise and splits new folder from base path
-var createFolder = _ramda2.default.curry((folderName, configObj) => {
-  var path = (0, _path.join)(configObj.basePath, folderName);
+const createFolder = _ramda2.default.curry((folderName, configObj) => {
+  const path = (0, _path.join)(configObj.basePath, folderName);
   return new _bluebird2.default((resolve, reject) => {
     (0, _fs.mkdir)(path, err => {
       if (err) return reject(err);
@@ -65,12 +65,12 @@ var createFolder = _ramda2.default.curry((folderName, configObj) => {
 
 // createDockDev :: object -> promise(object)
 // initializes a new DockDev project by adding a .dockdev
-var createDockDev = exports.createDockDev = createFolder(configFolder);
+const createDockDev = exports.createDockDev = createFolder(configFolder);
 
 // writeFileProm :: string -> function -> object -> promise(object)
 // wraps writeFile in a promise, accepts an object and a transformation
-var writeFileProm = _ramda2.default.curry((fileName, transform, configObj) => {
-  var path = (0, _path.join)(configObj.basePath, fileName);
+const writeFileProm = _ramda2.default.curry((fileName, transform, configObj) => {
+  const path = (0, _path.join)(configObj.basePath, fileName);
   return new _bluebird2.default((resolve, reject) => {
     (0, _fs.writeFile)(path, transform(configObj), err => {
       if (err) return reject(err);
@@ -82,21 +82,21 @@ var writeFileProm = _ramda2.default.curry((fileName, transform, configObj) => {
 // cleanConfigToWrite :: object -> string
 // removes in-memory properties to write config to dockdev.json
 // also JSON stringifies with indent formatting
-var cleanConfigToWrite = _ramda2.default.compose(JSONStringifyPretty, _ramda2.default.pick(configWriteParams));
+const cleanConfigToWrite = _ramda2.default.compose(JSONStringifyPretty, _ramda2.default.pick(configWriteParams));
 
 // writeConfig :: string -> function -> object -> promise(object)
 // writes the config object to the specified path
 // it will overwrite any existing file.
 // should be used with readConfig for existing projects
-var writeConfig = exports.writeConfig = writeFileProm((0, _path.join)(configFolder, configFile), cleanConfigToWrite);
+const writeConfig = exports.writeConfig = writeFileProm((0, _path.join)(configFolder, configFile), cleanConfigToWrite);
 
 // readJSON :: string -> string -> promise(object)
 // wraps readFile in a promise and splits filename from base path
 // returns the config object with the basePath added
 // transform is a function that takes the JSON string and basePath
 // other transform functions can be created if they follow that structure
-var readJSON = _ramda2.default.curry((fileName, transform, basePath) => {
-  var path = (0, _path.join)(basePath, fileName);
+const readJSON = _ramda2.default.curry((fileName, transform, basePath) => {
+  const path = (0, _path.join)(basePath, fileName);
   return new _bluebird2.default((resolve, reject) => {
     (0, _fs.readFile)(path, 'utf-8', (err, data) => {
       if (err) return reject(err);
@@ -107,38 +107,38 @@ var readJSON = _ramda2.default.curry((fileName, transform, basePath) => {
 
 // addBasePath :: string -> string -> object
 // takes a json string, parses it, and returns a new object with the basePath included
-var addBasePath = (jsonObj, basePath) => _ramda2.default.merge(JSON.parse(jsonObj), { basePath: basePath });
+const addBasePath = (jsonObj, basePath) => _ramda2.default.merge(JSON.parse(jsonObj), { basePath: basePath });
 
 // readConfig :: string -> promise(object)
 // given a base path it will return the parsed JSON file
-var readConfig = exports.readConfig = readJSON((0, _path.join)(configFolder, configFile), addBasePath);
+const readConfig = exports.readConfig = readJSON((0, _path.join)(configFolder, configFile), addBasePath);
 
 // extendConfig :: object -> object
 // accepts the existing config as first paramater
 // and merges/overwrites with the second object
-var extendConfig = _ramda2.default.merge;
+const extendConfig = _ramda2.default.merge;
 
 // addConfigToMemory :: object -> object -> object
 // adds the configObj for the project to the memory object
-var addConfigToMemory = exports.addConfigToMemory = _ramda2.default.curry((memory, configObj) => {
+const addConfigToMemory = exports.addConfigToMemory = _ramda2.default.curry((memory, configObj) => {
   memory[configObj.uuid] = configObj;
   return configObj;
 });
 
-var addToAppMemory = exports.addToAppMemory = addConfigToMemory(memory);
+const addToAppMemory = exports.addToAppMemory = addConfigToMemory(memory);
 
 // initiateProject :: string -> string -> promise(object)
 // combines the sequence of functions to initiate a new projects
 // takes a path and a project name and returns the config object
-var initiateProject = exports.initiateProject = (basePath, projectName) => {
-  var configObj = createConfig(basePath, projectName);
+const initiateProject = exports.initiateProject = (basePath, projectName) => {
+  const configObj = createConfig(basePath, projectName);
 
   return createDockDev(configObj).then(writeConfig).then(addToAppMemory);
 };
 
 // cmdLine :: string -> [string] -> promise(string)
 // returns the stdout of the command line call within a promise
-var cmdLine = _ramda2.default.curry((cmd, args) => {
+const cmdLine = _ramda2.default.curry((cmd, args) => {
   args = `${ cmd } ${ args.join(' ') }`;
   return new _bluebird2.default((resolve, reject) => {
     (0, _child_process2.default)(args, (err, stdout) => {
@@ -151,22 +151,22 @@ var cmdLine = _ramda2.default.curry((cmd, args) => {
 // dockerMachine :: [string] -> promise(string)
 // accepts an array of cmd line args for docker-machine
 // returns a promise that resolves to the stdout
-var dockerMachine = exports.dockerMachine = cmdLine('docker-machine');
+const dockerMachine = exports.dockerMachine = cmdLine('docker-machine');
 
 // rsync :: [string] -> promise(string)
 // accepts an array of cmd line args for rsync
 // returns a promise that resolves to teh stdout
-var rsync = exports.rsync = cmdLine('rsync');
+const rsync = exports.rsync = cmdLine('rsync');
 
 // docker :: [string] -> promise(string)
 // accepts an array of cmd line args for docker-machine
 // returns a promise that resolves to the stdout
-var docker = exports.docker = cmdLine('docker');
+const docker = exports.docker = cmdLine('docker');
 
 // selectWithin :: [string] -> string -> object
 // helper function to select specified props from a nested object
-var selectWithin = _ramda2.default.curry((array, key, obj) => {
-  var result = {};
+const selectWithin = _ramda2.default.curry((array, key, obj) => {
+  const result = {};
   array.forEach(val => result[val] = obj[key][val]);
   return result;
 });
@@ -174,8 +174,8 @@ var selectWithin = _ramda2.default.curry((array, key, obj) => {
 // createRsyncArgs :: string -> string -> object -> [string]
 // accepts source, destination, and machine info
 // returns an array of arguments for rsync
-var createRsyncArgs = _ramda2.default.curry((source, dest, machine) => {
-  var result = ['-a', '-e'];
+const createRsyncArgs = _ramda2.default.curry((source, dest, machine) => {
+  const result = ['-a', '-e'];
   result.push(`"ssh -i ${ machine.SSHKeyPath } -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"`);
   result.push('--delete');
   result.push(source);
@@ -185,7 +185,7 @@ var createRsyncArgs = _ramda2.default.curry((source, dest, machine) => {
 
 // selectSSHandIP :: object -> object
 // selects ssh and ip address from docker-machine inspect object
-var selectSSHandIP = _ramda2.default.compose(selectWithin(['SSHKeyPath', 'IPAddress'], 'Driver'), JSON.parse);
+const selectSSHandIP = _ramda2.default.compose(selectWithin(['SSHKeyPath', 'IPAddress'], 'Driver'), JSON.parse);
 
 // const runRsync = (source, dest, machineName) => {
 //   dockerMachine(['inspect', machineName])
@@ -198,4 +198,17 @@ var selectSSHandIP = _ramda2.default.compose(selectWithin(['SSHKeyPath', 'IPAddr
 // generateRsync :: object -> function
 // accepts a config object and returns a function that is
 // called when files change in the base directory of project
-var generateRsync = exports.generateRsync = config => {};
+const generateRsync = exports.generateRsync = config => {};
+
+// - File watch
+//   - need ability to turnoff file watching
+//   - handle if the root folder name is changed (need new watch)
+//   - handle multiple project watches simultaneously
+//   - use closure to avoid getting machine inspect 2x (same for volume)
+//   - create one watcher and then reference root directory
+//
+// - Rsync
+//   - put the promise that resolves machine ip, ssh, volume location, etc in closure
+//   - return a function that requires no parameters, but will rsync after promise resolves
+//   - need to consider error handling, but otherwise this solution should work great
+//   - should you rsync only the file or folder that changed or everything

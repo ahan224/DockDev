@@ -1,3 +1,5 @@
+'use strict';
+
 import { mkdir, writeFile, readFile } from 'fs';
 import { join } from 'path';
 import Promise from 'bluebird';
@@ -199,7 +201,7 @@ export const generateRsync = config => {
 //   - handle multiple project watches simultaneously
 //   - use closure to avoid getting machine inspect 2x (same for volume)
 //   - create one watcher and then reference root directory
-// 
+//
 // - Rsync
 //   - put the promise that resolves machine ip, ssh, volume location, etc in closure
 //   - return a function that requires no parameters, but will rsync after promise resolves
