@@ -9,7 +9,7 @@ import exec from 'child_process';
 const configFolder = '.dockdev';
 const configFile = 'dockdev.json';
 
-// object to store all projects (active and inactive)
+// object to store all projects
 export const memory = {};
 
 // list of the parameters from the configObj that should be
@@ -119,7 +119,7 @@ export const initiateProject = (basePath, projectName) => {
     .then(addToAppMemory)
 }
 
-// cmdLine :: string -> [string] -> object
+// cmdLine :: string -> [string] -> promise(string)
 // returns the stdout of the command line call within a promise
 const cmdLine = R.curry((cmd, args) => {
   args = `${ cmd } ${ args.join(' ') }`;
@@ -131,15 +131,22 @@ const cmdLine = R.curry((cmd, args) => {
   })
 });
 
-// dockerMachine :: [string] -> object
+// dockerMachine :: [string] -> promise(string)
 // accepts an array of cmd line args for docker-machine
 // returns a promise that resolves to the stdout
 export const dockerMachine = cmdLine('docker-machine');
 
-// rsync :: [string] -> object
+// rsync :: [string] -> promise(string)
 // accepts an array of cmd line args for rsync
 // returns a promise that resolves to teh stdout
 export const rsync = cmdLine('rsync');
+
+// docker :: [string] -> promise(string)
+// accepts an array of cmd line args for docker-machine
+// returns a promise that resolves to the stdout
+export const docker = cmdLine('docker');
+
+
 
 // selectWithin :: [string] -> string -> object
 // helper function to select specified props from a nested object

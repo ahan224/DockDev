@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.generateRsync = exports.rsync = exports.dockerMachine = exports.initiateProject = exports.addToAppMemory = exports.addConfigToMemory = exports.readConfig = exports.writeConfig = exports.createDockDev = exports.createConfig = exports.configWriteParams = exports.memory = undefined;
+exports.generateRsync = exports.docker = exports.rsync = exports.dockerMachine = exports.initiateProject = exports.addToAppMemory = exports.addConfigToMemory = exports.readConfig = exports.writeConfig = exports.createDockDev = exports.createConfig = exports.configWriteParams = exports.memory = undefined;
 
 var _fs = require('fs');
 
@@ -31,7 +31,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var configFolder = '.dockdev';
 var configFile = 'dockdev.json';
 
-// object to store all projects (active and inactive)
+// object to store all projects
 var memory = exports.memory = {};
 
 // list of the parameters from the configObj that should be
@@ -136,7 +136,7 @@ var initiateProject = exports.initiateProject = (basePath, projectName) => {
   return createDockDev(configObj).then(writeConfig).then(addToAppMemory);
 };
 
-// cmdLine :: string -> [string] -> object
+// cmdLine :: string -> [string] -> promise(string)
 // returns the stdout of the command line call within a promise
 var cmdLine = _ramda2.default.curry((cmd, args) => {
   args = `${ cmd } ${ args.join(' ') }`;
@@ -148,15 +148,20 @@ var cmdLine = _ramda2.default.curry((cmd, args) => {
   });
 });
 
-// dockerMachine :: [string] -> object
+// dockerMachine :: [string] -> promise(string)
 // accepts an array of cmd line args for docker-machine
 // returns a promise that resolves to the stdout
 var dockerMachine = exports.dockerMachine = cmdLine('docker-machine');
 
-// rsync :: [string] -> object
+// rsync :: [string] -> promise(string)
 // accepts an array of cmd line args for rsync
 // returns a promise that resolves to teh stdout
 var rsync = exports.rsync = cmdLine('rsync');
+
+// docker :: [string] -> promise(string)
+// accepts an array of cmd line args for docker-machine
+// returns a promise that resolves to the stdout
+var docker = exports.docker = cmdLine('docker');
 
 // selectWithin :: [string] -> string -> object
 // helper function to select specified props from a nested object
