@@ -191,3 +191,17 @@ export const generateRsync = config => {
 
 
 }
+
+
+// - File watch
+//   - need ability to turnoff file watching
+//   - handle if the root folder name is changed (need new watch)
+//   - handle multiple project watches simultaneously
+//   - use closure to avoid getting machine inspect 2x (same for volume)
+//   - create one watcher and then reference root directory
+// 
+// - Rsync
+//   - put the promise that resolves machine ip, ssh, volume location, etc in closure
+//   - return a function that requires no parameters, but will rsync after promise resolves
+//   - need to consider error handling, but otherwise this solution should work great
+//   - should you rsync only the file or folder that changed or everything
