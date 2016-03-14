@@ -89,7 +89,7 @@ describe('initiate new DockDev project via initiateProject', () => {
   });
 
   it('should create a configObj', () => {
-    result = utils.initiateProject(basePath, projectName);
+    result = utils.initProject(basePath, projectName);
     return result.then(data => {
       (0, _chai.expect)(data).to.be.an('object');
       (0, _chai.expect)(data.uuid).to.be.a('string');
@@ -107,7 +107,7 @@ describe('initiate new DockDev project via initiateProject', () => {
   });
 
   it('should fail if a project already exists', () => {
-    return utils.initiateProject(basePath, projectName).then(data => (0, _chai.expect)(data).to.be(undefined)).catch(err => (0, _chai.expect)(err.code).to.equal('EEXIST'));
+    return utils.initProject(basePath, projectName).then(data => (0, _chai.expect)(data).to.be(undefined)).catch(err => (0, _chai.expect)(err.code).to.equal('EEXIST'));
   });
 });
 

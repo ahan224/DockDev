@@ -1,25 +1,34 @@
 'use strict';
 
-import { mkdir, writeFile, readFile } from 'fs';
+require('any-promise/register')('bluebird');
+import { mkdir, writeFile, readFile } from 'mz/fs';
+import { exec } from 'mz/child_process';
 import { join } from 'path';
-import Promise from 'bluebird';
+import Promise, { coroutine as co } from 'bluebird';
 import R from 'ramda';
 import uuid from 'node-uuid';
-import exec from 'child_process';
 
-// config variables
-const configFolder = '.dockdev';
-const configFile = 'dockdev.json';
+
+/**
+* @param {object} config has project config settings
+* @param {object} config.folder is where project config details are stored
+* @param {object} config.file is file name for dockdev project config
+* @param {object} config.writeParams list the project config props that will be written to disk
+* @param {object} config.path is relative to a projects base path (i.e. user selected folder)
+*/
+export const config = {
+  folder: '.dockdev',
+  file: 'dockdev.json',
+  writeParams: ['uuid', 'projectName'],
+  path() {
+    return join(this.folder, this.file)
+  }
+}
 
 // object to store all projects
 export const memory = {};
 
-// list of the parameters from the configObj that should be
-// written to dockdev.json.  Remaining parameters are in-memory only.
-// this needs to be updated for properties that should be stored on disk
-export const configWriteParams = ['uuid', 'projectName']
-
-// JSONStringifyPretty :: a -> string
+// JSONStringifyPretty :: object -> string
 // predefines JSON stringify with formatting
 const JSONStringifyPretty = (obj) => JSON.stringify(obj, null, 2);
 
@@ -45,7 +54,7 @@ const createFolder = R.curry((folderName, configObj) => {
 
 // createDockDev :: object -> promise(object)
 // initializes a new DockDev project by adding a .dockdev
-export const createDockDev = createFolder(configFolder);
+export const createDockDev = createFolder(config.folder);
 
 // writeFileProm :: string -> function -> object -> promise(object)
 // wraps writeFile in a promise, accepts an object and a transformation
@@ -64,14 +73,14 @@ const writeFileProm = R.curry((fileName, transform, configObj) => {
 // also JSON stringifies with indent formatting
 const cleanConfigToWrite = R.compose(
   JSONStringifyPretty,
-  R.pick(configWriteParams)
+  R.pick(config.writeParams)
 )
 
 // writeConfig :: string -> function -> object -> promise(object)
 // writes the config object to the specified path
 // it will overwrite any existing file.
 // should be used with readConfig for existing projects
-export const writeConfig = writeFileProm(join(configFolder, configFile), cleanConfigToWrite);
+export const writeConfig = writeFileProm(config.path(), cleanConfigToWrite);
 
 // readJSON :: string -> string -> promise(object)
 // wraps readFile in a promise and splits filename from base path
@@ -94,7 +103,7 @@ const addBasePath = (jsonObj, basePath) => R.merge(JSON.parse(jsonObj), { basePa
 
 // readConfig :: string -> promise(object)
 // given a base path it will return the parsed JSON file
-export const readConfig = readJSON(join(configFolder, configFile), addBasePath);
+export const readConfig = readJSON(config.path(), addBasePath);
 
 // extendConfig :: object -> object
 // accepts the existing config as first paramater
@@ -121,8 +130,18 @@ export const initiateProject = (basePath, projectName) => {
     .then(addToAppMemory)
 }
 
+export const initProject = Promise.coroutine(function *(basePath, projectName) {
+  const configObj = createConfig(basePath, projectName);
+
+  yield createDockDev(configObj);
+  yield writeConfig(configObj);
+
+  return addToAppMemory(configObj);
+})
+
 // cmdLine :: string -> [string] -> promise(string)
 // returns the stdout of the command line call within a promise
+//** redesign to accept a string rather than an array
 const cmdLine = R.curry((cmd, args) => {
   args = `${ cmd } ${ args.join(' ') }`;
   return new Promise((resolve, reject) => {
@@ -161,6 +180,7 @@ const selectWithin = R.curry((array, key, obj) => {
 // createRsyncArgs :: string -> string -> object -> [string]
 // accepts source, destination, and machine info
 // returns an array of arguments for rsync
+//** this should be redesigned to output just a string
 const createRsyncArgs = R.curry((source, dest, machine) => {
   const result = ['-a', '-e'];
   result.push(`"ssh -i ${ machine.SSHKeyPath } -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"`);
