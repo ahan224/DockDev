@@ -8,7 +8,7 @@ import R from 'ramda';
 import uuid from 'node-uuid';
 
 // promisify certain callback functions
-export const mkdir = Promise.promisify(fs.mkdir);
+const mkdir = Promise.promisify(fs.mkdir);
 const writeFile = Promise.promisify(fs.writeFile);
 const readFile = Promise.promisify(fs.readFile);
 const exec = Promise.promisify(child_process.exec);
@@ -103,35 +103,14 @@ export const initProject = co(function *(basePath, projectName) {
   return configObj;
 })
 
-// cmdLine :: string -> [string] -> promise(string)
+// cmdLine :: string -> string -> promise(string)
 // returns the stdout of the command line call within a promise
-//** redesign to accept a string rather than an array
-const cmdLine = R.curry((cmd, args) => {
-  args = `${ cmd } ${ args.join(' ') }`;
-  return new Promise((resolve, reject) => {
-    exec(args, (err, stdout) => {
-      if (err) reject(err);
-      resolve(stdout);
-    });
-  })
-});
+export const cmdLine = R.curry((cmd, args) => exec(`${ cmd } ${ args }`));
 
-// dockerMachine :: [string] -> promise(string)
-// accepts an array of cmd line args for docker-machine
-// returns a promise that resolves to the stdout
-export const dockerMachine = cmdLine('docker-machine');
-
-// rsync :: [string] -> promise(string)
+// rsync :: string -> promise(string)
 // accepts an array of cmd line args for rsync
 // returns a promise that resolves to teh stdout
 export const rsync = cmdLine('rsync');
-
-// docker :: [string] -> promise(string)
-// accepts an array of cmd line args for docker-machine
-// returns a promise that resolves to the stdout
-export const docker = cmdLine('docker');
-
-
 
 // selectWithin :: [string] -> string -> object
 // helper function to select specified props from a nested object
@@ -160,14 +139,6 @@ const selectSSHandIP = R.compose(
   selectWithin(['SSHKeyPath', 'IPAddress'], 'Driver'),
   JSON.parse
 );
-
-// const runRsync = (source, dest, machineName) => {
-//   dockerMachine(['inspect', machineName])
-//   .then(selectSSHandIP)
-//   .then(createRsyncArgs(source, dest))
-//   .then(rsync)
-//   .catch(console.log)
-// }
 
 
 // generateRsync :: object -> function
