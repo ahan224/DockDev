@@ -1,34 +1,34 @@
 {
-  "name": "electron-quick-start",
+  "name": "dockdev",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "docker for development",
   "main": "main.js",
   "scripts": {
-    "start": "electron main.js"
+    "start": "electron app/index.js",
+    "babel:watch": "babel ./app/src -d ./app/lib --watch",
+    "babel:test": "babel ./test/tests.js --watch --out-file ./test/tests-compiled.js",
+    "babel": "npm run babel:test & npm run babel:watch",
+    "test": "mocha \"./test/tests-compiled.js\""
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/atom/electron-quick-start.git"
-  },
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial"
-  ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
-  "bugs": {
-    "url": "https://github.com/atom/electron-quick-start/issues"
-  },
-  "homepage": "https://github.com/atom/electron-quick-start#readme",
   "devDependencies": {
-    "electron-prebuilt": "^0.36.0"
+    "babel-cli": "^6.6.5",
+    "babel-plugin-transform-es2015-block-scoping": "^6.7.1",
+    "babel-plugin-transform-es2015-destructuring": "^6.6.5",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.7.0",
+    "babel-plugin-transform-es2015-shorthand-properties": "^6.5.0",
+    "chai": "^3.5.0",
+    "electron-prebuilt": "^0.36.0",
+    "mocha": "^2.4.5",
+    "rimraf": "^2.5.2"
   },
   "dependencies": {
     "bluebird": "^3.3.3",
+    "bootstrap": "^3.3.6",
     "chokidar": "^1.4.3",
-    "mocha": "^2.4.5",
-    "ramda": "^0.19.1"
+    "jquery": "^2.2.1",
+    "node-uuid": "^1.4.7",
+    "photon": "^2.0.0",
+    "ramda": "^0.19.1",
+    "tether": "^1.2.0"
   }
 }
