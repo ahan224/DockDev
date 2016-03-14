@@ -1,93 +1,117 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Hello World!</title>
-    <link rel="stylesheet" href="../bower_components/uikit/css/uikit.css" media="screen" title="no title" charset="utf-8">
-    <link rel="stylesheet" href="../bower_components/uikit/css/uikit.almost-flat.css">
-    <link rel="stylesheet" href="../bower_components/uikit/css/uikit.gradient.css">
-    <link rel="stylesheet" href="../bower_components/uikit/css/components/form-select.css">
-    <link rel="stylesheet" href="../bower_components/uikit/css/components/placeholder.css">
-    <link rel="stylesheet" href="../bower_components/uikit/css/components/placeholder.gradient.css">
-    <link rel="stylesheet" href="../bower_components/uikit/css/components/placeholder.almost-flat.css">
 
-    <link rel="stylesheet" href="../bower_components/uikit/css/components/upload.css">
-    <link rel="stylesheet" href="../bower_components/uikit/css/components/form-file.css">
+	<head>
+		<meta charset="utf-8">
+		<title>DocDev</title>
+	</head>
 
-    <link rel="stylesheet" href="../bower_components/uikit/css/components/progress.css">
+	<link rel="stylesheet" href="./css/main.css" media="screen" title="no title" charset="utf-8">
+	<link rel="stylesheet" href="bower_components/photon/dist/css/photon.css" media="screen" title="no title" charset="utf-8">
+	<link rel="stylesheet" href="../node_modules/tether/dist/css/tether.css" media="screen" title="no title" charset="utf-8">
+	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" media="screen" title="no title" charset="utf-8">
+	<link rel="stylesheet" href="bower_components/ionicons/css/ionicons.css" media="screen" title="no title" charset="utf-8">
+	<link rel="stylesheet" href="bower_components/ionicons/fonts/ionicons.ttf" media="screen" title="no title" charset="utf-8">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+	<body>
+		<div class="window">
+			<div class="header">
+				<h6>DOCDEV</h6>
+			</div>
+			<div class="window-content">
+				<div class="pane-group">
+					<div class="pane-sm sidebar">
+						<ul class="list-group container-list container-links">
+							<li class="list-group-item add-container">
+								<button type="button" name="button">
+									<span class=" icon ion-ios-plus-outline"></span>
+								</button>
+							</li>
+							<li class="list-group-item">
+								<div class="media-body">
+									<div class="col-xs-2">
+										<i class="icon ion-ios-box-outline container-icon"></i>
+									</div>
+									<div class="col-xs-10">
+										<strong>List item title</strong>
+										<p>Lorem ipsum dolor sit amet.</p>
+									</div>
+								</div>
+							</li>
+							<li class="list-group-item">
+								<div class="media-body">
+									<div class="col-xs-2">
+										<i class="icon ion-ios-box-outline container-icon"></i>
+									</div>
+									<div class="col-xs-10">
+										<strong>List item title</strong>
+										<p>Lorem ipsum dolor sit amet.</p>
+									</div>
+								</div>
+							</li>
+						</ul>
+						<ul class="list-group container-list bottom-nav">
+							<!-- <li class="list-group-item add-container-wrapper">
+								<button type="button" class="btn btn-primary-outline btn-block">Create Container</button>
+							</li> -->
+							<li class="list-group-item options">
+								<div class="col-xs-4">
 
-    <link rel="stylesheet" href="./css/main.css" media="screen" title="no title" charset="utf-8">
-  </head>
-  <body>
-    <div class="">
-      <nav class="uk-navbar window-nav">
-        <div class="uk-navbar-flip">
-          <ul class="uk-navbar-nav">
-            <li><a href="">DockDev</a></li>
-          </ul>
-        </div>
-      </nav>
-    </div>
-    <div class="uk-flex main-body">
-        <div class="box main-nav">
-          <ul class="uk-list uk-list-space">
-            <li>Codesmith</li>
-            <li>LAMDA</li>
-          </ul>
+								</div>
+								<div class="col-xs-4">
 
-        </div>
-        <div class="uk-grid tm-grid-truncate uk-margin uk-margin-left uk-margin-right uk-margin-bottom" data-uk-grid-margin="5">
-          <div class="uk-width-medium-1-1">
-            <div id="upload-drop" class="uk-placeholder">
-                Info text... <a class="uk-form-file">Select a file<input id="upload-select" type="file"></a>.
-            </div>
-              <script>
-                var holder = document.getElementById('upload-drop');
-                holder.ondragover = function () {
-                  return false;
-                };
-                holder.ondragleave = holder.ondragend = function () {
-                  return false;
-                };
-                holder.ondrop = function (e) {
-                  e.preventDefault();
-                  var file = e.dataTransfer.files[0];
-                  console.log('File you dragged here is', file.path);
-                  return false;
-                };
-              </script>
-          </div>
-          <div class="uk-width-medium-1-3 uk-row-first">
-              <div class="uk-panel uk-panel-box uk-panel-box-primary">
-                <div class="uk-thumbnail">
-                    <img src="images/mongo.svg" alt="">
-                    <div class="uk-thumbnail-caption">...</div>
-                </div>
-                  <h3 class="uk-panel-title">Title</h3>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. <code>.uk-panel-box-primary</code>
-              </div>
-          </div>
-          <div class="uk-width-medium-1-3">
-              <div class="uk-panel uk-panel-box uk-panel-box-primary">
-                  <h3 class="uk-panel-title">Title</h3>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. <code>.uk-panel-box-primary</code>
-              </div>
-          </div>
-          <div class="uk-width-medium-1-3">
-              <div class="uk-panel uk-panel-box uk-panel-box-primary">
-                  <h3 class="uk-panel-title">Title</h3>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. <code>.uk-panel-box-primary</code>
-              </div>
-          </div>
-        </div>
-    </div>
-    <script src="js/file-search.js"></script>
+								</div>
+								<div class="col-xs-4">
+									<span class="ion-ios-gear-outline"></span>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="pane">
+						<div class="container main-content">
+							<!-- <form class="form-inline pull-xs-right">
+								<input class="form-control" type="text" placeholder="Search">
+								<button class="btn btn-success-outline" type="submit">Search</button>
+							</form> -->
+							<div class="card-group main-content-card-group ">
+								<div class="card col-xs-12">
+									<!-- <img class="card-img-top" data-src="..." alt="Card image cap"> -->
+									<div class="card-block">
+										<h4 class="card-title">Card title</h4>
+										<p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+										<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+									</div>
+								</div>
+								<div class="card col-xs-12">
+									<!-- <img class="card-img-top" data-src="..." alt="Card image cap"> -->
+									<div class="card-block">
+										<h4 class="card-title">Card title</h4>
+										<p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
+										<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+									</div>
+								</div>
+								<div class="card col-xs-12">
+									<!-- <img class="card-img-top" data-src="..." alt="Card image cap"> -->
+									<div class="card-block">
+										<h4 class="card-title">Card title</h4>
+										<p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+										<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="./bower_components/jquery/dist/jquery.min.js"></script>
+	<script>
+		window.jQuery = window.$ = typeof module === 'object' ? module.exports : jQuery
 
-    <script src="../bower_components/jquery/dist/jquery.js"></script>
-    <script src="../bower_components/uikit/js/uikit.js"></script>
-    <script src="../bower_components/uikit/js/components/upload.js"></script>
+	</script>
+	<script src="../node_modules/tether/dist/js/tether.js"></script>
+	<script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
+	<script type="text/javascript" src="./src/main.js"></script>
 
-  </body>
 </html>
