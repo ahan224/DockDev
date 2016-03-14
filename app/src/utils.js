@@ -1,20 +1,24 @@
 'use strict';
 
-require('any-promise/register')('bluebird');
-import { mkdir, writeFile, readFile } from 'mz/fs';
-import { exec } from 'mz/child_process';
+import fs from 'fs';
+import child_process from 'child_process';
 import { join } from 'path';
 import Promise, { coroutine as co } from 'bluebird';
 import R from 'ramda';
 import uuid from 'node-uuid';
 
+// promisify certain callback functions
+export const mkdir = Promise.promisify(fs.mkdir);
+const writeFile = Promise.promisify(fs.writeFile);
+const readFile = Promise.promisify(fs.readFile);
+const exec = Promise.promisify(child_process.exec);
 
 /**
 * @param {object} config has project config settings
-* @param {object} config.folder is where project config details are stored
-* @param {object} config.file is file name for dockdev project config
-* @param {object} config.writeParams list the project config props that will be written to disk
-* @param {object} config.path is relative to a projects base path (i.e. user selected folder)
+* @param {string} config.folder is where project config details are stored
+* @param {string} config.file is file name for dockdev project config
+* @param {[string]} config.writeParams list the project config props that will be written to disk
+* @param {function} config.path is relative to a projects base path (i.e. user selected folder)
 */
 export const config = {
   folder: '.dockdev',
@@ -40,33 +44,9 @@ export const createConfig = (basePath, projectName) => ({
   basePath
 });
 
-// createFolder :: string -> object -> promise(object)
-// wraps mkdir in a promise and splits new folder from base path
-const createFolder = R.curry((folderName, configObj) => {
-  const path = join(configObj.basePath, folderName);
-  return new Promise((resolve, reject) => {
-    mkdir(path, err => {
-      if (err) return reject(err);
-      return resolve(configObj);
-    });
-  });
-});
-
 // createDockDev :: object -> promise(object)
 // initializes a new DockDev project by adding a .dockdev
-export const createDockDev = createFolder(config.folder);
-
-// writeFileProm :: string -> function -> object -> promise(object)
-// wraps writeFile in a promise, accepts an object and a transformation
-const writeFileProm = R.curry((fileName, transform, configObj) => {
-  const path = join(configObj.basePath, fileName);
-  return new Promise((resolve, reject) => {
-    writeFile(path, transform(configObj), err => {
-      if (err) return reject(err);
-      return resolve(configObj);
-    });
-  });
-});
+export const createDockDev = (configObj) => mkdir(join(configObj.basePath, config.folder));
 
 // cleanConfigToWrite :: object -> string
 // removes in-memory properties to write config to dockdev.json
@@ -80,22 +60,9 @@ const cleanConfigToWrite = R.compose(
 // writes the config object to the specified path
 // it will overwrite any existing file.
 // should be used with readConfig for existing projects
-export const writeConfig = writeFileProm(config.path(), cleanConfigToWrite);
-
-// readJSON :: string -> string -> promise(object)
-// wraps readFile in a promise and splits filename from base path
-// returns the config object with the basePath added
-// transform is a function that takes the JSON string and basePath
-// other transform functions can be created if they follow that structure
-const readJSON = R.curry((fileName, transform, basePath) => {
-  const path = join(basePath, fileName);
-  return new Promise((resolve, reject) => {
-    readFile(path, 'utf-8', (err, data) => {
-      if (err) return reject(err);
-      return resolve(transform(data, basePath));
-    });
-  });
-})
+export const writeConfig = (configObj) => (
+  writeFile(join(configObj.basePath, config.path()), cleanConfigToWrite(configObj))
+);
 
 // addBasePath :: string -> string -> object
 // takes a json string, parses it, and returns a new object with the basePath included
@@ -103,7 +70,10 @@ const addBasePath = (jsonObj, basePath) => R.merge(JSON.parse(jsonObj), { basePa
 
 // readConfig :: string -> promise(object)
 // given a base path it will return the parsed JSON file
-export const readConfig = readJSON(config.path(), addBasePath);
+export const readConfig = co(function *(basePath) {
+  const configFile = yield readFile(join(basePath, config.path()));
+  return addBasePath(configFile, basePath);
+})
 
 // extendConfig :: object -> object
 // accepts the existing config as first paramater
@@ -119,24 +89,18 @@ export const addConfigToMemory = R.curry((memory, configObj) => {
 
 export const addToAppMemory = addConfigToMemory(memory);
 
-// initiateProject :: string -> string -> promise(object)
+// initProject :: string -> string -> promise(object)
 // combines the sequence of functions to initiate a new projects
 // takes a path and a project name and returns the config object
-export const initiateProject = (basePath, projectName) => {
-  const configObj = createConfig(basePath, projectName);
-
-  return createDockDev(configObj)
-    .then(writeConfig)
-    .then(addToAppMemory)
-}
-
-export const initProject = Promise.coroutine(function *(basePath, projectName) {
+export const initProject = co(function *(basePath, projectName) {
   const configObj = createConfig(basePath, projectName);
 
   yield createDockDev(configObj);
   yield writeConfig(configObj);
 
-  return addToAppMemory(configObj);
+  addToAppMemory(configObj);
+
+  return configObj;
 })
 
 // cmdLine :: string -> [string] -> promise(string)

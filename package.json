@@ -13,6 +13,7 @@
   "devDependencies": {
     "babel-cli": "^6.6.5",
     "babel-plugin-transform-es2015-block-scoping": "^6.7.1",
+    "babel-plugin-transform-es2015-destructuring": "^6.6.5",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.7.0",
     "babel-plugin-transform-es2015-shorthand-properties": "^6.5.0",
     "chai": "^3.5.0",
@@ -21,10 +22,8 @@
     "rimraf": "^2.5.2"
   },
   "dependencies": {
-    "any-promise": "^1.1.0",
     "bluebird": "^3.3.3",
     "chokidar": "^1.4.3",
-    "mz": "^2.3.1",
     "node-uuid": "^1.4.7",
     "ramda": "^0.19.1"
   }
