@@ -26,9 +26,10 @@ describe('initiate new DockDev project via individual functions', () => {
 
   it('createConfig should create a config object with a unique id and project name', () => {
     configObj = utils.createConfig(basePath, projectName);
-    expect(configObj.projectName).to.equal('project1');
+    expect(configObj.projectName).to.equal(projectName);
     expect(configObj.uuid).to.be.a('string');
     expect(configObj.basePath).to.be.a('string');
+    expect(configObj.basePath).to.equal(basePath);
   })
 
   it('createDockDev should create .dockdev folder when none exists', () => {
