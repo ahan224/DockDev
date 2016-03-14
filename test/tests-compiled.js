@@ -51,11 +51,13 @@ describe('initiate new DockDev project via individual functions', () => {
 
   it('createDockDev should create .dockdev folder when none exists', () => {
     result = utils.createDockDev(configObj);
-    return result.then(data => (0, _chai.expect)(data).to.equal(configObj));
+    return result.then(() => {
+      (0, _chai.expect)((0, _fs.readdirSync)((0, _path.join)(configObj.basePath, utils.config.folder))).to.be.empty;
+    });
   });
 
   it('writeConfig should write a specified object to the configFile', () => {
-    return result.then(utils.writeConfig).then(data => (0, _fs.readFileSync)((0, _path.join)(data.basePath, '.dockdev', 'dockdev.json'))).then(_ramda2.default.toString).then(JSON.parse).then(data => (0, _chai.expect)(data).to.deep.equal(_ramda2.default.pick(utils.configWriteParams, configObj)));
+    return utils.writeConfig(configObj).then(() => (0, _fs.readFileSync)((0, _path.join)(configObj.basePath, '.dockdev', 'dockdev.json'))).then(_ramda2.default.toString).then(JSON.parse).then(data => (0, _chai.expect)(data).to.deep.equal(_ramda2.default.pick(utils.config.writeParams, configObj)));
   });
 
   it('addConfigToMemory should add the config object to the apps memory object', () => {
@@ -99,7 +101,7 @@ describe('initiate new DockDev project via initiateProject', () => {
   });
 
   it('should write the config file to dockdev.json', () => {
-    return result.then(data => (0, _fs.readFileSync)((0, _path.join)(basePath, '.dockdev', 'dockdev.json'))).then(_ramda2.default.toString).then(JSON.parse).then(data => result.then(orig => (0, _chai.expect)(_ramda2.default.pick(utils.configWriteParams, orig)).to.deep.equal(data)));
+    return result.then(() => (0, _fs.readFileSync)((0, _path.join)(basePath, '.dockdev', 'dockdev.json'))).then(_ramda2.default.toString).then(JSON.parse).then(data => result.then(orig => (0, _chai.expect)(_ramda2.default.pick(utils.config.writeParams, orig)).to.deep.equal(data)));
   });
 
   it('should add the config to app memory', () => {
@@ -129,7 +131,7 @@ describe('read and modify an existing project', () => {
     // add back the project folder
     (0, _fs.mkdirSync)(basePath);
 
-    result = utils.initiateProject(basePath, projectName);
+    result = utils.initProject(basePath, projectName);
   });
 
   // this should probably be moved to the existing project tests (project2)

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import * as utils from '../app/lib/utils.js';
 import { join } from 'path';
 import rimraf from 'rimraf';
-import { readFileSync, mkdirSync } from 'fs';
+import { readFileSync, mkdirSync, readdirSync } from 'fs';
 import R from 'ramda';
 
 describe('initiate new DockDev project via individual functions', () => {
@@ -33,16 +33,17 @@ describe('initiate new DockDev project via individual functions', () => {
 
   it('createDockDev should create .dockdev folder when none exists', () => {
     result = utils.createDockDev(configObj);
-    return result.then(data => expect(data).to.equal(configObj));
+    return result.then(() => {
+      expect(readdirSync(join(configObj.basePath, utils.config.folder))).to.be.empty;
+    });
   });
 
   it('writeConfig should write a specified object to the configFile', () => {
-    return result
-      .then(utils.writeConfig)
-      .then(data => readFileSync(join(data.basePath, '.dockdev', 'dockdev.json')))
+    return utils.writeConfig(configObj)
+      .then(() => readFileSync(join(configObj.basePath, '.dockdev', 'dockdev.json')))
       .then(R.toString)
       .then(JSON.parse)
-      .then(data => expect(data).to.deep.equal(R.pick(utils.configWriteParams, configObj)));
+      .then(data => expect(data).to.deep.equal(R.pick(utils.config.writeParams, configObj)));
   })
 
   it('addConfigToMemory should add the config object to the apps memory object', () => {
@@ -91,10 +92,10 @@ describe('initiate new DockDev project via initiateProject', () => {
 
   it('should write the config file to dockdev.json', () => {
     return result
-      .then(data => readFileSync(join(basePath, '.dockdev', 'dockdev.json')))
+      .then(() => readFileSync(join(basePath, '.dockdev', 'dockdev.json')))
       .then(R.toString)
       .then(JSON.parse)
-      .then(data => result.then(orig => expect(R.pick(utils.configWriteParams, orig)).to.deep.equal(data)))
+      .then(data => result.then(orig => expect(R.pick(utils.config.writeParams, orig)).to.deep.equal(data)))
   })
 
   it('should add the config to app memory', () => {
@@ -127,7 +128,7 @@ describe('read and modify an existing project', () => {
     // add back the project folder
     mkdirSync(basePath);
 
-    result = utils.initiateProject(basePath, projectName);
+    result = utils.initProject(basePath, projectName);
   });
 
   // this should probably be moved to the existing project tests (project2)
