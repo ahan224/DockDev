@@ -79,7 +79,7 @@ describe('initiate new DockDev project via initiateProject', () => {
   });
 
   it('should create a configObj', () => {
-    result = utils.initiateProject(basePath, projectName);
+    result = utils.initProject(basePath, projectName);
     return result
       .then(data => {
         expect(data).to.be.an('object');
@@ -103,7 +103,7 @@ describe('initiate new DockDev project via initiateProject', () => {
   })
 
   it('should fail if a project already exists', () => {
-    return utils.initiateProject(basePath, projectName)
+    return utils.initProject(basePath, projectName)
       .then(data => expect(data).to.be(undefined))
       .catch(err => expect(err.code).to.equal('EEXIST'))
   })
