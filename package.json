@@ -4,7 +4,7 @@
   "description": "docker for development",
   "main": "main.js",
   "scripts": {
-    "start": "electron main.js",
+    "start": "electron app/index.js",
     "babel:watch": "babel ./app/src -d ./app/lib --watch",
     "babel:test": "babel ./test/tests.js --watch --out-file ./test/tests-compiled.js",
     "babel": "npm run babel:test & npm run babel:watch",
@@ -23,8 +23,12 @@
   },
   "dependencies": {
     "bluebird": "^3.3.3",
+    "bootstrap": "^3.3.6",
     "chokidar": "^1.4.3",
+    "jquery": "^2.2.1",
     "node-uuid": "^1.4.7",
-    "ramda": "^0.19.1"
+    "photon": "^2.0.0",
+    "ramda": "^0.19.1",
+    "tether": "^1.2.0"
   }
 }
