@@ -1,8 +1,8 @@
 'use strict';
 
 // main.js
-import React from 'react';
-import ReactDOM from 'react-dom';
+const React = require('react');
+const ReactDOM = require('react-dom');
 
 // PARENT////////////////////////////////////
 // NOTE : The parent will be the electron Window
@@ -143,7 +143,7 @@ let BottomNavList = React.createClass({
         React.createElement(
           'button',
           { type: 'button', name: 'button', onClick: '' },
-          React.createElement('span', { className: ' icon ion-gear-a' })
+          React.createElement('img', { className: 'icon', src: './icons/Userinterface_setting-roll.svg' })
         )
       )
     );
