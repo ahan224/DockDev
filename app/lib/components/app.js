@@ -1,8 +1,8 @@
 'use strict';
 
 // main.js
-const React = require('react');
-const ReactDOM = require('react-dom');
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 // PARENT////////////////////////////////////
 // NOTE : The parent will be the electron Window
