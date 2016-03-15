@@ -105,7 +105,8 @@ let BottomNavList = React.createClass({
   return(  <ul className="list-group container-list bottom-nav">
               <li className="list-group-item add-container">
                 <button type="button" name="button" onClick="">
-                  <span className=" icon ion-gear-a"></span>
+                  <img className="icon" src="./icons/Userinterface_setting-roll.svg">
+                  </img>
                 </button>
               </li>
             </ul>)
