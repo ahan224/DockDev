@@ -4,11 +4,14 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 
+// PARENT////////////////////////////////////
+// NOTE : The parent will be the electron Window
+// /////////////////////////////////////////////
 let App = React.createClass({
   displayName: 'App',
 
   getInitialState: function () {
-    return { windowWidth: window.innerWidth };
+    return { projects: [] };
   },
   // addProject: function() {
   //   return (<li className="list-group-item project">
@@ -28,16 +31,21 @@ let App = React.createClass({
       'div',
       { className: 'pane-group' },
       React.createElement(SideMenu, null),
-      React.createElement(ProjectDetails, null),
+      React.createElement(ProjectList, null),
       console.log('react yo')
     );
   }
 });
 
+// SIDEMENU ////////////////////////////////////
+// NOTE : Ul element where the side navigation and project list will populate
+// Relationship: App > Sidemenu
+// Children: TopNavList, ProjectList, BottomNavList
+// /////////////////////////////////////////////
 let SideMenu = React.createClass({
   displayName: 'SideMenu',
 
-  handleAddProject: function () {
+  handleAddProject: function (e) {
     console.log('created project');
   },
 
@@ -45,144 +53,178 @@ let SideMenu = React.createClass({
     return React.createElement(
       'div',
       { className: 'pane-sm sidebar' },
-      React.createElement(
-        'ul',
-        { className: 'list-group container-list container-links' },
-        React.createElement(TopNav, null),
-        React.createElement(ProjectItem, null),
-        React.createElement(BottomNav, null)
-      )
+      React.createElement(TopNavList, null),
+      React.createElement(ProjectList, null),
+      React.createElement(BottomNavList, null)
     );
   }
 });
 
-let TopNav = React.createClass({
-  displayName: 'TopNav',
+let TopNavList = React.createClass({
+  displayName: 'TopNavList',
 
   render: function () {
-    return React.createElement(
-      'li',
-      { className: 'list-group-item add-container' },
-      React.createElement(
-        'button',
-        { type: 'button', name: 'button', onClick: '' },
-        React.createElement('span', { className: ' icon ion-ios-plus-outline' })
-      )
-    );
-  }
-});
 
-let ProjectItem = React.createClass({
-  displayName: 'ProjectItem',
-
-  render: function () {
     return React.createElement(
-      'li',
-      { className: 'list-group-item active-projects' },
+      'ul',
+      { className: 'list-group container-list container-links topNav' },
       React.createElement(
-        'div',
-        { className: 'media-body project' },
-        React.createElement('div', { className: 'col-xs-2' }),
+        'li',
+        { className: 'list-group-item add-container' },
         React.createElement(
-          'div',
-          { className: 'col-xs-10' },
+          'button',
+          { type: 'button', name: 'button', onClick: '' },
+          React.createElement('span', { className: ' icon ion-ios-plus-outline' })
+        )
+      )
+    );
+  }
+});
+
+// let TopNavItem = React.createClass({
+//   render: function () {
+//     return (<li className="list-group-item add-container">
+//       <button type="button" name="button" onClick="">
+//         <span className=" icon ion-ios-plus-outline"></span>
+//       </button>
+//     </li>)
+//   }
+// });
+
+let ProjectList = React.createClass({
+  displayName: 'ProjectList',
+
+  render: function () {
+
+    if (this.props.projects) {
+      var children = this.props.projects.map(x => {
+        return React.createElement(
+          'li',
+          { className: 'list-group-item active-projects' },
           React.createElement(
-            'strong',
-            null,
-            'List item title'
+            'div',
+            { className: 'media-body project' },
+            React.createElement('div', { className: 'col-xs-2' }),
+            React.createElement(
+              'div',
+              { className: 'col-xs-10' },
+              React.createElement(
+                'strong',
+                null,
+                this.props.projects.name
+              )
+            )
           )
-        )
-      )
-    );
-  }
-});
+        );
+      });
+    }
 
-let ProjectDetails = React.createClass({
-  displayName: 'ProjectDetails',
-
-  render: function () {
     return React.createElement(
-      'div',
-      { className: 'pane', id: 'main' },
-      React.createElement(
-        'div',
-        { className: 'container main-content-wrapper' },
-        React.createElement(
-          'div',
-          { className: 'card-group main-content-card-group ' },
-          React.createElement(ProjectDetailItem, null)
-        )
-      )
+      'ul',
+      { className: ' list-group container-list container-links projects' },
+      ' ',
+      children,
+      ' '
     );
   }
 });
 
-let ProjectDetailItem = React.createClass({
-  displayName: 'ProjectDetailItem',
+let BottomNavList = React.createClass({
+  displayName: 'BottomNavList',
 
   render: function () {
-    return React.createElement(
-      'div',
-      { className: 'card dependancy col-xs-12' },
-      React.createElement(
-        'div',
-        { className: 'card-block' },
-        React.createElement(
-          'h4',
-          { className: 'card-title' },
-          'Title'
-        ),
-        React.createElement(
-          'p',
-          { className: 'card-text' },
-          'This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.'
-        ),
-        React.createElement(
-          'p',
-          { className: 'card-text' },
-          React.createElement(
-            'small',
-            { className: 'text-muted' },
-            '...'
-          )
-        )
-      )
-    );
-  }
-});
 
-let BottomNav = React.createClass({
-  displayName: 'BottomNav',
-
-  render: function () {
     return React.createElement(
       'ul',
       { className: 'list-group container-list bottom-nav' },
       React.createElement(
         'li',
-        { className: 'list-group-item options' },
-        React.createElement('div', { className: 'col-xs-4' }),
-        React.createElement('div', { className: 'col-xs-4' }),
+        { className: 'list-group-item add-container' },
         React.createElement(
-          'div',
-          { className: 'col-xs-4' },
-          React.createElement(SettingsBtn, null)
+          'button',
+          { type: 'button', name: 'button', onClick: '' },
+          React.createElement('span', { className: ' icon ion-gear-a' })
         )
       )
     );
   }
 });
 
-let SettingsBtn = React.createClass({
-  displayName: 'SettingsBtn',
+// PROJECTLIST ///////////////////////////////////
+// NOTE : All active projects will be populated here
+// /////////////////////////////////////////////
+let ProjectDetailList = React.createClass({
+  displayName: 'ProjectDetailList',
 
   render: function () {
-    return React.createElement(
-      'button',
-      { type: 'button', className: 'settings-btn' },
-      React.createElement('span', { className: 'ion-ios-gear-outline' })
-    );
+    if (this.props.projects) {
+      var children = this.props.projects.map(x => {
+        return React.createElement(
+          'div',
+          { className: 'card dependancy col-xs-12' },
+          React.createElement(
+            'div',
+            { className: 'card-block' },
+            React.createElement(
+              'h4',
+              { className: 'card-title' },
+              'Title'
+            ),
+            React.createElement(
+              'p',
+              { className: 'card-text' },
+              'This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.'
+            ),
+            React.createElement(
+              'p',
+              { className: 'card-text' },
+              React.createElement(
+                'small',
+                { className: 'text-muted' },
+                '...'
+              )
+            )
+          )
+        );
+      });
+
+      return React.createElement(
+        'div',
+        { className: 'pane', id: 'main' },
+        React.createElement(
+          'div',
+          { className: 'container main-content-wrapper' },
+          React.createElement(
+            'div',
+            { className: 'card-group main-content-card-group ' },
+            children
+          )
+        )
+      );
+    } else {
+      return;
+    }
   }
 });
+
+// let ProjectDetailItem = React.createClass({
+//   render: function(){
+//     return (<div className="card dependancy col-xs-12">
+//               <div className="card-block">
+//                 <h4 className="card-title">Title</h4>
+//                 <p className="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+//                 <p className="card-text"><small className="text-muted">...</small></p>
+//               </div>
+//             </div>)
+//   }
+// });
+
+// let SettingsBtn = React.createClass({
+//   render: function(){
+//     return (<button type="button" className="settings-btn">
+//               <span className="ion-ios-gear-outline"></span>
+//             </button>)
+//   }
+// });
 
 ReactDOM.render(React.createElement(App, null), document.getElementById('main'));
