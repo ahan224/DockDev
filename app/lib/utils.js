@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.generateRsync = exports.docker = exports.rsync = exports.dockerMachine = exports.initProject = exports.addToAppMemory = exports.addConfigToMemory = exports.readConfig = exports.writeConfig = exports.createDockDev = exports.createConfig = exports.memory = exports.config = exports.mkdir = undefined;
+exports.generateRsync = exports.rsync = exports.cmdLine = exports.initProject = exports.addToAppMemory = exports.addConfigToMemory = exports.readConfig = exports.writeConfig = exports.createDockDev = exports.createConfig = exports.memory = exports.config = undefined;
 
 var _fs = require('fs');
 
@@ -30,7 +30,7 @@ var _nodeUuid2 = _interopRequireDefault(_nodeUuid);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // promisify certain callback functions
-const mkdir = exports.mkdir = _bluebird2.default.promisify(_fs2.default.mkdir);
+const mkdir = _bluebird2.default.promisify(_fs2.default.mkdir);
 const writeFile = _bluebird2.default.promisify(_fs2.default.writeFile);
 const readFile = _bluebird2.default.promisify(_fs2.default.readFile);
 const exec = _bluebird2.default.promisify(_child_process2.default.exec);
@@ -120,33 +120,14 @@ const initProject = exports.initProject = (0, _bluebird.coroutine)(function* (ba
   return configObj;
 });
 
-// cmdLine :: string -> [string] -> promise(string)
+// cmdLine :: string -> string -> promise(string)
 // returns the stdout of the command line call within a promise
-//** redesign to accept a string rather than an array
-const cmdLine = _ramda2.default.curry((cmd, args) => {
-  args = `${ cmd } ${ args.join(' ') }`;
-  return new _bluebird2.default((resolve, reject) => {
-    exec(args, (err, stdout) => {
-      if (err) reject(err);
-      resolve(stdout);
-    });
-  });
-});
+const cmdLine = exports.cmdLine = _ramda2.default.curry((cmd, args) => exec(`${ cmd } ${ args }`));
 
-// dockerMachine :: [string] -> promise(string)
-// accepts an array of cmd line args for docker-machine
-// returns a promise that resolves to the stdout
-const dockerMachine = exports.dockerMachine = cmdLine('docker-machine');
-
-// rsync :: [string] -> promise(string)
+// rsync :: string -> promise(string)
 // accepts an array of cmd line args for rsync
 // returns a promise that resolves to teh stdout
 const rsync = exports.rsync = cmdLine('rsync');
-
-// docker :: [string] -> promise(string)
-// accepts an array of cmd line args for docker-machine
-// returns a promise that resolves to the stdout
-const docker = exports.docker = cmdLine('docker');
 
 // selectWithin :: [string] -> string -> object
 // helper function to select specified props from a nested object
@@ -172,14 +153,6 @@ const createRsyncArgs = _ramda2.default.curry((source, dest, machine) => {
 // selectSSHandIP :: object -> object
 // selects ssh and ip address from docker-machine inspect object
 const selectSSHandIP = _ramda2.default.compose(selectWithin(['SSHKeyPath', 'IPAddress'], 'Driver'), JSON.parse);
-
-// const runRsync = (source, dest, machineName) => {
-//   dockerMachine(['inspect', machineName])
-//   .then(selectSSHandIP)
-//   .then(createRsyncArgs(source, dest))
-//   .then(rsync)
-//   .catch(console.log)
-// }
 
 // generateRsync :: object -> function
 // accepts a config object and returns a function that is
