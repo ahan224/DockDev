@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.generateRsync = exports.rsync = exports.cmdLine = exports.initProject = exports.addToAppMemory = exports.addConfigToMemory = exports.readConfig = exports.writeConfig = exports.createDockDev = exports.createConfig = exports.memory = exports.config = undefined;
+exports.generateRsync = exports.rsync = exports.cmdLine = exports.initProject = exports.addToAppMemory = exports.addConfigToMemory = exports.readConfig = exports.writeConfig = exports.createDockDev = exports.createConfig = exports.machines = exports.memory = exports.config = exports.exec = exports.readFile = undefined;
 
 var _fs = require('fs');
 
@@ -32,8 +32,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // promisify certain callback functions
 const mkdir = _bluebird2.default.promisify(_fs2.default.mkdir);
 const writeFile = _bluebird2.default.promisify(_fs2.default.writeFile);
-const readFile = _bluebird2.default.promisify(_fs2.default.readFile);
-const exec = _bluebird2.default.promisify(_child_process2.default.exec);
+const readFile = exports.readFile = _bluebird2.default.promisify(_fs2.default.readFile);
+const exec = exports.exec = _bluebird2.default.promisify(_child_process2.default.exec);
 
 /**
 * @param {object} config has project config settings
@@ -53,6 +53,12 @@ const config = exports.config = {
 
 // object to store all projects
 const memory = exports.memory = {};
+
+/**
+* @param {object} store machine config details
+* @param {object} props are machine names and vals are promises
+*/
+const machines = exports.machines = {};
 
 // JSONStringifyPretty :: object -> string
 // predefines JSON stringify with formatting

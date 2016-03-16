@@ -10,8 +10,8 @@ import uuid from 'node-uuid';
 // promisify certain callback functions
 const mkdir = Promise.promisify(fs.mkdir);
 const writeFile = Promise.promisify(fs.writeFile);
-const readFile = Promise.promisify(fs.readFile);
-const exec = Promise.promisify(child_process.exec);
+export const readFile = Promise.promisify(fs.readFile);
+export const exec = Promise.promisify(child_process.exec);
 
 /**
 * @param {object} config has project config settings
@@ -31,6 +31,12 @@ export const config = {
 
 // object to store all projects
 export const memory = {};
+
+/**
+* @param {object} store machine config details
+* @param {object} props are machine names and vals are promises
+*/
+export const machines = {};
 
 // JSONStringifyPretty :: object -> string
 // predefines JSON stringify with formatting
