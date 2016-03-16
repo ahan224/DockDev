@@ -2,11 +2,13 @@
 
 import rp from 'request-promise';
 import * as machine from './machine.js';
-import { coroutine as co } from 'bluebird';
-import { exec } from './utils.js';
+import Promise, { coroutine as co } from 'bluebird';
 import R from 'ramda';
+import * as child_process from 'child_process';
 
-// restart, remove, save, pull, logs, commit, search
+const exec = Promise.promisify(child_process.exec);
+
+// save, commit, search, build, archive
 
 const dockerCommands = {
   start: {
@@ -44,11 +46,18 @@ const dockerCommands = {
       return `/containers/${ this.cmd }`;
     }
   },
-  pull: {
-    cmd: 'pull',
+  restart: {
+    cmd: 'restart',
     method: 'POST',
-    uri(image) {
-      return `/images/create?fromImage=${ image }`;
+    uri(containerId) {
+      return `/containers/${ containerId }/${ cmd }`;
+    }
+  },
+  remove: {
+    cmd: '',
+    method: 'DELETE',
+    uri(containerId) {
+      return `/containers/${ containerId }?v=1&force=1`;
     }
   }
 }
@@ -69,6 +78,9 @@ export const stop = commandMaker(dockerCommands.stop);
 export const list = commandMaker(dockerCommands.list);
 export const inspect = commandMaker(dockerCommands.inspect);
 export const create = commandMaker(dockerCommands.create);
+export const restart = commandMaker(dockerCommands.restart);
+export const remove = commandMaker(dockerCommands.remove);
+
 
 export const pull = co(function *(machineName, image) {
   let env = yield machine.env(machineName);
@@ -79,6 +91,25 @@ export const pull = co(function *(machineName, image) {
   }
   return yield exec(`docker pull ${ image }`, { env });
 });
+
+export const logs = co(function *(machineName, containerId) {
+  let env = yield machine.env(machineName);
+  env = R.fromPairs(env.split('\n').slice(0, 4).map(val => val.substr(7).split('=')));
+  for (var prop in env) {
+    var len = env[prop].length - 2;
+    env[prop] = env[prop].substr(1).substr(0, len);
+  }
+  return yield exec(`docker logs ${ containerId }`, { env });
+});
+
+export const setContainerParams = (image) => ({
+  image,
+  Volumes: { '/mnt': {} }
+});
+
+// remove('default', 'f3e796d19685')
+//   .then(console.log)
+//   .catch(console.log);
 
 
 // Example POST request to create a container
