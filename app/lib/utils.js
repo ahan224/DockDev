@@ -30,10 +30,10 @@ var _nodeUuid2 = _interopRequireDefault(_nodeUuid);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // promisify certain callback functions
-const mkdir = _bluebird2.default.promisify(_fs2.default.mkdir);
-const writeFile = _bluebird2.default.promisify(_fs2.default.writeFile);
-const readFile = _bluebird2.default.promisify(_fs2.default.readFile);
-const exec = _bluebird2.default.promisify(_child_process2.default.exec);
+var mkdir = _bluebird2.default.promisify(_fs2.default.mkdir);
+var writeFile = _bluebird2.default.promisify(_fs2.default.writeFile);
+var readFile = _bluebird2.default.promisify(_fs2.default.readFile);
+var exec = _bluebird2.default.promisify(_child_process2.default.exec);
 
 /**
 * @param {object} config has project config settings
@@ -42,98 +42,145 @@ const exec = _bluebird2.default.promisify(_child_process2.default.exec);
 * @param {[string]} config.writeParams list the project config props that will be written to disk
 * @param {function} config.path is relative to a projects base path (i.e. user selected folder)
 */
-const config = exports.config = {
+var config = exports.config = {
   folder: '.dockdev',
   file: 'dockdev.json',
   writeParams: ['uuid', 'projectName'],
-  path: function () {
+  path: function path() {
     return (0, _path.join)(this.folder, this.file);
   }
 };
 
 // object to store all projects
-const memory = exports.memory = {};
+var memory = exports.memory = {};
 
 // JSONStringifyPretty :: object -> string
 // predefines JSON stringify with formatting
-const JSONStringifyPretty = obj => JSON.stringify(obj, null, 2);
+var JSONStringifyPretty = function JSONStringifyPretty(obj) {
+  return JSON.stringify(obj, null, 2);
+};
 
 // createConfig :: string -> string -> object
 // accepts a project name & basePath, returns object with uuid
-const createConfig = exports.createConfig = (basePath, projectName) => ({
-  uuid: _nodeUuid2.default.v4(),
-  projectName: projectName,
-  basePath: basePath
-});
+var createConfig = exports.createConfig = function createConfig(basePath, projectName) {
+  return {
+    uuid: _nodeUuid2.default.v4(),
+    projectName: projectName,
+    basePath: basePath
+  };
+};
 
 // createDockDev :: object -> promise(object)
 // initializes a new DockDev project by adding a .dockdev
-const createDockDev = exports.createDockDev = configObj => mkdir((0, _path.join)(configObj.basePath, config.folder));
+var createDockDev = exports.createDockDev = function createDockDev(configObj) {
+  return mkdir((0, _path.join)(configObj.basePath, config.folder));
+};
 
 // cleanConfigToWrite :: object -> string
 // removes in-memory properties to write config to dockdev.json
 // also JSON stringifies with indent formatting
-const cleanConfigToWrite = _ramda2.default.compose(JSONStringifyPretty, _ramda2.default.pick(config.writeParams));
+var cleanConfigToWrite = _ramda2.default.compose(JSONStringifyPretty, _ramda2.default.pick(config.writeParams));
 
 // writeConfig :: string -> function -> object -> promise(object)
 // writes the config object to the specified path
 // it will overwrite any existing file.
 // should be used with readConfig for existing projects
-const writeConfig = exports.writeConfig = configObj => writeFile((0, _path.join)(configObj.basePath, config.path()), cleanConfigToWrite(configObj));
+var writeConfig = exports.writeConfig = function writeConfig(configObj) {
+  return writeFile((0, _path.join)(configObj.basePath, config.path()), cleanConfigToWrite(configObj));
+};
 
 // addBasePath :: string -> string -> object
 // takes a json string, parses it, and returns a new object with the basePath included
-const addBasePath = (jsonObj, basePath) => _ramda2.default.merge(JSON.parse(jsonObj), { basePath: basePath });
+var addBasePath = function addBasePath(jsonObj, basePath) {
+  return _ramda2.default.merge(JSON.parse(jsonObj), { basePath: basePath });
+};
 
 // readConfig :: string -> promise(object)
 // given a base path it will return the parsed JSON file
-const readConfig = exports.readConfig = (0, _bluebird.coroutine)(function* (basePath) {
-  const configFile = yield readFile((0, _path.join)(basePath, config.path()));
-  return addBasePath(configFile, basePath);
-});
+var readConfig = exports.readConfig = (0, _bluebird.coroutine)(regeneratorRuntime.mark(function _callee(basePath) {
+  var configFile;
+  return regeneratorRuntime.wrap(function _callee$(_context) {
+    while (1) {
+      switch (_context.prev = _context.next) {
+        case 0:
+          _context.next = 2;
+          return readFile((0, _path.join)(basePath, config.path()));
+
+        case 2:
+          configFile = _context.sent;
+          return _context.abrupt('return', addBasePath(configFile, basePath));
+
+        case 4:
+        case 'end':
+          return _context.stop();
+      }
+    }
+  }, _callee, this);
+}));
 
 // extendConfig :: object -> object
 // accepts the existing config as first paramater
 // and merges/overwrites with the second object
-const extendConfig = _ramda2.default.merge;
+var extendConfig = _ramda2.default.merge;
 
 // addConfigToMemory :: object -> object -> object
 // adds the configObj for the project to the memory object
-const addConfigToMemory = exports.addConfigToMemory = _ramda2.default.curry((memory, configObj) => {
+var addConfigToMemory = exports.addConfigToMemory = _ramda2.default.curry(function (memory, configObj) {
   memory[configObj.uuid] = configObj;
   return configObj;
 });
 
-const addToAppMemory = exports.addToAppMemory = addConfigToMemory(memory);
+var addToAppMemory = exports.addToAppMemory = addConfigToMemory(memory);
 
 // initProject :: string -> string -> promise(object)
 // combines the sequence of functions to initiate a new projects
 // takes a path and a project name and returns the config object
-const initProject = exports.initProject = (0, _bluebird.coroutine)(function* (basePath, projectName) {
-  const configObj = createConfig(basePath, projectName);
+var initProject = exports.initProject = (0, _bluebird.coroutine)(regeneratorRuntime.mark(function _callee2(basePath, projectName) {
+  var configObj;
+  return regeneratorRuntime.wrap(function _callee2$(_context2) {
+    while (1) {
+      switch (_context2.prev = _context2.next) {
+        case 0:
+          configObj = createConfig(basePath, projectName);
+          _context2.next = 3;
+          return createDockDev(configObj);
 
-  yield createDockDev(configObj);
-  yield writeConfig(configObj);
+        case 3:
+          _context2.next = 5;
+          return writeConfig(configObj);
 
-  addToAppMemory(configObj);
+        case 5:
 
-  return configObj;
-});
+          addToAppMemory(configObj);
+
+          return _context2.abrupt('return', configObj);
+
+        case 7:
+        case 'end':
+          return _context2.stop();
+      }
+    }
+  }, _callee2, this);
+}));
 
 // cmdLine :: string -> string -> promise(string)
 // returns the stdout of the command line call within a promise
-const cmdLine = exports.cmdLine = _ramda2.default.curry((cmd, args) => exec(`${ cmd } ${ args }`));
+var cmdLine = exports.cmdLine = _ramda2.default.curry(function (cmd, args) {
+  return exec(cmd + ' ' + args);
+});
 
 // rsync :: string -> promise(string)
 // accepts an array of cmd line args for rsync
 // returns a promise that resolves to teh stdout
-const rsync = exports.rsync = cmdLine('rsync');
+var rsync = exports.rsync = cmdLine('rsync');
 
 // selectWithin :: [string] -> string -> object
 // helper function to select specified props from a nested object
-const selectWithin = _ramda2.default.curry((array, key, obj) => {
-  const result = {};
-  array.forEach(val => result[val] = obj[key][val]);
+var selectWithin = _ramda2.default.curry(function (array, key, obj) {
+  var result = {};
+  array.forEach(function (val) {
+    return result[val] = obj[key][val];
+  });
   return result;
 });
 
@@ -141,23 +188,23 @@ const selectWithin = _ramda2.default.curry((array, key, obj) => {
 // accepts source, destination, and machine info
 // returns an array of arguments for rsync
 //** this should be redesigned to output just a string
-const createRsyncArgs = _ramda2.default.curry((source, dest, machine) => {
-  const result = ['-a', '-e'];
-  result.push(`"ssh -i ${ machine.SSHKeyPath } -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"`);
+var createRsyncArgs = _ramda2.default.curry(function (source, dest, machine) {
+  var result = ['-a', '-e'];
+  result.push('"ssh -i ' + machine.SSHKeyPath + ' -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"');
   result.push('--delete');
   result.push(source);
-  result.push(`docker@${ machine.IPAddress }:${ dest }`);
+  result.push('docker@' + machine.IPAddress + ':' + dest);
   return result;
 });
 
 // selectSSHandIP :: object -> object
 // selects ssh and ip address from docker-machine inspect object
-const selectSSHandIP = _ramda2.default.compose(selectWithin(['SSHKeyPath', 'IPAddress'], 'Driver'), JSON.parse);
+var selectSSHandIP = _ramda2.default.compose(selectWithin(['SSHKeyPath', 'IPAddress'], 'Driver'), JSON.parse);
 
 // generateRsync :: object -> function
 // accepts a config object and returns a function that is
 // called when files change in the base directory of project
-const generateRsync = exports.generateRsync = config => {};
+var generateRsync = exports.generateRsync = function generateRsync(config) {};
 
 // - File watch
 //   - need ability to turnoff file watching

@@ -3,7 +3,7 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 
 // PARENT////////////////////////////////////
-// NOTE : The parent will be the electron Window
+// NOTE : The parent will be the electron Window.
 // /////////////////////////////////////////////
 let App = React.createClass({
   getInitialState: function() {
