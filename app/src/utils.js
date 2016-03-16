@@ -11,14 +11,8 @@ import * as fileSearch from '../app/lib/file-search.js';
 // promisify certain callback functions
 const mkdir = Promise.promisify(fs.mkdir);
 const writeFile = Promise.promisify(fs.writeFile);
-<<<<<<< HEAD
 const readFile = Promise.promisify(fs.readFile);
 const exec = Promise.promisify(child_process.exec);
-// const appendFile = Promise.promisify(fs.appendFile);
-=======
-export const readFile = Promise.promisify(fs.readFile);
-export const exec = Promise.promisify(child_process.exec);
->>>>>>> docker_request_api
 
 /**
 * @param {object} config has project config settings
@@ -44,18 +38,9 @@ export const config = {
   }
 }
 
-<<<<<<< HEAD
-=======
 // object to store all projects
 export const memory = {};
 
-/**
-* @param {object} store machine config details
-* @param {object} props are machine names and vals are promises
-*/
-export const machines = {};
-
->>>>>>> docker_request_api
 // JSONStringifyPretty :: object -> string
 // predefines JSON stringify with formatting
 const JSONStringifyPretty = (obj) => JSON.stringify(obj, null, 2);
