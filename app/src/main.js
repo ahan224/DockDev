@@ -2,6 +2,11 @@
 
 $(function(){
   $('.add-container button').on('click', function(){
-    alert('button clicked');
+    alert('add project clicked');
   });
+
+  $('.settings-btn').on('click', function(){
+    alert('settings toggled');
+  });
+
 });

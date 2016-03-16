@@ -1,4 +1,6 @@
 {
-  "uuid": "5cfdb5d6-a61e-4f97-8e40-abda2caee83a",
-  "projectName": "project1"
+  "uuid": "b6f6dc98-7d82-4c02-933e-661ec333f75f",
+  "projectName": "project1",
+  "containers": {},
+  "machine": "default"
 }
