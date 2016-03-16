@@ -12,99 +12,22 @@
 	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" media="screen" title="no title" charset="utf-8">
 	<link rel="stylesheet" href="bower_components/ionicons/css/ionicons.css" media="screen" title="no title" charset="utf-8">
 	<link rel="stylesheet" href="bower_components/ionicons/fonts/ionicons.ttf" media="screen" title="no title" charset="utf-8">
+	<script type="text/javascript" src="">
+
+
+	</script>
 
 	<body>
 		<div class="window">
 			<div class="header">
 				<h6>DOCDEV</h6>
 			</div>
-			<div class="window-content">
-				<div class="pane-group">
-					<div class="pane-sm sidebar">
-						<ul class="list-group container-list container-links">
-							<li class="list-group-item add-container">
-								<button type="button" name="button">
-									<span class=" icon ion-ios-plus-outline"></span>
-								</button>
-							</li>
-							<li class="list-group-item">
-								<div class="media-body">
-									<div class="col-xs-2">
-										<i class="icon ion-ios-box-outline container-icon"></i>
-									</div>
-									<div class="col-xs-10">
-										<strong>List item title</strong>
-										<p>Lorem ipsum dolor sit amet.</p>
-									</div>
-								</div>
-							</li>
-							<li class="list-group-item">
-								<div class="media-body">
-									<div class="col-xs-2">
-										<i class="icon ion-ios-box-outline container-icon"></i>
-									</div>
-									<div class="col-xs-10">
-										<strong>List item title</strong>
-										<p>Lorem ipsum dolor sit amet.</p>
-									</div>
-								</div>
-							</li>
-						</ul>
-						<ul class="list-group container-list bottom-nav">
-							<!-- <li class="list-group-item add-container-wrapper">
-								<button type="button" class="btn btn-primary-outline btn-block">Create Container</button>
-							</li> -->
-							<li class="list-group-item options">
-								<div class="col-xs-4">
-
-								</div>
-								<div class="col-xs-4">
-
-								</div>
-								<div class="col-xs-4">
-									<span class="ion-ios-gear-outline"></span>
-								</div>
-							</li>
-						</ul>
-					</div>
-					<div class="pane">
-						<div class="container main-content">
-							<!-- <form class="form-inline pull-xs-right">
-								<input class="form-control" type="text" placeholder="Search">
-								<button class="btn btn-success-outline" type="submit">Search</button>
-							</form> -->
-							<div class="card-group main-content-card-group ">
-								<div class="card col-xs-12">
-									<!-- <img class="card-img-top" data-src="..." alt="Card image cap"> -->
-									<div class="card-block">
-										<h4 class="card-title">Card title</h4>
-										<p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-										<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-									</div>
-								</div>
-								<div class="card col-xs-12">
-									<!-- <img class="card-img-top" data-src="..." alt="Card image cap"> -->
-									<div class="card-block">
-										<h4 class="card-title">Card title</h4>
-										<p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
-										<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-									</div>
-								</div>
-								<div class="card col-xs-12">
-									<!-- <img class="card-img-top" data-src="..." alt="Card image cap"> -->
-									<div class="card-block">
-										<h4 class="card-title">Card title</h4>
-										<p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
-										<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+			<div class="window-content" id="main"></div>
 		</div>
 	</body>
+	<script src="lib/build/app.js"></script>
+	<!-- <script src="lib/build/react-dom.js"></script> -->
+	<script type="text/babel" src="src/components/app.js"></script>
 	<script src="./bower_components/jquery/dist/jquery.min.js"></script>
 	<script>
 		window.jQuery = window.$ = typeof module === 'object' ? module.exports : jQuery
@@ -112,6 +35,6 @@
 	</script>
 	<script src="../node_modules/tether/dist/js/tether.js"></script>
 	<script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
-	<script type="text/javascript" src="./src/main.js"></script>
+	<!-- <script type="text/javascript" src="./src/main.js"></script> -->
 
 </html>
