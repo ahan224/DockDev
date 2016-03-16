@@ -126,6 +126,11 @@ body {
     color: #9A9A9A;
 }
 
+.bottom-nav button {
+  min-width: 35px;
+  opacity: 0.4;
+}
+
 li.list-group-item:active, .btn-primary-outline:focus, .btn-primary-outline.focus, .btn-primary-outline:active, .btn-primary-outline.active, .open > .btn-primary-outline.dropdown-toggle, button:active, button:visited, button:focus, span:active, span:focus, span:visited, span:before {
   outline: none!important;
 }

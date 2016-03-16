@@ -1,6 +1,6 @@
 'use strict';
 
-const Promise = require('bluebird');
+var Promise = require('bluebird');
 
 // TEST 1 -- confirm that promises will queue calls prior to resolution
 // expect 100, 10, 11, 12, 13, 1, 2, 3, 4, 5, 1000, 2000
