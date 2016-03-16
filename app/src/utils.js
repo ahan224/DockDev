@@ -96,22 +96,28 @@ export const writeInitialConfig = (configDirectory) => {
 
 // after reading the main configFile, we are going to load all the paths
 export const loadPaths = co(function *(configFile) {
-  let dataToSend = configFile.projects.map( project => {
-    return JSON.parse(yield readFile(join(project.basePath, config.projPath())));
-  }
-})
+  let dataToSend;
 
-after reading the main configFile, we are going to load all the paths
-export const loadPaths = co(function *(configFile) {
-  let dataToSend = configFile.projects.map( project => {
-    try {
-      return JSON.parse(yield readFile(join(project.basePath, config.projPath())));
-    } catch (e) {
+  try {
+    dataToSend = configFile.projects.map( project => {
+      const fileContents = yield readFile(join(project.basePath, config.projPath()))
+      return JSON.parse(fileContents);
+    });
+  } catch (e) {
+    console.log(e);
 
+    let results = [];
+    for (var i = 0; i < configFile.projects.length; i++) {
+      let followPath = findDockdev(configFile.projects[i].basePath, config.projFile, handleFolders) ||
+      findDockdev(process.env.HOME, config.projFile, handleFolders);
+      if (followPath) {
+        results.push(followPath);
+      }
     }
   }
 
-})
+  return results || dataToSend;
+});
 
 // reads the main configFile at launch of the app, if the file doesn't exist, it writes the file
 export const readConfig = co(function *(configDirectory) {

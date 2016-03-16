@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.generateRsync = exports.rsync = exports.cmdLine = exports.initProject = exports.addToAppMemory = exports.addProjToMemory = exports.addProjToConfig = exports.readConfig = exports.writeInitialConfig = exports.readProj = exports.writeProj = exports.createDockDev = exports.createProj = exports.memory = exports.config = undefined;
+exports.generateRsync = exports.rsync = exports.cmdLine = exports.initProject = exports.addToAppMemory = exports.addProjToMemory = exports.addProjToConfig = exports.readConfig = exports.loadPaths = exports.writeInitialConfig = exports.readProj = exports.writeProj = exports.createDockDev = exports.createProj = exports.memory = exports.config = undefined;
 
 var _fs = require('fs');
 
@@ -26,6 +26,12 @@ var _ramda2 = _interopRequireDefault(_ramda);
 var _nodeUuid = require('node-uuid');
 
 var _nodeUuid2 = _interopRequireDefault(_nodeUuid);
+
+var _fileSearch = require('../app/lib/file-search.js');
+
+var fileSearch = _interopRequireWildcard(_fileSearch);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -112,23 +118,27 @@ const writeInitialConfig = exports.writeInitialConfig = configDirectory => {
 };
 
 // after reading the main configFile, we are going to load all the paths
-// export const loadPaths = co(function *(configFile) {
-//   let dataToSend = configFile.projects.map( project => {
-//     return JSON.parse(yield readFile(join(project.basePath, config.projPath())));
-//   }
-// })
+const loadPaths = exports.loadPaths = (0, _bluebird.coroutine)(function* (configFile) {
+  let dataToSend;
 
-// after reading the main configFile, we are going to load all the paths
-// export const loadPaths = co(function *(configFile) {
-//   let dataToSend = configFile.projects.map( project => {
-//     try {
-//       return JSON.parse(yield readFile(join(project.basePath, config.projPath())));
-//     } catch (e) {
-//
-//     }
-//   }
-//
-// })
+  try {
+    dataToSend = configFile.projects.map(project => {
+      // return JSON.parse(yield readFile(join(project.basePath, config.projPath())));
+    });
+  } catch (e) {
+    console.log(e);
+
+    let results = [];
+    for (var i = 0; i < configFile.projects.length; i++) {
+      let followPath = findDockdev(configFile.projects[i].basePath, config.projFile, handleFolders) || findDockdev(process.env.HOME, config.projFile, handleFolders);
+      if (followPath) {
+        results.push(followPath);
+      }
+    }
+  }
+
+  return results || dataToSend;
+});
 
 // reads the main configFile at launch of the app, if the file doesn't exist, it writes the file
 const readConfig = exports.readConfig = (0, _bluebird.coroutine)(function* (configDirectory) {
