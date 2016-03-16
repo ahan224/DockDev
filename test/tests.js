@@ -141,7 +141,54 @@ describe('read and modify an existing project', () => {
 
 })
 
-describe('find our target files in specified directory', () => {
+// describe('find our target files in specified directory', () => {
+//
+//
+// })
 
 
+describe('add and modify containers within a project', () => {
+  const projectName = 'project4'
+  const basePath = join(__dirname, 'userFolder', projectName);
+  const dockDevPath = join(basePath, '.dockdev');
+  const image = 'node';
+  let result;
+  let containerId;
+
+  before(() => {
+    // make sure there is a userFolder
+    try { mkdirSync(join(__dirname, 'userFolder')) }
+    catch (e) {}
+
+    // remove project projFolder if it exists
+    rimraf.sync(basePath);
+
+    // add back the project projFolder
+    mkdirSync(basePath);
+
+    result = utils.initProject(basePath, projectName);
+  });
+
+  it('should add a container to the project', () => {
+    return result
+      .then(data => utils.addContainer(data, image))
+      .then(id => {
+        containerId = id;
+        expect(containerId).to.not.equal(undefined);
+        result.then(data => {
+          console.log(data);
+          expect(data.containers[containerId].image).to.equal(image);
+          expect(data.containers[containerId].containerId).to.equal(containerId);
+        })
+      });
+  })
+
+  it('should delete a container from a project', () => {
+    return result
+      .then(data => utils.removeContainer(data, containerId))
+      .then(data => {
+        expect(data).to.equal(true);
+        expect(data.containers).to.be.empty;
+      })
+  })
 })
