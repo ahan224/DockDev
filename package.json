@@ -7,7 +7,7 @@
     "start": "electron app/index.js",
     "babel:watch": "babel ./app/src -d ./app/lib --watch",
     "babel:test": "babel ./test/tests.js --watch --out-file ./test/tests-compiled.js",
-    "babel": "npm run babel:test & npm run babel:watch",
+    "babel": "npm run babel:test & npm run babel:watch & babel:react",
     "test": "mocha \"./test/tests-compiled.js\""
   },
   "devDependencies": {
@@ -16,6 +16,8 @@
     "babel-plugin-transform-es2015-destructuring": "^6.6.5",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.7.0",
     "babel-plugin-transform-es2015-shorthand-properties": "^6.5.0",
+    "babel-preset-react": "^6.5.0",
+    "babelify": "^7.2.0",
     "chai": "^3.5.0",
     "electron-prebuilt": "^0.36.0",
     "mocha": "^2.4.5",
@@ -24,11 +26,14 @@
   "dependencies": {
     "bluebird": "^3.3.3",
     "bootstrap": "^3.3.6",
+    "bower": "^1.7.7",
     "chokidar": "^1.4.3",
     "jquery": "^2.2.1",
     "node-uuid": "^1.4.7",
     "photon": "^2.0.0",
     "ramda": "^0.19.1",
+    "react": "^0.14.7",
+    "react-dom": "^0.14.7",
     "tether": "^1.2.0"
   }
 }
