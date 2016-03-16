@@ -4,6 +4,7 @@ import { join } from 'path';
 import rimraf from 'rimraf';
 import { readFileSync, mkdirSync, readdirSync } from 'fs';
 import R from 'ramda';
+import * as rsync from './rsync.js';
 
 describe('initiate new DockDev project via individual functions', () => {
   const projectName = 'project1'
@@ -176,7 +177,6 @@ describe('add and modify containers within a project', () => {
         containerId = id;
         expect(containerId).to.not.equal(undefined);
         result.then(data => {
-          console.log(data);
           expect(data.containers[containerId].image).to.equal(image);
           expect(data.containers[containerId].containerId).to.equal(containerId);
         })
@@ -190,5 +190,37 @@ describe('add and modify containers within a project', () => {
         expect(data).to.equal(true);
         expect(data.containers).to.be.empty;
       })
+  })
+})
+
+
+describe('should sync files to docker machine', () => {
+  const projectName = 'project5'
+  const basePath = join(__dirname, 'userFolder', projectName);
+  const dockDevPath = join(basePath, '.dockdev');
+  const image = 'node';
+  let result;
+  let containerId;
+
+  before(() => {
+    // make sure there is a userFolder
+    try { mkdirSync(join(__dirname, 'userFolder')) }
+    catch (e) {}
+
+    // remove project projFolder if it exists
+    rimraf.sync(basePath);
+
+    // add back the project projFolder
+    mkdirSync(basePath);
+
+    containerId = utils.initProject(basePath, projectName)
+      .then(data => {
+        result = data;
+        return utils.addContainer(data, image)
+      })
+  });
+
+  it('should create an specific rsync function using closure', () => {
+
   })
 })
