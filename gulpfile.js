@@ -19,9 +19,9 @@ gulp.task('default', () => {
 
 gulp.task('react', () => {
 	return gulp.src('app/src/components/*.js')
-    .pipe(watch('app/src/components/*.js'))
+    // .pipe(watch('app/src/components/*.js'))
     .pipe(babel( {presets: ['react','es2015']} ))
-		.pipe(gulp.dest('app/lib/build'));
+		.pipe(gulp.dest('app/lib/components'));
 });
 
 gulp.task('test', () => {
