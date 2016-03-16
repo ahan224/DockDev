@@ -165,8 +165,10 @@ export const cmdLine = R.curry((cmd, args) => exec(`${ cmd } ${ args }`));
 export const addContainer = co(function *(projObj, image) {
   const containerConfig = container.setContainerParams(image);
   const containerId = (yield container.create(projObj.machine, containerConfig)).Id;
-  const dest = (yield container.inspect(projObj.machine, containerId)).Mounts[0].Source;
-  projObj.containers[containerId] = {image, containerId, dest};
+  const inspectContainer = yield container.inspect(projObj.machine, containerId)
+  const dest = inspectContainer.Mounts[0].Source;
+  const name = inspectContainer.Name.substr(1);
+  projObj.containers[containerId] = {image, containerId, name, dest, sync: true};
   return containerId;
 });
 
