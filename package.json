@@ -32,12 +32,9 @@
     "node-uuid": "^1.4.7",
     "photon": "^2.0.0",
     "ramda": "^0.19.1",
-<<<<<<< HEAD
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
-=======
     "request-promise": "^2.0.1",
->>>>>>> docker_request_api
     "tether": "^1.2.0"
   }
 }

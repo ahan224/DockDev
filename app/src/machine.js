@@ -1,8 +1,13 @@
 'use strict';
 
-import { spawn } from 'fs';
-import { cmdLine, machines, readFile } from './utils.js';
-import { coroutine as co } from 'bluebird';
+import fs from 'fs';
+import child_process from 'child_process';
+import Promise, { coroutine as co } from 'bluebird';
+import R from 'ramda';
+
+const readFile = Promise.promisify(fs.readFile);
+const execProm = Promise.promisify(child_process.exec);
+const cmdLine = R.curry((cmd, args) => execProm(`${ cmd } ${ args }`));
 
 // dockerMachine :: string -> promise(string)
 // accepts an array of cmd line args for docker-machine
@@ -34,14 +39,14 @@ export const config = co(function *(machineName) {
 
 // creates a Droplet on DigitalOcean
 //** promisify this function
-const createDroplet = (accessToken, dropletName) => {
- dropletName = "test9";
- accessToken = 'eedf80c21a790ed8328a1f64447a2b239ba98c8137051a362b8bee89530968a7';
- return spawn('docker-machine', ['create', '--driver', 'digitalocean', '--digitalocean-access-token', accessToken, dropletName]);
-}
-
-// also stops a Droplet on digitalocean
-const stopMachine = machineName => dockerMachine(`stop ${ machineName }`);
-
-// also removes a Droplet on DigitalOcean
-const removeMachine = machineName => dockerMachine(`rm -y ${ machineName }`);
+// const createDroplet = (accessToken, dropletName) => {
+//  dropletName = "test9";
+//  accessToken = 'eedf80c21a790ed8328a1f64447a2b239ba98c8137051a362b8bee89530968a7';
+//  return spawn('docker-machine', ['create', '--driver', 'digitalocean', '--digitalocean-access-token', accessToken, dropletName]);
+// }
+//
+// // also stops a Droplet on digitalocean
+// const stopMachine = machineName => dockerMachine(`stop ${ machineName }`);
+//
+// // also removes a Droplet on DigitalOcean
+// const removeMachine = machineName => dockerMachine(`rm -y ${ machineName }`);
