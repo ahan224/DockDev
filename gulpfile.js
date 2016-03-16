@@ -23,10 +23,15 @@ gulp.task('react', () => {
 		.pipe(gulp.dest('app/lib/build'));
 });
 
+gulp.task('test', () => {
+  return gulp.src('test/tests.js')
+  .pipe(babel( {presets: ['es2015']} ))
+  .pipe(gulp.dest('test/lib'));
+});
+
  // "scripts": {
  //   "start": "electron app/index.js",
  //   "babel:watch": "babel ./app/src -d ./app/lib --watch",
- //   "babel:test": "babel ./test/tests.js --watch --out-file ./test/tests-compiled.js",
  //   "babel": "npm run babel:test & npm run babel:watch & babel:react",
  //   "test": "mocha \"./test/tests-compiled.js\""
  // },
