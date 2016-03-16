@@ -7,7 +7,7 @@
     "start": "electron app/index.js",
     "babel:watch": "babel ./app/src -d ./app/lib --watch",
     "babel:test": "babel ./test/tests.js --watch --out-file ./test/tests-compiled.js",
-    "babel": "npm run babel:test & npm run babel:watch & babel:react",
+    "babel": "npm run babel:test & npm run babel:watch",
     "test": "mocha \"./test/tests-compiled.js\""
   },
   "devDependencies": {

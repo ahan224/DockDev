@@ -163,10 +163,12 @@ export const cmdLine = R.curry((cmd, args) => exec(`${ cmd } ${ args }`));
 // need to think about how to pick a default machine
 // for now it is hardcoded to 'default' but shouldnt be
 export const addContainer = co(function *(projObj, image) {
-  const containerConfig = container.setContainerParams(image);
+  const containerConfig = container.setContainerParams(image, projObj);
   const containerId = (yield container.create(projObj.machine, containerConfig)).Id;
-  const dest = (yield container.inspect(projObj.machine, containerId)).Mounts[0].Source;
-  projObj.containers[containerId] = {image, containerId, dest};
+  const inspectContainer = yield container.inspect(projObj.machine, containerId)
+  const dest = inspectContainer.Mounts[0].Source;
+  const name = inspectContainer.Name.substr(1);
+  projObj.containers[containerId] = {image, containerId, name, dest, sync: true};
   return containerId;
 });
 

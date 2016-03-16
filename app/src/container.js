@@ -102,9 +102,12 @@ export const logs = co(function *(machineName, containerId) {
   return yield exec(`docker logs ${ containerId }`, { env });
 });
 
-export const setContainerParams = (image) => ({
+export const setContainerParams = (image, projObj) => ({
   image,
-  Volumes: { '/mnt': {} }
+  // Volumes: { '/mnt': {} }
+  HostConfig: {
+    Binds: [`/home/docker/dockdev/${ projObj.uuid }:/app`]
+  }
 });
 
 // remove('default', 'f3e796d19685')

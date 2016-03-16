@@ -22,6 +22,8 @@ export const inspect = (machineName) => exec(`inspect ${ machineName }`);
 
 export const env = (machineName) => exec(`env ${ machineName }`);
 
+export const ssh = (machineName, args) => exec(`ssh ${ machineName } ${ args }`);
+
 /**
 * config :: string -> promise(object)
 * accepts a machine name and returns the parsed config results
