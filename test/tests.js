@@ -10,50 +10,50 @@ describe('initiate new DockDev project via individual functions', () => {
   const basePath = join(__dirname, 'userFolder', projectName);
   const dockDevPath = join(basePath, '.dockdev');
   let result;
-  let configObj;
+  let projObj;
 
   before(() => {
     // make sure there is a userFolder
     try { mkdirSync(join(__dirname, 'userFolder')) }
     catch (e) {}
 
-    // remove project folder if it exists
+    // remove project projFolder if it exists
     rimraf.sync(basePath);
 
-    // add back the project folder
+    // add back the project projFolder
     mkdirSync(basePath);
   });
 
-  it('createConfig should create a config object with a unique id and project name', () => {
-    configObj = utils.createConfig(basePath, projectName);
-    expect(configObj.projectName).to.equal(projectName);
-    expect(configObj.uuid).to.be.a('string');
-    expect(configObj.basePath).to.be.a('string');
-    expect(configObj.basePath).to.equal(basePath);
+  it('createProj should create a config object with a unique id and project name', () => {
+    projObj = utils.createProj(basePath, projectName);
+    expect(projObj.projectName).to.equal(projectName);
+    expect(projObj.uuid).to.be.a('string');
+    expect(projObj.basePath).to.be.a('string');
+    expect(projObj.basePath).to.equal(basePath);
   })
 
-  it('createDockDev should create .dockdev folder when none exists', () => {
-    result = utils.createDockDev(configObj);
+  it('createDockDev should create .dockdev projFolder when none exists', () => {
+    result = utils.createDockDev(projObj);
     return result.then(() => {
-      expect(readdirSync(join(configObj.basePath, utils.config.folder))).to.be.empty;
+      expect(readdirSync(join(projObj.basePath, utils.config.projFolder))).to.be.empty;
     });
   });
 
-  it('writeConfig should write a specified object to the configFile', () => {
-    return utils.writeConfig(configObj)
-      .then(() => readFileSync(join(configObj.basePath, '.dockdev', 'dockdev.json')))
+  it('writeProj should write a specified object to the configFile', () => {
+    return utils.writeProj(projObj)
+      .then(() => readFileSync(join(projObj.basePath, '.dockdev', 'dockdev.json')))
       .then(R.toString)
       .then(JSON.parse)
-      .then(data => expect(data).to.deep.equal(R.pick(utils.config.writeParams, configObj)));
+      .then(data => expect(data).to.deep.equal(R.pick(utils.config.projWriteParams, projObj)));
   })
 
-  it('addConfigToMemory should add the config object to the apps memory object', () => {
-    utils.addConfigToMemory(utils.memory, configObj);
-    expect(utils.memory[configObj.uuid]).to.equal(configObj);
+  it('addProjToMemory should add the config object to the apps memory object', () => {
+    utils.addProjToMemory(utils.memory, projObj);
+    expect(utils.memory[projObj.uuid]).to.equal(projObj);
   })
 
-  it('createDockDev should fail when the folder already exists', () => {
-    const tryAgain = utils.createDockDev(configObj);
+  it('createDockDev should fail when the projFolder already exists', () => {
+    const tryAgain = utils.createDockDev(projObj);
     return tryAgain
     .then(
       data => expect(data).to.equal(undefined),
@@ -73,14 +73,14 @@ describe('initiate new DockDev project via initiateProject', () => {
     try { mkdirSync(join(__dirname, 'userFolder')) }
     catch (e) {}
 
-    // remove project folder if it exists
+    // remove project projFolder if it exists
     rimraf.sync(basePath);
 
-    // add back the project folder
+    // add back the project projFolder
     mkdirSync(basePath);
   });
 
-  it('should create a configObj', () => {
+  it('should create a projObj', () => {
     result = utils.initProject(basePath, projectName);
     return result
       .then(data => {
@@ -96,7 +96,7 @@ describe('initiate new DockDev project via initiateProject', () => {
       .then(() => readFileSync(join(basePath, '.dockdev', 'dockdev.json')))
       .then(R.toString)
       .then(JSON.parse)
-      .then(data => result.then(orig => expect(R.pick(utils.config.writeParams, orig)).to.deep.equal(data)))
+      .then(data => result.then(orig => expect(R.pick(utils.config.projWriteParams, orig)).to.deep.equal(data)))
   })
 
   it('should add the config to app memory', () => {
@@ -123,20 +123,25 @@ describe('read and modify an existing project', () => {
     try { mkdirSync(join(__dirname, 'userFolder')) }
     catch (e) {}
 
-    // remove project folder if it exists
+    // remove project projFolder if it exists
     rimraf.sync(basePath);
 
-    // add back the project folder
+    // add back the project projFolder
     mkdirSync(basePath);
 
     result = utils.initProject(basePath, projectName);
   });
 
   // this should probably be moved to the existing project tests (project2)
-  it('readConfig should read an existing config file returning an object', () => {
+  it('readProj should read an existing config file returning an object', () => {
     return result
-    .then(data => utils.readConfig(data.basePath))
+    .then(data => utils.readProj(data.basePath))
     .then(data => result.then(orig => expect(data).to.deep.equal(orig)))
   })
+
+})
+
+describe('find our target files in specified directory', () => {
+
 
 })
