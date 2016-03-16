@@ -18,7 +18,7 @@ function handleFolders(data) {
   console.log(data.toString(), Date.now())
 }
 
-findDockdev('/Users/dbschwartz83/DockDev/', 'index.html', handleFolders)
+// findDockdev('/Users/dbschwartz83/DockDev/', 'index.html', handleFolders)
 // .then(console.log)
 // .catch(console.log);
 //.stdout.on('data', data => console.log(data.toString()));
