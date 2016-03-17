@@ -23,10 +23,7 @@ var path = require('path');
 // PARENT////////////////////////////////////
 // NOTE : The parent will be the electron Window.
 // /////////////////////////////////////////////
-let App = React.createClass({
-  getInitialState: function() {
-    return {projects: []};
-  },
+var App = React.createClass({
   // addProject: function() {
   //   return (<li className="list-group-item project">
   //             <div className="media-body">
@@ -39,12 +36,20 @@ let App = React.createClass({
   //             </div>
   //           </li>);
   // }
+  getInitialState: function() {
+    return {
+      projects: ['test'],
+      words: 'hello-world'
+    };
+  },
 
   render: function(){
     return(<div className="pane-group">
-    					<SideMenu/>
-              <ProjectList/>
-              {console.log('react yo')}
+    					<SideMenu projects={this.state}/>
+              <ProjectList />
+              <ProjectDetailList projects={this.state.projects}/>
+              //  {console.log(this.state.projects)}
+
     			 </div>)
   }
 });
@@ -55,7 +60,7 @@ let App = React.createClass({
 // Relationship: App > Sidemenu
 // Children: TopNavList, ProjectList, BottomNavList
 // /////////////////////////////////////////////
-let SideMenu = React.createClass({
+var SideMenu = React.createClass({
   handleAddProject: function(e){
     console.log('created project');
   },
@@ -64,7 +69,7 @@ let SideMenu = React.createClass({
     return (
        <div className="pane-sm sidebar">
          <TopNavList/>
-         <ProjectList/>
+         <ProjectList projects={this.props.projects}/>
          <BottomNavList/>
        </div>
     )
@@ -72,7 +77,7 @@ let SideMenu = React.createClass({
 });
 
 
-let TopNavList = React.createClass({
+var TopNavList = React.createClass({
   //  handleClick: function(e){
   //   return  swal({
   //       title: "An input!",
@@ -109,46 +114,68 @@ let TopNavList = React.createClass({
   }
 });
 
-let ProjectList = React.createClass({
+var ProjectList = React.createClass({
   render: function () {
-    if (this.props.projects) {
-      var children = this.props.projects.map((x)=> {
-            return <li className="list-group-item active-projects">
-            <div className="media-body project">
-            <div className="col-xs-2">
-            </div>
-            <div className="col-xs-10">
-            <strong>{this.props.projects.name}</strong>
-          </div>
-          </div>
-          </li>
+    console.log(this.props.projects);
+    if (this.props) {
+      var children = this.props.map((x)=> {
+            return
+              <div>
+                <li className="list-group-item active-projects" key={x}>
+                  <div className="media-body project">
+                    <div className="col-xs-2">
+                    </div>
+                    <div className="col-xs-10">
+                      <strong>{this.props.projects.name}</strong>
+                    </div>
+                  </div>
+                </li>
+              </div>
         });
+        return (
+          <div>
+            <ul className=" list-group container-list container-links projects">
+              {children}
+            </ul>
+          </div>)
     }
-
-    return ( <ul className=" list-group container-list container-links projects"> {children} </ul> )
+    else {
+      return (<div><h2>;alsdkjf</h2></div>);
+    }
   }
 });
 
-let BottomNavList = React.createClass({
+var BottomNavList = React.createClass({
   render: function(){
-      return(  <ul className="list-group container-list bottom-nav">
-                  <li className="list-group-item add-container">
-                    <button type="button" name="button" onClick="">
-                      <img className="icon" src="./icons/Userinterface_setting-roll.svg">
-                      </img>
-                    </button>
-                  </li>
-                </ul>)
+      return(
+               <div>
+                 <ul className="list-group container-list bottom-nav">
+                   <li className="list-group-item add-container">
+                     <button type="button" name="button" onClick="">
+                       <img className="icon" src="./icons/Userinterface_setting-roll.svg">
+                       </img>
+                     </button>
+                   </li>
+                 </ul>
+
+               </div>)
             }
 });
 
 // PROJECTLIST ///////////////////////////////////
 // NOTE : All active projects will be populated here
 // /////////////////////////////////////////////
-let ProjectDetailList = React.createClass({
+var ProjectDetailList = React.createClass({
+
+  handleClick: function(e){
+    console.log('running');
+    return console.log(e);
+  },
+
   render: function(){
-    if (this.props.projects) {
-      var children = this.props.projects.map((x)=> {
+    console.log('am i here');
+    if (this.props.proj.length) {
+      var children = this.props.proj.map((x)=> {
         return (<div className="card dependancy col-xs-12">
                 <div className="card-block">
                 <h4 className="card-title">Title</h4>
@@ -158,17 +185,26 @@ let ProjectDetailList = React.createClass({
           </div>)
         });
 
-        return (<div className="pane" id="main">
-                  <div className="container main-content-wrapper">
-                    <div className="card-group main-content-card-group ">
-                    { children }
-
-                    </div>
-                  </div>
-                </div>)
+        return (
+          <div className="card dependancy col-xs-12">
+                  <div className="card-block">
+                  <h4 className="card-title">Title</h4>
+                <p className="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+              <p className="card-text"><small className="text-muted">...</small></p>
+            </div>
+            </div>
+          )
     }
     else {
-      return
+      return (
+        <div className="pane" id="main">
+          <div className="container main-content-wrapper">
+            <div className="card-group main-content-card-group ">
+            <button id="openFile" onClick="openFile()">Open</button>
+            <button id="saveFile" onClick={this.handleClick}>Savafasdfe</button>
+            </div>
+          </div>
+        </div>)
     }
 
   }

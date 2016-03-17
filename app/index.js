@@ -1,12 +1,12 @@
-'use strict';
+'use-strict';
+
 const electron = require('electron');
 const app = electron.app;
 const ipcMain = require('electron').ipcMain;
 const dialog = require('electron').dialog;
+const utils = require('./lib/utils.js');
 
 const BrowserWindow = electron.BrowserWindow;
-
-
 global.ipcRenderer = require('electron').ipcRenderer;
 
 var mainWindow = null;
@@ -18,6 +18,9 @@ var mainWindow = null;
 app.on('ready', function(){
   mainWindow = new BrowserWindow({width:750,height:550, titleBarStyle: "hidden-inset"});
   mainWindow.loadURL('file://' + __dirname + '/index.html');
+
+  utils.readConfig(process.env.HOME)
+    .catch(console.log);
 
   mainWindow.webContents.openDevTools();
   mainWindow.on('close', function () {
@@ -31,8 +34,7 @@ app.on('ready', function(){
 // });
 
 ipcMain.on('synchronous-message', function(event, arg) {
-
   dialog.showOpenDialog({ properties: [ 'openDirectory']});
-  console.log(arg);  // prints "ping"
-  event.returnValue = 'pong';
+  event.returnValue = event;
+  // event.returnValue = 'pong';
 });

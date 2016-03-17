@@ -13,6 +13,8 @@
 	<link rel="stylesheet" href="bower_components/ionicons/css/ionicons.css" media="screen" title="no title" charset="utf-8">
 	<link rel="stylesheet" href="bower_components/ionicons/fonts/ionicons.ttf" media="screen" title="no title" charset="utf-8">
 	<link rel="stylesheet" type="text/css" href="../node_modules/sweetalert2/dist/sweetalert2.css">
+	<script type="text/javascript" src="../node_modules/regenerator/runtime.js"></script>
+
 
 	<body>
 		<div class="window">
@@ -20,12 +22,12 @@
 				<h6>DOCDEV</h6>
 			</div>
 			<div class="window-content" id="main"></div>
-			<button id="openFile" onclick="openFile();">Open</button>
+			<!--<button id="openFile" onclick="openFile();">Open</button>
 			<button id="saveFile">Save</button>
 			<br />
 			<br />
-			<textarea id="editor" style="width: 400px; height: 300px;"></textarea>
-			<script>
+			<textarea id="editor" style="width: 400px; height: 300px;"></textarea> -->
+			<!-- <script>
 				var remote = require('remote');
 				var dialog = remote.require('dialog');
 				var fs = require('fs');
@@ -38,22 +40,22 @@
 					}));
 				}
 
-				// function openFile() {
-				// 	dialog.showOpenDialog(function(fileNames) {
-				// 		if (fileNames === undefined) return;
-				// 		var fileName = fileNames[0];
-				// 		fs.readFile(fileName, 'utf-8', function(err, data) {
-				// 			document.getElementById("editor").value = data;
-				// 		});
-				// 	});
-				// }
+				function openFile() {
+					dialog.showOpenDialog(function(fileNames) {
+						if (fileNames === undefined) return;
+						var fileName = fileNames[0];
+						fs.readFile(fileName, 'utf-8', function(err, data) {
+							document.getElementById("editor").value = data;
+						});
+					});
+				}
 
-			</script>
+			</script> -->
 		</div>
 	</body>
 	<script src="lib/components/app.js"></script>
 	<!-- <script src="lib/build/react-dom.js"></script> -->
-	<script type="text/babel" src="src/components/app.js"></script>
+	<!-- <script type="text/babel" src="src/components/app.js"></script> -->
 	<script src="./bower_components/jquery/dist/jquery.min.js"></script>
 	<script>
 		window.jQuery = window.$ = typeof module === 'object' ? module.exports : jQuery

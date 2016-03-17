@@ -2,5 +2,4 @@ node_modules
 bower_components
 .DS_Store
 /app/lib
-/test/tests-compiled.js
 /test/userFolder
