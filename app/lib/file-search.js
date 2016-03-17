@@ -1,12 +1,3 @@
-'use strict';
-
-var _child_process = require('child_process');
-
-var _bluebird = require('bluebird');
-
-var _bluebird2 = _interopRequireDefault(_bluebird);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // const spawn = Promise.promisify(child_process.spawn);
 
@@ -16,17 +7,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //   return find(`-name ${ folder_name }`);
 // }
 
-const findDockdev = (base_folder, target, cb) => {
-  const find = (0, _child_process.spawn)('find', [base_folder, '-name', target]);
-  find.stdout.on('data', cb);
-  find.stderr.on('data', cb);
-};
-
-function handleFolders(data) {
-  console.log(data.toString(), Date.now());
-}
-
-// findDockdev('/Users/dbschwartz83/DockDev/', 'index.html', handleFolders)
 // .then(console.log)
 // .catch(console.log);
 //.stdout.on('data', data => console.log(data.toString()));
@@ -131,3 +111,4 @@ function handleFolders(data) {
 // }));
 //
 // console.log(__dirname);
+"use strict";
