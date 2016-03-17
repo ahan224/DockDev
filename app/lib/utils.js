@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.removeContainer = exports.addContainer = exports.cmdLine = exports.initProject = exports.addToAppMemory = exports.addProjToMemory = exports.addProjToConfig = exports.readConfig = exports.writeInitialConfig = exports.readProj = exports.writeProj = exports.createDockDev = exports.createProj = exports.memory = exports.config = exports.exec = exports.readFile = exports.writeFile = exports.mkdir = undefined;
+exports.removeContainer = exports.addContainer = exports.cmdLine = exports.initProject = exports.addToAppMemory = exports.addProjToMemory = exports.addProjToConfig = exports.readConfig = exports.loadPaths = exports.writeInitialConfig = exports.readProj = exports.writeProj = exports.createDockDev = exports.createProj = exports.memory = exports.config = exports.exec = exports.readFile = exports.writeFile = exports.mkdir = undefined;
 
 var _fs = require('fs');
 
@@ -30,6 +30,10 @@ var _nodeUuid2 = _interopRequireDefault(_nodeUuid);
 var _container = require('./container.js');
 
 var container = _interopRequireWildcard(_container);
+
+var _fileSearch = require('./file-search.js');
+
+var fileSearch = _interopRequireWildcard(_fileSearch);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -114,28 +118,69 @@ const readProj = exports.readProj = (0, _bluebird.coroutine)(function* (basePath
 const writeInitialConfig = exports.writeInitialConfig = configDirectory => {
   writeFile((0, _path.join)(configDirectory, config.configFolder, config.configFile), JSONStringifyPretty({
     configDirectory: configDirectory,
-    projects: []
+    projects: {}
   }));
 };
 
-// after reading the main configFile, we are going to load all the paths
-// export const loadPaths = co(function *(configFile) {
-//   let dataToSend = configFile.projects.map( project => {
-//     return JSON.parse(yield readFile(join(project.basePath, config.projPath())));
-//   }
-// })
+const findDockdev = array => {
+  let result = '';
+  const find = (0, _child_process.spawn)('find', array);
 
-//after reading the main configFile, we are going to load all the paths
-// export const loadPaths = co(function *(configFile) {
-//   let dataToSend = configFile.projects.map( project => {
-//     try {
-//       return JSON.parse(yield readFile(join(project.basePath, config.projPath())));
-//     } catch (e) {
-//
-//     }
-//   }
-//
-// })
+  find.stdout.on('data', data => result += data);
+
+  return new _bluebird2.default((resolve, reject) => {
+    find.stderr.on('data', reject);
+    find.stdout.on('close', () => {
+      resolve(result.split('\n').slice(0, -1));
+    });
+  });
+};
+
+// findDockdev(['/Users/dbschwartz83/DockDev', '-name', 'index.html'], handleFolders);
+
+// after reading the main configFile, we are going to load all the paths
+const loadPaths = exports.loadPaths = (0, _bluebird.coroutine)(function* (configFile, configDirectory) {
+  let needToSearch = false;
+  let pathsToSendToUI = [];
+
+  for (var key in configFile.projects) {
+    try {
+      let fileContents = JSON.parse((yield readFile((0, _path.join)(configFile.projects[key], config.projPath()))));
+      pathsToSendToUI.push(fileContents);
+    } catch (e) {
+      console.log(e);
+      needToSearch = true;
+      delete configFile.projects[key];
+    }
+  }
+
+  // send the data from pathsToSendToUI to the UI
+
+  // search for the other projects if there were any errors in the data
+  if (needToSearch) {
+    let searchArray = [];
+    // create the parameters for the linux find command
+    searchArray.push(configDirectory);
+    searchArray.push('-name');
+    searchArray.push(config.projFile);
+    for (var key in configFile.projects) {
+
+      // create the parameters for files to exclude based on the projects that were already found
+      searchArray.push('!');
+      searchArray.push('-path');
+      searchArray.push(projects[key]);
+    }
+    let searchResultsToUI = [];
+
+    // returns an array of data
+    let searchResults = yield findDockdev(searchArray);
+    for (var i = 0; i < searchResults.length; i++) {
+      let fileContents = JSON.parse((yield readFile((0, _path.join)(searchResults[i], config.projPath()))));
+      searchResultsToUI.push(fileContents);
+    }
+    // send the data from searchResultsToUI to the UI
+  }
+});
 
 // reads the main configFile at launch of the app, if the file doesn't exist, it writes the file
 const readConfig = exports.readConfig = (0, _bluebird.coroutine)(function* (configDirectory) {
@@ -143,7 +188,7 @@ const readConfig = exports.readConfig = (0, _bluebird.coroutine)(function* (conf
 
   try {
     readConfigFile = JSON.parse((yield readFile((0, _path.join)(configDirectory, config.configFolder, config.configFile))));
-    yield loadPaths(readConfigFile);
+    yield loadPaths(readConfigFile, configDirectory);
   } catch (e) {
     console.log(e);
   }
@@ -152,9 +197,9 @@ const readConfig = exports.readConfig = (0, _bluebird.coroutine)(function* (conf
 });
 
 // adds projects uuid and paths to the main config file
-const addProjToConfig = exports.addProjToConfig = (0, _bluebird.coroutine)(function* (configDirectory, uuid, basePath) {
+const addProjToConfig = exports.addProjToConfig = (0, _bluebird.coroutine)(function* (configDirectory, basePath) {
   let readConfigFile = JSON.parse((yield readConfig(configDirectory)));
-  readConfigFile.projects.push({ uuid: uuid, basePath: basePath });
+  readConfigFile.projects[basePath] = basePath;
   yield writeFile((0, _path.join)(configDirectory, config.configFolder, config.configFile), JSONStringifyPretty(readConfigFile));
 });
 
@@ -176,6 +221,7 @@ const initProject = exports.initProject = (0, _bluebird.coroutine)(function* (ba
   yield createDockDev(projObj);
   yield writeProj(projObj);
 
+  addProjToConfig(configDirectory, basePath);
   addToAppMemory(projObj);
 
   return projObj;

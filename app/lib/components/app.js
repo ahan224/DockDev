@@ -1,16 +1,16 @@
 'use strict';
 
 //
-var React = require('react');
-var ReactDOM = require('react-dom');
+const React = require('react');
+const ReactDOM = require('react-dom');
 
 // PARENT////////////////////////////////////
 // NOTE : The parent will be the electron Window.
 // /////////////////////////////////////////////
-var App = React.createClass({
+let App = React.createClass({
   displayName: 'App',
 
-  getInitialState: function getInitialState() {
+  getInitialState: function () {
     return { projects: [] };
   },
   // addProject: function() {
@@ -26,7 +26,7 @@ var App = React.createClass({
   //           </li>);
   // }
 
-  render: function render() {
+  render: function () {
     return React.createElement(
       'div',
       { className: 'pane-group' },
@@ -42,14 +42,14 @@ var App = React.createClass({
 // Relationship: App > Sidemenu
 // Children: TopNavList, ProjectList, BottomNavList
 // /////////////////////////////////////////////
-var SideMenu = React.createClass({
+let SideMenu = React.createClass({
   displayName: 'SideMenu',
 
-  handleAddProject: function handleAddProject(e) {
+  handleAddProject: function (e) {
     console.log('created project');
   },
 
-  render: function render() {
+  render: function () {
     return React.createElement(
       'div',
       { className: 'pane-sm sidebar' },
@@ -60,10 +60,10 @@ var SideMenu = React.createClass({
   }
 });
 
-var TopNavList = React.createClass({
+let TopNavList = React.createClass({
   displayName: 'TopNavList',
 
-  render: function render() {
+  render: function () {
     return React.createElement(
       'ul',
       { className: 'list-group container-list container-links topNav' },
@@ -80,14 +80,12 @@ var TopNavList = React.createClass({
   }
 });
 
-var ProjectList = React.createClass({
+let ProjectList = React.createClass({
   displayName: 'ProjectList',
 
-  render: function render() {
-    var _this = this;
-
+  render: function () {
     if (this.props.projects) {
-      var children = this.props.projects.map(function (x) {
+      var children = this.props.projects.map(x => {
         return React.createElement(
           'li',
           { className: 'list-group-item active-projects' },
@@ -101,7 +99,7 @@ var ProjectList = React.createClass({
               React.createElement(
                 'strong',
                 null,
-                _this.props.projects.name
+                this.props.projects.name
               )
             )
           )
@@ -119,10 +117,10 @@ var ProjectList = React.createClass({
   }
 });
 
-var BottomNavList = React.createClass({
+let BottomNavList = React.createClass({
   displayName: 'BottomNavList',
 
-  render: function render() {
+  render: function () {
     return React.createElement(
       'ul',
       { className: 'list-group container-list bottom-nav' },
@@ -142,12 +140,12 @@ var BottomNavList = React.createClass({
 // PROJECTLIST ///////////////////////////////////
 // NOTE : All active projects will be populated here
 // /////////////////////////////////////////////
-var ProjectDetailList = React.createClass({
+let ProjectDetailList = React.createClass({
   displayName: 'ProjectDetailList',
 
-  render: function render() {
+  render: function () {
     if (this.props.projects) {
-      var children = this.props.projects.map(function (x) {
+      var children = this.props.projects.map(x => {
         return React.createElement(
           'div',
           { className: 'card dependancy col-xs-12' },
