@@ -1,5 +1,4 @@
 'use-strict';
-import 'babel-polyfill'
 
 const electron = require('electron');
 const app = electron.app;
