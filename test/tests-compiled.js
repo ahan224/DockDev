@@ -18,6 +18,12 @@ var _ramda = require('ramda');
 
 var _ramda2 = _interopRequireDefault(_ramda);
 
+var _rsync = require('../app/lib/rsync.js');
+
+var rsync = _interopRequireWildcard(_rsync);
+
+var _fileWatch = require('../app/lib/fileWatch.js');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -141,4 +147,98 @@ describe('read and modify an existing project', () => {
   });
 });
 
-describe('find our target files in specified directory', () => {});
+// describe('find our target files in specified directory', () => {
+//
+//
+// })
+
+describe('add and modify containers within a project', () => {
+  const projectName = 'project4';
+  const basePath = (0, _path.join)(__dirname, 'userFolder', projectName);
+  const dockDevPath = (0, _path.join)(basePath, '.dockdev');
+  const image = 'node';
+  let result;
+  let containerId;
+
+  before(() => {
+    // make sure there is a userFolder
+    try {
+      (0, _fs.mkdirSync)((0, _path.join)(__dirname, 'userFolder'));
+    } catch (e) {}
+
+    // remove project projFolder if it exists
+    _rimraf2.default.sync(basePath);
+
+    // add back the project projFolder
+    (0, _fs.mkdirSync)(basePath);
+
+    result = utils.initProject(basePath, projectName);
+  });
+
+  it('should add a container to the project', () => {
+    return result.then(data => utils.addContainer(data, image)).then(id => {
+      containerId = id;
+      (0, _chai.expect)(containerId).to.not.equal(undefined);
+      result.then(data => {
+        (0, _chai.expect)(data.containers[containerId].image).to.equal(image);
+        (0, _chai.expect)(data.containers[containerId].containerId).to.equal(containerId);
+      });
+    });
+  });
+
+  it('should delete a container from a project', () => {
+    return result.then(data => utils.removeContainer(data, containerId)).then(data => {
+      (0, _chai.expect)(data).to.equal(true);
+      (0, _chai.expect)(data.containers).to.be.empty;
+    });
+  });
+});
+
+xdescribe('should sync files to docker machine', () => {
+  const projectName = 'project5';
+  const basePath = (0, _path.join)(__dirname, 'userFolder', projectName);
+  const dockDevPath = (0, _path.join)(basePath, '.dockdev');
+  const image = 'node';
+  let result;
+  let containerId;
+
+  before(() => {
+    // make sure there is a userFolder
+    try {
+      (0, _fs.mkdirSync)((0, _path.join)(__dirname, 'userFolder'));
+    } catch (e) {}
+
+    // remove project projFolder if it exists
+    _rimraf2.default.sync(basePath);
+
+    // add back the project projFolder
+    (0, _fs.mkdirSync)(basePath);
+
+    containerId = utils.initProject(basePath, projectName).then(data => {
+      result = data;
+      return utils.addContainer(data, image);
+    });
+  });
+
+  it('should sync folder to docker-machine', () => {
+    return containerId.then(id => {
+      const syncFunc = rsync.generateRsync(result);
+      (0, _fs.writeFileSync)((0, _path.join)(result.basePath, 'test.txt'));
+      return syncFunc();
+    });
+  });
+
+  it('should watch and sync files to the docker-machine', done => {
+    return containerId.then(id => {
+      (0, _fileWatch.addFileWatcher)(result);
+      (0, _fs.writeFileSync)((0, _path.join)(result.basePath, 'test1.txt'));
+      (0, _fs.writeFileSync)((0, _path.join)(result.basePath, 'test2.txt'));
+      (0, _fs.writeFileSync)((0, _path.join)(result.basePath, 'test3.txt'));
+      (0, _fs.writeFileSync)((0, _path.join)(result.basePath, 'test4.txt'));
+      (0, _fs.writeFileSync)((0, _path.join)(result.basePath, 'test10.txt'));
+
+      setTimeout(done, 10000);
+      return;
+    });
+  });
+});

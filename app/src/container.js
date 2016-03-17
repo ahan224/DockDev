@@ -1,35 +1,12 @@
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.setContainerParams = exports.logs = exports.pull = exports.remove = exports.restart = exports.create = exports.inspect = exports.list = exports.stop = exports.start = undefined;
+import rp from 'request-promise';
+import * as machine from './machine.js';
+import Promise, { coroutine as co } from 'bluebird';
+import R from 'ramda';
+import * as child_process from 'child_process';
 
-var _requestPromise = require('request-promise');
-
-var _requestPromise2 = _interopRequireDefault(_requestPromise);
-
-var _machine = require('./machine.js');
-
-var machine = _interopRequireWildcard(_machine);
-
-var _bluebird = require('bluebird');
-
-var _bluebird2 = _interopRequireDefault(_bluebird);
-
-var _ramda = require('ramda');
-
-var _ramda2 = _interopRequireDefault(_ramda);
-
-var _child_process = require('child_process');
-
-var child_process = _interopRequireWildcard(_child_process);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const exec = _bluebird2.default.promisify(child_process.exec);
+const exec = Promise.promisify(child_process.exec);
 
 // save, commit, search, build, archive
 
@@ -37,95 +14,96 @@ const dockerCommands = {
   start: {
     cmd: 'start',
     method: 'POST',
-    uri: function (containerId) {
+    uri(containerId) {
       return `/containers/${ containerId }/${ this.cmd }`;
     }
   },
   stop: {
     cmd: 'stop',
     method: 'POST',
-    uri: function (containerId) {
+    uri(containerId) {
       return `/containers/${ containerId }/${ this.cmd }`;
     }
   },
   inspect: {
     cmd: 'json',
     method: 'GET',
-    uri: function (containerId) {
+    uri(containerId) {
       return `/containers/${ containerId }/${ this.cmd }`;
     }
   },
   list: {
     cmd: 'json',
     method: 'GET',
-    uri: function () {
+    uri() {
       return `/containers/${ this.cmd }`;
     }
   },
   create: {
     cmd: 'create',
     method: 'POST',
-    uri: function () {
+    uri() {
       return `/containers/${ this.cmd }`;
     }
   },
   restart: {
     cmd: 'restart',
     method: 'POST',
-    uri: function (containerId) {
+    uri(containerId) {
       return `/containers/${ containerId }/${ cmd }`;
     }
   },
   remove: {
     cmd: '',
     method: 'DELETE',
-    uri: function (containerId) {
+    uri(containerId) {
       return `/containers/${ containerId }?v=1&force=1`;
     }
   }
-};
+}
 
-function commandMaker(cmd) {
-  return (0, _bluebird.coroutine)(function* (machineName, containerInfo) {
+function commandMaker(cmd){
+  return co(function *(machineName, containerInfo) {
     const config = yield machine.config(machineName);
     config.uri += cmd.uri(containerInfo);
     config.method = cmd.method;
     config.json = true;
     if (cmd.cmd === 'create') config.body = containerInfo;
-    return yield (0, _requestPromise2.default)(config);
-  });
+    return yield rp(config);
+  })
 }
 
-const start = exports.start = commandMaker(dockerCommands.start);
-const stop = exports.stop = commandMaker(dockerCommands.stop);
-const list = exports.list = commandMaker(dockerCommands.list);
-const inspect = exports.inspect = commandMaker(dockerCommands.inspect);
-const create = exports.create = commandMaker(dockerCommands.create);
-const restart = exports.restart = commandMaker(dockerCommands.restart);
-const remove = exports.remove = commandMaker(dockerCommands.remove);
+export const start = commandMaker(dockerCommands.start);
+export const stop = commandMaker(dockerCommands.stop);
+export const list = commandMaker(dockerCommands.list);
+export const inspect = commandMaker(dockerCommands.inspect);
+export const create = commandMaker(dockerCommands.create);
+export const restart = commandMaker(dockerCommands.restart);
+export const remove = commandMaker(dockerCommands.remove);
 
-const pull = exports.pull = (0, _bluebird.coroutine)(function* (machineName, image) {
+
+export const pull = co(function *(machineName, image) {
   let env = yield machine.env(machineName);
-  env = _ramda2.default.fromPairs(env.split('\n').slice(0, 4).map(val => val.substr(7).split('=')));
+  env = R.fromPairs(env.split('\n').slice(0, 4).map(val => val.substr(7).split('=')));
   for (var prop in env) {
     var len = env[prop].length - 2;
     env[prop] = env[prop].substr(1).substr(0, len);
   }
-  return yield exec(`docker pull ${ image }`, { env: env });
+  return yield exec(`docker pull ${ image }`, { env });
 });
 
-const logs = exports.logs = (0, _bluebird.coroutine)(function* (machineName, containerId) {
+export const logs = co(function *(machineName, containerId) {
   let env = yield machine.env(machineName);
-  env = _ramda2.default.fromPairs(env.split('\n').slice(0, 4).map(val => val.substr(7).split('=')));
+  env = R.fromPairs(env.split('\n').slice(0, 4).map(val => val.substr(7).split('=')));
   for (var prop in env) {
     var len = env[prop].length - 2;
     env[prop] = env[prop].substr(1).substr(0, len);
   }
-  return yield exec(`docker logs ${ containerId }`, { env: env });
+  return yield exec(`docker logs ${ containerId }`, { env });
 });
 
-const setContainerParams = exports.setContainerParams = (image, projObj) => ({
-  image: image,
+export const setContainerParams = (image, projObj) => ({
+  image,
   // Volumes: { '/mnt': {} }
   HostConfig: {
     Binds: [`/home/docker/dockdev/${ projObj.uuid }:/app`]
@@ -135,6 +113,7 @@ const setContainerParams = exports.setContainerParams = (image, projObj) => ({
 // remove('default', 'f3e796d19685')
 //   .then(console.log)
 //   .catch(console.log);
+
 
 // Example POST request to create a container
 // POST /containers/create HTTP/1.1

@@ -6,14 +6,13 @@ import { join } from 'path';
 import Promise, { coroutine as co } from 'bluebird';
 import R from 'ramda';
 import uuid from 'node-uuid';
-import * as fileSearch from '../app/lib/file-search.js';
+import * as container from './container.js';
 
 // promisify certain callback functions
-const mkdir = Promise.promisify(fs.mkdir);
-const writeFile = Promise.promisify(fs.writeFile);
-const readFile = Promise.promisify(fs.readFile);
-const exec = Promise.promisify(child_process.exec);
-// const appendFile = Promise.promisify(fs.appendFile);
+export const mkdir = Promise.promisify(fs.mkdir);
+export const writeFile = Promise.promisify(fs.writeFile);
+export const readFile = Promise.promisify(fs.readFile);
+export const exec = Promise.promisify(child_process.exec);
 
 /**
 * @param {object} config has project config settings
@@ -33,20 +32,18 @@ export const config = {
   // individual project infomration
   projFolder: '.dockdev',
   projFile: 'dockdev.json',
-  projWriteParams: ['uuid', 'projectName'],
+  projWriteParams: ['uuid', 'projectName', 'containers', 'machine'],
   projPath() {
     return join(this.projFolder, this.projFile)
   }
 }
 
-// JSONStringifyPretty :: object -> string
-// predefines JSON stringify with formatting
-const JSONStringifyPretty = (obj) => JSON.stringify(obj, null, 2);
-
-
 // object to store all projects
 export const memory = {};
 
+// JSONStringifyPretty :: object -> string
+// predefines JSON stringify with formatting
+const JSONStringifyPretty = (obj) => JSON.stringify(obj, null, 2);
 
 // createProj :: string -> string -> object
 // accepts a project name & basePath, returns object with uuid
@@ -54,6 +51,8 @@ export const createProj = (basePath, projectName) => ({
   uuid: uuid.v4(),
   projectName,
   basePath,
+  containers: {},
+  machine: 'default'
 });
 
 // createDockDev :: object -> promise(object)
@@ -95,23 +94,23 @@ export const writeInitialConfig = (configDirectory) => {
 };
 
 // after reading the main configFile, we are going to load all the paths
-export const loadPaths = co(function *(configFile) {
-  let dataToSend = configFile.projects.map( project => {
-    return JSON.parse(yield readFile(join(project.basePath, config.projPath())));
-  }
-})
+// export const loadPaths = co(function *(configFile) {
+//   let dataToSend = configFile.projects.map( project => {
+//     return JSON.parse(yield readFile(join(project.basePath, config.projPath())));
+//   }
+// })
 
-after reading the main configFile, we are going to load all the paths
-export const loadPaths = co(function *(configFile) {
-  let dataToSend = configFile.projects.map( project => {
-    try {
-      return JSON.parse(yield readFile(join(project.basePath, config.projPath())));
-    } catch (e) {
-
-    }
-  }
-
-})
+//after reading the main configFile, we are going to load all the paths
+// export const loadPaths = co(function *(configFile) {
+//   let dataToSend = configFile.projects.map( project => {
+//     try {
+//       return JSON.parse(yield readFile(join(project.basePath, config.projPath())));
+//     } catch (e) {
+//
+//     }
+//   }
+//
+// })
 
 // reads the main configFile at launch of the app, if the file doesn't exist, it writes the file
 export const readConfig = co(function *(configDirectory) {
@@ -133,12 +132,6 @@ export const addProjToConfig = co(function *(configDirectory, uuid, basePath) {
   readConfigFile.projects.push({uuid, basePath});
   yield writeFile(join(configDirectory, config.configFolder, config.configFile), JSONStringifyPretty(readConfigFile));
 })
-
-// I don't think we are using this at all
-// extendConfig :: object -> object
-// accepts the existing config as first paramater
-// and merges/overwrites with the second object
-const extendConfig = R.merge;
 
 // addProjToMemory :: object -> object -> object
 // adds the projObj for the project to the memory object
@@ -167,58 +160,20 @@ export const initProject = co(function *(basePath, projectName, configDirectory)
 // returns the stdout of the command line call within a promise
 export const cmdLine = R.curry((cmd, args) => exec(`${ cmd } ${ args }`));
 
-// rsync :: string -> promise(string)
-// accepts an array of cmd line args for rsync
-// returns a promise that resolves to teh stdout
-export const rsync = cmdLine('rsync');
-
-// selectWithin :: [string] -> string -> object
-// helper function to select specified props from a nested object
-const selectWithin = R.curry((array, key, obj) => {
-  const result = {};
-  array.forEach(val => result[val] = obj[key][val]);
-  return result;
-})
-
-// createRsyncArgs :: string -> string -> object -> [string]
-// accepts source, destination, and machine info
-// returns an array of arguments for rsync
-//** this should be redesigned to output just a string
-const createRsyncArgs = R.curry((source, dest, machine) => {
-  const result = ['-a', '-e'];
-  result.push(`"ssh -i ${ machine.SSHKeyPath } -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"`);
-  result.push('--delete');
-  result.push(source);
-  result.push(`docker@${ machine.IPAddress }:${ dest }`)
-  return result;
+// need to think about how to pick a default machine
+// for now it is hardcoded to 'default' but shouldnt be
+export const addContainer = co(function *(projObj, image) {
+  const containerConfig = container.setContainerParams(image, projObj);
+  const containerId = (yield container.create(projObj.machine, containerConfig)).Id;
+  const inspectContainer = yield container.inspect(projObj.machine, containerId)
+  const dest = inspectContainer.Mounts[0].Source;
+  const name = inspectContainer.Name.substr(1);
+  projObj.containers[containerId] = {image, containerId, name, dest, sync: true};
+  return containerId;
 });
 
-// selectSSHandIP :: object -> object
-// selects ssh and ip address from docker-machine inspect object
-const selectSSHandIP = R.compose(
-  selectWithin(['SSHKeyPath', 'IPAddress'], 'Driver'),
-  JSON.parse
-);
-
-
-// generateRsync :: object -> function
-// accepts a config object and returns a function that is
-// called when files change in the base directory of project
-export const generateRsync = config => {
-
-
-}
-
-
-// - File watch
-//   - need ability to turnoff projFile watching
-//   - handle if the root projFolder name is changed (need new watch)
-//   - handle multiple project watches simultaneously
-//   - use closure to avoid getting machine inspect 2x (same for volume)
-//   - create one watcher and then reference root directory
-//
-// - Rsync
-//   - put the promise that resolves machine ip, ssh, volume location, etc in closure
-//   - return a function that requires no parameters, but will rsync after promise resolves
-//   - need to consider error handling, but otherwise this solution should work great
-//   - should you rsync only the projFile or projFolder that changed or everything
+export const removeContainer = co(function *(projObj, containerId) {
+  yield container.remove(projObj.machine, containerId);
+  delete projObj.containers[containerId];
+  return true;
+})

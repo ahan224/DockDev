@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.generateRsync = exports.rsync = exports.cmdLine = exports.initProject = exports.addToAppMemory = exports.addProjToMemory = exports.addProjToConfig = exports.readConfig = exports.writeInitialConfig = exports.readProj = exports.writeProj = exports.createDockDev = exports.createProj = exports.memory = exports.config = undefined;
+exports.removeContainer = exports.addContainer = exports.cmdLine = exports.initProject = exports.addToAppMemory = exports.addProjToMemory = exports.addProjToConfig = exports.readConfig = exports.writeInitialConfig = exports.readProj = exports.writeProj = exports.createDockDev = exports.createProj = exports.memory = exports.config = exports.exec = exports.readFile = exports.writeFile = exports.mkdir = undefined;
 
 var _fs = require('fs');
 
@@ -27,14 +27,19 @@ var _nodeUuid = require('node-uuid');
 
 var _nodeUuid2 = _interopRequireDefault(_nodeUuid);
 
+var _container = require('./container.js');
+
+var container = _interopRequireWildcard(_container);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // promisify certain callback functions
-const mkdir = _bluebird2.default.promisify(_fs2.default.mkdir);
-const writeFile = _bluebird2.default.promisify(_fs2.default.writeFile);
-const readFile = _bluebird2.default.promisify(_fs2.default.readFile);
-const exec = _bluebird2.default.promisify(_child_process2.default.exec);
-// const appendFile = Promise.promisify(fs.appendFile);
+const mkdir = exports.mkdir = _bluebird2.default.promisify(_fs2.default.mkdir);
+const writeFile = exports.writeFile = _bluebird2.default.promisify(_fs2.default.writeFile);
+const readFile = exports.readFile = _bluebird2.default.promisify(_fs2.default.readFile);
+const exec = exports.exec = _bluebird2.default.promisify(_child_process2.default.exec);
 
 /**
 * @param {object} config has project config settings
@@ -55,25 +60,27 @@ const config = exports.config = {
   // individual project infomration
   projFolder: '.dockdev',
   projFile: 'dockdev.json',
-  projWriteParams: ['uuid', 'projectName'],
+  projWriteParams: ['uuid', 'projectName', 'containers', 'machine'],
   projPath: function () {
     return (0, _path.join)(this.projFolder, this.projFile);
   }
 };
 
+// object to store all projects
+const memory = exports.memory = {};
+
 // JSONStringifyPretty :: object -> string
 // predefines JSON stringify with formatting
 const JSONStringifyPretty = obj => JSON.stringify(obj, null, 2);
-
-// object to store all projects
-const memory = exports.memory = {};
 
 // createProj :: string -> string -> object
 // accepts a project name & basePath, returns object with uuid
 const createProj = exports.createProj = (basePath, projectName) => ({
   uuid: _nodeUuid2.default.v4(),
   projectName: projectName,
-  basePath: basePath
+  basePath: basePath,
+  containers: {},
+  machine: 'default'
 });
 
 // createDockDev :: object -> promise(object)
@@ -118,7 +125,7 @@ const writeInitialConfig = exports.writeInitialConfig = configDirectory => {
 //   }
 // })
 
-// after reading the main configFile, we are going to load all the paths
+//after reading the main configFile, we are going to load all the paths
 // export const loadPaths = co(function *(configFile) {
 //   let dataToSend = configFile.projects.map( project => {
 //     try {
@@ -151,12 +158,6 @@ const addProjToConfig = exports.addProjToConfig = (0, _bluebird.coroutine)(funct
   yield writeFile((0, _path.join)(configDirectory, config.configFolder, config.configFile), JSONStringifyPretty(readConfigFile));
 });
 
-// I don't think we are using this at all
-// extendConfig :: object -> object
-// accepts the existing config as first paramater
-// and merges/overwrites with the second object
-const extendConfig = _ramda2.default.merge;
-
 // addProjToMemory :: object -> object -> object
 // adds the projObj for the project to the memory object
 const addProjToMemory = exports.addProjToMemory = _ramda2.default.curry((memory, projObj) => {
@@ -184,50 +185,20 @@ const initProject = exports.initProject = (0, _bluebird.coroutine)(function* (ba
 // returns the stdout of the command line call within a promise
 const cmdLine = exports.cmdLine = _ramda2.default.curry((cmd, args) => exec(`${ cmd } ${ args }`));
 
-// rsync :: string -> promise(string)
-// accepts an array of cmd line args for rsync
-// returns a promise that resolves to teh stdout
-const rsync = exports.rsync = cmdLine('rsync');
-
-// selectWithin :: [string] -> string -> object
-// helper function to select specified props from a nested object
-const selectWithin = _ramda2.default.curry((array, key, obj) => {
-  const result = {};
-  array.forEach(val => result[val] = obj[key][val]);
-  return result;
+// need to think about how to pick a default machine
+// for now it is hardcoded to 'default' but shouldnt be
+const addContainer = exports.addContainer = (0, _bluebird.coroutine)(function* (projObj, image) {
+  const containerConfig = container.setContainerParams(image, projObj);
+  const containerId = (yield container.create(projObj.machine, containerConfig)).Id;
+  const inspectContainer = yield container.inspect(projObj.machine, containerId);
+  const dest = inspectContainer.Mounts[0].Source;
+  const name = inspectContainer.Name.substr(1);
+  projObj.containers[containerId] = { image: image, containerId: containerId, name: name, dest: dest, sync: true };
+  return containerId;
 });
 
-// createRsyncArgs :: string -> string -> object -> [string]
-// accepts source, destination, and machine info
-// returns an array of arguments for rsync
-//** this should be redesigned to output just a string
-const createRsyncArgs = _ramda2.default.curry((source, dest, machine) => {
-  const result = ['-a', '-e'];
-  result.push(`"ssh -i ${ machine.SSHKeyPath } -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"`);
-  result.push('--delete');
-  result.push(source);
-  result.push(`docker@${ machine.IPAddress }:${ dest }`);
-  return result;
+const removeContainer = exports.removeContainer = (0, _bluebird.coroutine)(function* (projObj, containerId) {
+  yield container.remove(projObj.machine, containerId);
+  delete projObj.containers[containerId];
+  return true;
 });
-
-// selectSSHandIP :: object -> object
-// selects ssh and ip address from docker-machine inspect object
-const selectSSHandIP = _ramda2.default.compose(selectWithin(['SSHKeyPath', 'IPAddress'], 'Driver'), JSON.parse);
-
-// generateRsync :: object -> function
-// accepts a config object and returns a function that is
-// called when files change in the base directory of project
-const generateRsync = exports.generateRsync = config => {};
-
-// - File watch
-//   - need ability to turnoff projFile watching
-//   - handle if the root projFolder name is changed (need new watch)
-//   - handle multiple project watches simultaneously
-//   - use closure to avoid getting machine inspect 2x (same for volume)
-//   - create one watcher and then reference root directory
-//
-// - Rsync
-//   - put the promise that resolves machine ip, ssh, volume location, etc in closure
-//   - return a function that requires no parameters, but will rsync after promise resolves
-//   - need to consider error handling, but otherwise this solution should work great
-//   - should you rsync only the projFile or projFolder that changed or everything
