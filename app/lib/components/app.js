@@ -28,12 +28,6 @@ var path = require('path');
 var App = React.createClass({
   displayName: 'App',
 
-  getInitialState: function getInitialState() {
-    return {
-      projects: ['test'],
-      words: 'hello-world'
-    };
-  },
   // addProject: function() {
   //   return (<li className="list-group-item project">
   //             <div className="media-body">
@@ -46,14 +40,21 @@ var App = React.createClass({
   //             </div>
   //           </li>);
   // }
+  getInitialState: function getInitialState() {
+    return {
+      projects: ['test'],
+      words: 'hello-world'
+    };
+  },
 
   render: function render() {
     return React.createElement(
       'div',
       { className: 'pane-group' },
-      React.createElement(SideMenu, null),
-      React.createElement(ProjectList, { proj: this.state.projects, word: this.state.words }),
-      React.createElement(ProjectDetailList, { proj: this.state.projects, word: this.state.words }),
+      React.createElement(SideMenu, { projects: this.state }),
+      React.createElement(ProjectList, null),
+      React.createElement(ProjectDetailList, { projects: this.state.projects }),
+      '//  ',
       console.log(this.state.projects)
     );
   }
@@ -76,7 +77,7 @@ var SideMenu = React.createClass({
       'div',
       { className: 'pane-sm sidebar' },
       React.createElement(TopNavList, null),
-      React.createElement(ProjectList, null),
+      React.createElement(ProjectList, { projects: this.props.projects }),
       React.createElement(BottomNavList, null)
     );
   }
@@ -133,10 +134,9 @@ var ProjectList = React.createClass({
   render: function render() {
     var _this = this;
 
-    console.log(this.props.proj);
-    console.log(this.props.word);
-    if (this.props.proj.length > 0) {
-      var children = this.props.proj.map(function (x) {
+    console.log(this.props.projects);
+    if (this.props) {
+      var children = this.props.map(function (x) {
         return;
         React.createElement(
           'div',
@@ -154,7 +154,7 @@ var ProjectList = React.createClass({
                 React.createElement(
                   'strong',
                   null,
-                  _this.props.proj.name
+                  _this.props.projects.name
                 )
               )
             )
@@ -213,6 +213,7 @@ var BottomNavList = React.createClass({
 // /////////////////////////////////////////////
 var ProjectDetailList = React.createClass({
   displayName: 'ProjectDetailList',
+
 
   handleClick: function handleClick(e) {
     console.log('running');
