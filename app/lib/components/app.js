@@ -3,6 +3,7 @@
 //
 const React = require('react');
 const ReactDOM = require('react-dom');
+<<<<<<< HEAD
 const ipcRenderer = require('electron').ipcRenderer;
 const sweetAlert = require('sweetalert2');
 var remote = require('remote');
@@ -21,6 +22,8 @@ var path = require('path');
 //     }));
 //   }
 // });
+=======
+>>>>>>> master
 
 // PARENT////////////////////////////////////
 // NOTE : The parent will be the electron Window.
@@ -81,6 +84,7 @@ let SideMenu = React.createClass({
 let TopNavList = React.createClass({
   displayName: 'TopNavList',
 
+<<<<<<< HEAD
   //  handleClick: function(e){
   //   return  swal({
   //       title: "An input!",
@@ -102,6 +106,8 @@ let TopNavList = React.createClass({
     };
   },
 
+=======
+>>>>>>> master
   render: function () {
     return React.createElement(
       'div',
