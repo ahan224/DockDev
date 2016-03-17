@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.config = exports.env = exports.inspect = exports.exec = undefined;
+exports.config = exports.ssh = exports.env = exports.inspect = exports.exec = undefined;
 
 var _fs = require('fs');
 
@@ -39,6 +39,8 @@ const exec = exports.exec = cmdLine('docker-machine');
 const inspect = exports.inspect = machineName => exec(`inspect ${ machineName }`);
 
 const env = exports.env = machineName => exec(`env ${ machineName }`);
+
+const ssh = exports.ssh = (machineName, args) => exec(`ssh ${ machineName } ${ args }`);
 
 /**
 * config :: string -> promise(object)

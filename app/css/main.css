@@ -89,6 +89,11 @@ body {
     text-align: center;
 }
 
+.sidebar .options button {
+  border: none;
+  background: none;
+}
+
 .main-content {
  margin: 0;
  padding: 0!important;
@@ -119,6 +124,11 @@ body {
     font-size: 28px;
     padding: .2rem;
     color: #9A9A9A;
+}
+
+.bottom-nav button {
+  min-width: 35px;
+  opacity: 0.4;
 }
 
 li.list-group-item:active, .btn-primary-outline:focus, .btn-primary-outline.focus, .btn-primary-outline:active, .btn-primary-outline.active, .open > .btn-primary-outline.dropdown-toggle, button:active, button:visited, button:focus, span:active, span:focus, span:visited, span:before {

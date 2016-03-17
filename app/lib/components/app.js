@@ -1,11 +1,11 @@
 'use strict';
 
-// main.js
+//
 const React = require('react');
 const ReactDOM = require('react-dom');
 
 // PARENT////////////////////////////////////
-// NOTE : The parent will be the electron Window
+// NOTE : The parent will be the electron Window.
 // /////////////////////////////////////////////
 let App = React.createClass({
   displayName: 'App',
@@ -64,7 +64,6 @@ let TopNavList = React.createClass({
   displayName: 'TopNavList',
 
   render: function () {
-
     return React.createElement(
       'ul',
       { className: 'list-group container-list container-links topNav' },
@@ -81,21 +80,10 @@ let TopNavList = React.createClass({
   }
 });
 
-// let TopNavItem = React.createClass({
-//   render: function () {
-//     return (<li className="list-group-item add-container">
-//       <button type="button" name="button" onClick="">
-//         <span className=" icon ion-ios-plus-outline"></span>
-//       </button>
-//     </li>)
-//   }
-// });
-
 let ProjectList = React.createClass({
   displayName: 'ProjectList',
 
   render: function () {
-
     if (this.props.projects) {
       var children = this.props.projects.map(x => {
         return React.createElement(
@@ -133,7 +121,6 @@ let BottomNavList = React.createClass({
   displayName: 'BottomNavList',
 
   render: function () {
-
     return React.createElement(
       'ul',
       { className: 'list-group container-list bottom-nav' },
@@ -143,7 +130,7 @@ let BottomNavList = React.createClass({
         React.createElement(
           'button',
           { type: 'button', name: 'button', onClick: '' },
-          React.createElement('span', { className: ' icon ion-gear-a' })
+          React.createElement('img', { className: 'icon', src: './icons/Userinterface_setting-roll.svg' })
         )
       )
     );
@@ -206,25 +193,5 @@ let ProjectDetailList = React.createClass({
     }
   }
 });
-
-// let ProjectDetailItem = React.createClass({
-//   render: function(){
-//     return (<div className="card dependancy col-xs-12">
-//               <div className="card-block">
-//                 <h4 className="card-title">Title</h4>
-//                 <p className="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-//                 <p className="card-text"><small className="text-muted">...</small></p>
-//               </div>
-//             </div>)
-//   }
-// });
-
-// let SettingsBtn = React.createClass({
-//   render: function(){
-//     return (<button type="button" className="settings-btn">
-//               <span className="ion-ios-gear-outline"></span>
-//             </button>)
-//   }
-// });
 
 ReactDOM.render(React.createElement(App, null), document.getElementById('main'));

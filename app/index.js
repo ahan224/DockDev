@@ -1,8 +1,8 @@
 'use strict';
-
 const electron = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
+
 global.ipcRenderer = require('electron').ipcRenderer;
 
 var mainWindow = null;
