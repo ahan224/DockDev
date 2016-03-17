@@ -1,6 +1,13 @@
 //
 const React = require('react');
 const ReactDOM = require('react-dom');
+const ipcRenderer = require('electron').ipcRenderer;
+const sweetAlert = require('sweetalert2');
+// console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints "pong"
+
+ipcRenderer.on('asynchronous-reply', function(event, arg) {
+  console.log(arg); // prints "pong"
+});
 
 // PARENT////////////////////////////////////
 // NOTE : The parent will be the electron Window.
@@ -55,14 +62,36 @@ let SideMenu = React.createClass({
 
 
 let TopNavList = React.createClass({
+  //  handleClick: function(e){
+  //   return  swal({
+  //       title: "An input!",
+  //       text: 'Write something interesting:',
+  //       html: "<span class='btn btn-default btn-file'>Browse <input type='file'></input></span>",
+  //       showCancelButton: true,
+  //       closeOnConfirm: false,
+  //       animation: "slide-from-top"
+  //     }, function(inputValue){
+  //       console.log("You wrote", inputValue);
+  //       ipcRenderer.send('asynchronous-message', 'pik');
+  //     });
+  //  },
+  handleClick: function(e){
+   return  ipcRenderer.send('asynchronous-message', 'select file');
+
+  },
+
   render : function(){
-    return ( <ul className="list-group container-list container-links topNav">
-               <li className="list-group-item add-container">
-                  <button type="button" name="button" onClick="">
-                    <span className=" icon ion-ios-plus-outline"></span>
+    return (
+              <div>
+                <ul className="list-group container-list container-links topNav">
+                  <li className="list-group-item add-container">
+                  <button type="button" name="button" onClick={this.handleClick}>
+                  <span className=" icon ion-ios-plus-outline"></span>
                   </button>
-               </li>
-             </ul> )
+                </li>
+                </ul>
+              </div>
+          )
   }
 });
 
@@ -119,6 +148,7 @@ let ProjectDetailList = React.createClass({
                   <div className="container main-content-wrapper">
                     <div className="card-group main-content-card-group ">
                     { children }
+
                     </div>
                   </div>
                 </div>)
