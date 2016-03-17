@@ -1,9 +1,11 @@
-'use strict';
+'use-strict';
+
 const electron = require('electron');
 const app = electron.app;
 const ipcMain = require('electron').ipcMain;
 const dialog = require('electron').dialog;
 const utils = require('./lib/utils.js');
+
 const BrowserWindow = electron.BrowserWindow;
 global.ipcRenderer = require('electron').ipcRenderer;
 

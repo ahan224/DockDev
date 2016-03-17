@@ -24,12 +24,6 @@ var path = require('path');
 // NOTE : The parent will be the electron Window.
 // /////////////////////////////////////////////
 var App = React.createClass({
-  getInitialState: function() {
-    return {
-      projects: ['test'],
-      words: 'hello-world'
-    };
-  },
   // addProject: function() {
   //   return (<li className="list-group-item project">
   //             <div className="media-body">
@@ -42,13 +36,20 @@ var App = React.createClass({
   //             </div>
   //           </li>);
   // }
+  getInitialState: function() {
+    return {
+      projects: ['test'],
+      words: 'hello-world'
+    };
+  },
 
   render: function(){
     return(<div className="pane-group">
-    					<SideMenu/>
-              <ProjectList proj={this.state.projects} word={this.state.words}/>
-              <ProjectDetailList proj={this.state.projects} word={this.state.words}/>
-              {console.log(this.state.projects)}
+    					<SideMenu projects={this.state}/>
+              <ProjectList />
+              <ProjectDetailList projects={this.state.projects}/>
+              //  {console.log(this.state.projects)}
+
     			 </div>)
   }
 });
@@ -68,7 +69,7 @@ var SideMenu = React.createClass({
     return (
        <div className="pane-sm sidebar">
          <TopNavList/>
-         <ProjectList/>
+         <ProjectList projects={this.props.projects}/>
          <BottomNavList/>
        </div>
     )
@@ -115,10 +116,9 @@ var TopNavList = React.createClass({
 
 var ProjectList = React.createClass({
   render: function () {
-    console.log(this.props.proj);
-    console.log(this.props.word);
-    if (this.props.proj.length > 0) {
-      var children = this.props.proj.map((x)=> {
+    console.log(this.props.projects);
+    if (this.props) {
+      var children = this.props.map((x)=> {
             return
               <div>
                 <li className="list-group-item active-projects" key={x}>
@@ -126,7 +126,7 @@ var ProjectList = React.createClass({
                     <div className="col-xs-2">
                     </div>
                     <div className="col-xs-10">
-                      <strong>{this.props.proj.name}</strong>
+                      <strong>{this.props.projects.name}</strong>
                     </div>
                   </div>
                 </li>
