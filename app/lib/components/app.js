@@ -1,8 +1,6 @@
 'use strict';
 'use-strict';
 
-require('babel-polyfill');
-
 var React = require('react');
 var ReactDOM = require('react-dom');
 var ipcRenderer = require('electron').ipcRenderer;
