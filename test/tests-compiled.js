@@ -194,7 +194,7 @@ describe('add and modify containers within a project', () => {
   });
 });
 
-xdescribe('should sync files to docker machine', () => {
+describe('should sync files to docker machine', () => {
   const projectName = 'project5';
   const basePath = (0, _path.join)(__dirname, 'userFolder', projectName);
   const dockDevPath = (0, _path.join)(basePath, '.dockdev');
