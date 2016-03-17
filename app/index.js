@@ -25,14 +25,14 @@ app.on('ready', function(){
   });
 });
 
-ipcMain.on('asynchronous-message', function(event, arg) {
-  console.log(arg);  // prints "ping"
-  event.sender.send('asynchronous-reply', 'pong');
-});
+// ipcMain.on('asynchronous-message', function(event, arg) {
+//   console.log(arg);  // prints "ping"
+//   event.sender.send('asynchronous-reply', 'pong');
+// });
 
 ipcMain.on('synchronous-message', function(event, arg) {
 
-dialog.showOpenDialog({ properties: [ 'openDirectory', 'multiSelections' ]});
+  dialog.showOpenDialog({ properties: [ 'openDirectory']});
   console.log(arg);  // prints "ping"
   event.returnValue = 'pong';
 });

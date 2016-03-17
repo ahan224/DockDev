@@ -3,11 +3,22 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const ipcRenderer = require('electron').ipcRenderer;
 const sweetAlert = require('sweetalert2');
+var remote = require('remote');
+var dialog = remote.require('dialog');
+var fs = require('fs');
+var path = require('path');
 // console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints "pong"
 
-ipcRenderer.on('asynchronous-reply', function(event, arg) {
-  console.log(arg); // prints "pong"
-});
+// ipcRenderer.on('asynchronous-reply', function(event, arg) {
+//   console.log(arg); // prints "pong"
+//
+//
+//   function openFile() {
+//     console.log(dialog.showOpenDialog({
+//       properties: ['openDirectory']
+//     }));
+//   }
+// });
 
 // PARENT////////////////////////////////////
 // NOTE : The parent will be the electron Window.
@@ -76,8 +87,11 @@ let TopNavList = React.createClass({
   //     });
   //  },
   handleClick: function(e){
-   return  ipcRenderer.send('asynchronous-message', 'select file');
-
+   return  function openFile() {
+       console.log(dialog.showOpenDialog({
+         properties: ['openDirectory']
+       }));
+     }
   },
 
   render : function(){
