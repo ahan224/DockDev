@@ -46,6 +46,7 @@ gulp.task('react', () => {
   bundler.external('react');
   bundler.external('react-dom');
   bundler.external('./lib/utils.js');
+  bundler.external('ramda');
 
 
   const watcher = watchify(bundler);
