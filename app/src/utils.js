@@ -7,7 +7,6 @@ import Promise, { coroutine as co } from 'bluebird';
 import R from 'ramda';
 import uuid from 'node-uuid';
 import * as container from './container.js';
-import * as fileSearch from './file-search.js';
 import { spawn } from 'child_process';
 
 // promisify certain callback functions
@@ -27,8 +26,8 @@ export const config = {
   // main config infomration
   configFolder: '.dockdevConfig',
   configFile: 'dockdevConfig.json',
-  configPath(configDirectory) {
-    return join(configDirectory, this.configFolder, this.configFile);
+  configPath() {
+    return join(process.env.HOME, this.configFolder, this.configFile);
   },
 
   // individual project infomration
@@ -88,12 +87,14 @@ export const readProj = co(function *(basePath) {
   return addBasePath(readProjFile, basePath);
 })
 
-export const writeInitialConfig = (configDirectory) => {
-  writeFile(join(configDirectory, config.configFolder, config.configFile), JSONStringifyPretty({
-    configDirectory,
+export const writeInitialConfig = co(function *(userSelectedDirectory) {
+  if (!userSelectedDirectory) userSelectedDirectory = process.env.HOME;
+  yield mkdir(join(process.env.HOME, config.configFolder));
+  yield writeFile(config.configPath(), JSONStringifyPretty({
+    userSelectedDirectory,
     projects: {}
   }));
-};
+});
 
 const findDockdev = (array) => {
     let result = '';
@@ -112,7 +113,7 @@ const findDockdev = (array) => {
 // findDockdev(['/Users/dbschwartz83/DockDev', '-name', 'index.html'], handleFolders);
 
 // after reading the main configFile, we are going to load all the paths
-export const loadPaths = co(function *(configFile, configDirectory) {
+export const loadPaths = co(function *(configFile, userSelectedDirectory) {
   let needToSearch = false;
   let pathsToSendToUI = [];
 
@@ -129,13 +130,14 @@ export const loadPaths = co(function *(configFile, configDirectory) {
   }
 
 // send the data from pathsToSendToUI to the UI
-  
+
 
 // search for the other projects if there were any errors in the data
   if (needToSearch) {
     let searchArray = [];
+    if (!userSelectedDirectory) userSelectedDirectory = process.env.HOME;
     // create the parameters for the linux find command
-    searchArray.push(configDirectory);
+    searchArray.push(userSelectedDirectory);
     searchArray.push('-name');
     searchArray.push(config.projFile);
     for (var key in configFile.projects) {
@@ -160,24 +162,22 @@ export const loadPaths = co(function *(configFile, configDirectory) {
 });
 
 // reads the main configFile at launch of the app, if the file doesn't exist, it writes the file
-export const readConfig = co(function *(configDirectory) {
-  let readConfigFile;
+export const readConfig = co(function *(userSelectedDirectory) {
 
   try {
-    readConfigFile = JSON.parse(yield readFile(join(configDirectory, config.configFolder, config.configFile)));
-    yield loadPaths(readConfigFile, configDirectory);
+    let readConfigFile = yield readFile(config.configPath());
+    readConfigFile = JSON.parse(readConfigFile);
+    yield loadPaths(readConfigFile, userSelectedDirectory);
   } catch (e) {
-    console.log(e);
+    yield writeInitialConfig(userSelectedDirectory);
   }
-
-  if (!readConfigFile) yield writeInitialConfig(configDirectory);
 });
 
 // adds projects uuid and paths to the main config file
-export const addProjToConfig = co(function *(configDirectory, basePath) {
-  let readConfigFile = JSON.parse(yield readConfig(configDirectory));
+export const addProjToConfig = co(function *(basePath) {
+  let readConfigFile = JSON.parse(yield readConfig(config.configPath()));
   readConfigFile.projects[basePath] = basePath;
-  yield writeFile(join(configDirectory, config.configFolder, config.configFile), JSONStringifyPretty(readConfigFile));
+  yield writeFile(config.configPath(), JSONStringifyPretty(readConfigFile));
 })
 
 // addProjToMemory :: object -> object -> object
@@ -192,13 +192,14 @@ export const addToAppMemory = addProjToMemory(memory);
 // initProject :: string -> string -> promise(object)
 // combines the sequence of functions to initiate a new projects
 // takes a path and a project name and returns the config object
-export const initProject = co(function *(basePath, projectName, configDirectory) {
+export const initProject = co(function *(basePath, projectName) {
+
   const projObj = createProj(basePath, projectName);
 
   yield createDockDev(projObj);
   yield writeProj(projObj);
 
-  addProjToConfig(configDirectory, basePath);
+  // addProjToConfig(basePath);
   addToAppMemory(projObj);
 
   return projObj;
