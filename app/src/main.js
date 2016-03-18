@@ -7,8 +7,6 @@ import { join } from 'path';
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const ipcMain = electron.ipcMain;
-const dialog = electron.dialog;
-
 
 let mainWindow = null;
 
@@ -38,10 +36,12 @@ ipcMain.on('synchronous-message', function(event, arg) {
 
 // const ipcRenderer = require('electron').ipcRenderer;
 // const sweetAlert = require('sweetalert2');
-// const remote = require('remote');
-// const dialog = remote.require('dialog');
+;
 // const fs = require('fs');
 // const path = require('path');
 // const utils = require('../lib/utils.js');
+// const remote = require('remote');
+// const dialog = remote.require('dialog')
+// const dialog = electron.dialog;
 
 // global.ipcRenderer = require('electron').ipcRenderer;
