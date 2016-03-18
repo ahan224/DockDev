@@ -5,12 +5,11 @@ import { render } from 'react-dom';
 import SideMenu from './components/SideMenu.js';
 import * as utils from './lib/utils.js';
 
-
-
 class App extends React.Component {
   constructor() {
     super();
     this.addProject = this.addProject.bind(this);
+    this.projectSelect = this.projectSelect.bind(this);
     this.state = {
       projects: {
         'first': {
@@ -26,7 +25,8 @@ class App extends React.Component {
       .showOpenDialog(
         { properties: ['openDirectory', 'createDirectory'] },
         selectedDir => {
-          return utils.initProject(selectedDir[0], 'TEST')
+          const name = selectedDir[0].split('/').pop();
+          return utils.initProject(selectedDir[0], name)
             .then(() => this.updateProject(utils.memory))
         }
       )
@@ -40,6 +40,10 @@ class App extends React.Component {
 
   }
 
+  projectSelect(uuid) {
+    console.log(uuid);
+  }
+
   componentDidUpdate() {
     console.log('state updated', this.state);
   }
@@ -47,7 +51,11 @@ class App extends React.Component {
   render() {
     return (
       <div className="pane-group">
-        <SideMenu projects={this.state.projects} addProject={this.addProject} settingsClick={this.settingsClick}/>
+        <SideMenu projects={this.state.projects}
+          addProject={this.addProject}
+          settingsClick={this.settingsClick}
+          projectSelect={this.projectSelect}
+        />
       </div>
     );
   }
