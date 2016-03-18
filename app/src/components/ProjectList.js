@@ -11,7 +11,7 @@ const ProjectList = ({ projects }) => {
             <div className="col-xs-2">
             </div>
             <div className="col-xs-10">
-              <strong>{proj[1].name}</strong>
+              <strong>{proj[1].projectName}</strong>
             </div>
           </div>
         </li>
