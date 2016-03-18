@@ -31,7 +31,7 @@ body {
   background: rgb(234,234,234)!important;
 }
 
-.add-container button {
+/*.add-container button {
   background: rgb(234,234,234)!important;
   border: none;
   font-size: 23px;
@@ -39,7 +39,7 @@ body {
   float: right;
   margin-top: -7px;
   margin-right: -16px;
-}
+}*/
 
 .add-container {
     height: 44px!important;

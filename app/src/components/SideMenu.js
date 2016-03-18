@@ -9,11 +9,11 @@ import BottomNavList from './BottomNavList.js';
 // Relationship: App > Sidemenu
 // Children: TopNavList, ProjectList, BottomNavList
 // /////////////////////////////////////////////
-const SideMenu = ({projects, handleProjects}) => {
+const SideMenu = ({projects,addProject}) => {
   return (
     <div className="pane-sm sidebar">
-      <TopNavList/>
-      <ProjectList projects={projects} handleProjects={handleProjects} />
+      <TopNavList  addProject={addProject}/>
+      <ProjectList projects={projects}  />
       <BottomNavList/>
     </div>
   )
