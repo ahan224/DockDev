@@ -43,6 +43,11 @@ gulp.task('react', () => {
     fullPaths: true
   })
 
+  bundler.external('react');
+  bundler.external('react-dom');
+  bundler.external('./lib/utils.js');
+
+
   const watcher = watchify(bundler);
 
   return watcher
