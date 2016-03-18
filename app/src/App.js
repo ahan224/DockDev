@@ -24,8 +24,14 @@ class App extends React.Component {
     }
   }
 
-  handleProjects(e) {
+  handleProject(e) {
     this.setState({ projects: e });
+  }
+
+  addProject(e){
+     dialog.showOpenDialog({
+           properties: ['openDirectory']
+         });
   }
 
   componentDidUpdate() {
@@ -35,7 +41,7 @@ class App extends React.Component {
   render() {
     return (
       <div className="pane-group">
-        <SideMenu projects={this.state.projects} handleProjects={this.handleProjects}/>
+        <SideMenu projects={this.state.projects} handleProject={this.handleProject} addProject={this.addProject}/>
       </div>
     );
   }
