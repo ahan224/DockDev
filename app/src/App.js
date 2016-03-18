@@ -3,7 +3,9 @@
 import React from 'react';
 import { render } from 'react-dom';
 import SideMenu from './components/SideMenu.js';
+import * as utils from './lib/utils.js';
 
+console.log(utils.memory);
 
 console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints "pong"
 
