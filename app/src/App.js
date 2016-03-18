@@ -10,10 +10,11 @@ import * as utils from './lib/utils.js';
 class App extends React.Component {
   constructor() {
     super();
+    this.addProject = this.addProject.bind(this);
     this.state = {
       projects: {
         'first': {
-          name: 'test',
+          projectName: 'test',
           uuid: 1234556667
         }
       }
@@ -21,11 +22,22 @@ class App extends React.Component {
   }
 
   addProject(e) {
-    this.setState({ projects: e });
+    remote.dialog
+      .showOpenDialog(
+        { properties: ['openDirectory', 'createDirectory'] },
+        selectedDir => {
+          return utils.initProject(selectedDir[0], 'TEST')
+            .then(() => this.updateProject(utils.memory))
+        }
+      )
+  }
+
+  updateProject(memory) {
+    this.setState({ projects: memory })
   }
 
   settingsClick(e) {
-    console.log(e);
+
   }
 
   componentDidUpdate() {
@@ -41,8 +53,6 @@ class App extends React.Component {
   }
 }
 
-//
-// <ProjectDetailList projects={this.state.projects}/>
 
 render(<App/>, document.getElementById('main'));
 

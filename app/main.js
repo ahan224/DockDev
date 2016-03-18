@@ -18,7 +18,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const app = _electron2.default.app;
 const BrowserWindow = _electron2.default.BrowserWindow;
 const ipcMain = _electron2.default.ipcMain;
-const dialog = _electron2.default.dialog;
 
 let mainWindow = null;
 
@@ -46,10 +45,12 @@ ipcMain.on('synchronous-message', function (event, arg) {
 
 // const ipcRenderer = require('electron').ipcRenderer;
 // const sweetAlert = require('sweetalert2');
-// const remote = require('remote');
-// const dialog = remote.require('dialog');
+;
 // const fs = require('fs');
 // const path = require('path');
 // const utils = require('../lib/utils.js');
+// const remote = require('remote');
+// const dialog = remote.require('dialog')
+// const dialog = electron.dialog;
 
 // global.ipcRenderer = require('electron').ipcRenderer;
