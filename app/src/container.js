@@ -92,6 +92,18 @@ export const pull = co(function *(machineName, image) {
   return yield exec(`docker pull ${ image }`, { env });
 });
 
+export const save = co(function *(machineName, image) {
+  let env = yield machine.env(machineName);
+  env = R.fromPairs(env.split('\n').slice(0, 4).map(val => val.substr(7).split('=')));
+  for (var prop in env) {
+    var len = env[prop].length - 2;
+    env[prop] = env[prop].substr(1).substr(0, len);
+  }
+  return yield exec(`docker save ${ image } > tempImage.tar && docker-machine ssh ${ machineName } docker load < tempImage.tar`);
+});
+
+save('test11', 'busybox');
+
 export const logs = co(function *(machineName, containerId) {
   let env = yield machine.env(machineName);
   env = R.fromPairs(env.split('\n').slice(0, 4).map(val => val.substr(7).split('=')));
