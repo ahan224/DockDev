@@ -165,7 +165,8 @@ export const loadPaths = co(function *(configFile, userSelectedDirectory) {
 export const readConfig = co(function *(userSelectedDirectory) {
 
   try {
-    const readConfigFile = JSON.parse(yield readFile(config.configPath()));
+    let readConfigFile = yield readFile(config.configPath());
+    readConfigFile = JSON.parse(readConfigFile);
     yield loadPaths(readConfigFile, userSelectedDirectory);
   } catch (e) {
     yield writeInitialConfig(userSelectedDirectory);
