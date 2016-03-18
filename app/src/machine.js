@@ -23,7 +23,15 @@ export const exec = cmdLine('docker-machine');
 */
 export const inspect = (machineName) => exec(`inspect ${ machineName }`);
 
-export const env = (machineName) => exec(`env ${ machineName }`);
+export const env = co(function *(machineName) {
+  let env = yield exec(`env ${ machineName }`);
+  env = R.fromPairs(env.split('\n').slice(0, 4).map(val => val.substr(7).split('=')));
+  for (var prop in env) {
+    var len = env[prop].length - 2;
+    env[prop] = env[prop].substr(1).substr(0, len);
+  }
+  return env;
+});
 
 export const ssh = (machineName, args) => exec(`ssh ${ machineName } ${ args }`);
 
