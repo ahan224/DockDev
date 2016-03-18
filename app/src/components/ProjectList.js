@@ -1,11 +1,11 @@
 import React from 'react';
 import R from 'ramda'
 
-const ProjectList = ({ projects }) => {
+const ProjectList = ({ projects, projectSelect }) => {
   const projArray = R.toPairs(projects);
   const projToRender = projArray.map((proj, idx) => {
     return (
-      <div key={proj[1].uuid}>
+      <div key={proj[1].uuid} onClick={() => projectSelect(proj[1].uuid)}>
         <li className="list-group-item active-projects">
           <div className="media-body project">
             <div className="col-xs-2">
