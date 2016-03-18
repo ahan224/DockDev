@@ -3,10 +3,12 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const ipcRenderer = require('electron').ipcRenderer;
 const sweetAlert = require('sweetalert2');
-var remote = require('remote');
-var dialog = remote.require('dialog');
-var fs = require('fs');
-var path = require('path');
+const remote = require('remote');
+const dialog = remote.require('dialog');
+const fs = require('fs');
+const path = require('path');
+const utils = require('./lib/utils.js');
+
 // console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints "pong"
 
 // ipcRenderer.on('asynchronous-reply', function(event, arg) {
@@ -38,15 +40,23 @@ var App = React.createClass({
   // }
   getInitialState: function() {
     return {
-      projects: ['test'],
+      projects: [],
       words: 'hello-world'
     };
   },
 
+  handleProjects: function(e){
+    this.setState({ projects: e })
+    console.log(this.state);
+  },
+
+  componentDidUpdate: function(){
+    console.log('state updated', this.state);
+  },
+
   render: function(){
     return(<div className="pane-group">
-    					<SideMenu projects={this.state}/>
-              <ProjectList />
+    					<SideMenu projects={this.state.projects} handleProjects={this.handleProjects}/>
               <ProjectDetailList projects={this.state.projects}/>
               //  {console.log(this.state.projects)}
 
@@ -69,7 +79,7 @@ var SideMenu = React.createClass({
     return (
        <div className="pane-sm sidebar">
          <TopNavList/>
-         <ProjectList projects={this.props.projects}/>
+         <ProjectList projects={this.props.projects} handleProjects={this.props.handleProjects} />
          <BottomNavList/>
        </div>
     )
@@ -91,12 +101,32 @@ var TopNavList = React.createClass({
   //       ipcRenderer.send('asynchronous-message', 'pik');
   //     });
   //  },
+
+
   handleClick: function(e){
-   return  function openFile() {
-       console.log(dialog.showOpenDialog({
-         properties: ['openDirectory']
-       }));
-     }
+       dialog.showOpenDialog({
+         properties: ['openDirectory', 'createDirectory']
+       }, function(event) {
+         console.log(event);
+         return  swal({
+               title: "An input!",
+               text: 'Write something interesting:',
+               html: "<input id='input-field'></input>",
+               showCancelButton: true,
+               closeOnConfirm: false,
+               animation: "slide-from-top"
+             }, function(){
+               utils.initProject(event[0], $('#input-field').val())
+                .then(() => {
+                  return console.log('saving:', this.props.projects);
+                })
+                .then(() => {
+                  return this.props.handleProjects(utils.memory)
+                })
+                .catch(console.log);
+
+             });
+       });
   },
 
   render : function(){
@@ -105,7 +135,7 @@ var TopNavList = React.createClass({
                 <ul className="list-group container-list container-links topNav">
                   <li className="list-group-item add-container">
                   <button type="button" name="button" onClick={this.handleClick}>
-                  <span className=" icon ion-ios-plus-outline"></span>
+                  Add
                   </button>
                 </li>
                 </ul>
@@ -118,7 +148,7 @@ var ProjectList = React.createClass({
   render: function () {
     console.log(this.props.projects);
     if (this.props) {
-      var children = this.props.map((x)=> {
+      var children = this.props.projects.map((x)=> {
             return
               <div>
                 <li className="list-group-item active-projects" key={x}>
@@ -126,7 +156,7 @@ var ProjectList = React.createClass({
                     <div className="col-xs-2">
                     </div>
                     <div className="col-xs-10">
-                      <strong>{this.props.projects.name}</strong>
+                      <strong>{x.name}</strong>
                     </div>
                   </div>
                 </li>
@@ -151,7 +181,7 @@ var BottomNavList = React.createClass({
                <div>
                  <ul className="list-group container-list bottom-nav">
                    <li className="list-group-item add-container">
-                     <button type="button" name="button" onClick="">
+                     <button type="button" name="button">
                        <img className="icon" src="./icons/Userinterface_setting-roll.svg">
                        </img>
                      </button>
@@ -173,9 +203,8 @@ var ProjectDetailList = React.createClass({
   },
 
   render: function(){
-    console.log('am i here');
-    if (this.props.proj.length) {
-      var children = this.props.proj.map((x)=> {
+    if (this.props.projects.length) {
+      var children = this.props.projects.map((x)=> {
         return (<div className="card dependancy col-xs-12">
                 <div className="card-block">
                 <h4 className="card-title">Title</h4>
@@ -200,8 +229,6 @@ var ProjectDetailList = React.createClass({
         <div className="pane" id="main">
           <div className="container main-content-wrapper">
             <div className="card-group main-content-card-group ">
-            <button id="openFile" onClick="openFile()">Open</button>
-            <button id="saveFile" onClick={this.handleClick}>Savafasdfe</button>
             </div>
           </div>
         </div>)
