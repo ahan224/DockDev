@@ -198,7 +198,7 @@ export const initProject = co(function *(basePath, projectName) {
   yield createDockDev(projObj);
   yield writeProj(projObj);
 
-  addProjToConfig(basePath);
+  // addProjToConfig(basePath);
   addToAppMemory(projObj);
 
   return projObj;

@@ -9,6 +9,8 @@ var remote = require('remote');
 var dialog = remote.require('dialog');
 var fs = require('fs');
 var path = require('path');
+var utils = require('./lib/utils.js');
+
 // console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints "pong"
 
 // ipcRenderer.on('asynchronous-reply', function(event, arg) {
@@ -42,17 +44,25 @@ var App = React.createClass({
   // }
   getInitialState: function getInitialState() {
     return {
-      projects: ['test'],
+      projects: [],
       words: 'hello-world'
     };
+  },
+
+  handleProjects: function handleProjects(e) {
+    this.setState({ projects: e });
+    console.log(this.state);
+  },
+
+  componentDidUpdate: function componentDidUpdate() {
+    console.log('state updated', this.state);
   },
 
   render: function render() {
     return React.createElement(
       'div',
       { className: 'pane-group' },
-      React.createElement(SideMenu, { projects: this.state }),
-      React.createElement(ProjectList, null),
+      React.createElement(SideMenu, { projects: this.state.projects, handleProjects: this.handleProjects }),
       React.createElement(ProjectDetailList, { projects: this.state.projects }),
       '//  ',
       console.log(this.state.projects)
@@ -77,7 +87,7 @@ var SideMenu = React.createClass({
       'div',
       { className: 'pane-sm sidebar' },
       React.createElement(TopNavList, null),
-      React.createElement(ProjectList, { projects: this.props.projects }),
+      React.createElement(ProjectList, { projects: this.props.projects, handleProjects: this.props.handleProjects }),
       React.createElement(BottomNavList, null)
     );
   }
@@ -99,12 +109,29 @@ var TopNavList = React.createClass({
   //       ipcRenderer.send('asynchronous-message', 'pik');
   //     });
   //  },
+
   handleClick: function handleClick(e) {
-    return function openFile() {
-      console.log(dialog.showOpenDialog({
-        properties: ['openDirectory']
-      }));
-    };
+    dialog.showOpenDialog({
+      properties: ['openDirectory', 'createDirectory']
+    }, function (event) {
+      console.log(event);
+      return swal({
+        title: "An input!",
+        text: 'Write something interesting:',
+        html: "<input id='input-field'></input>",
+        showCancelButton: true,
+        closeOnConfirm: false,
+        animation: "slide-from-top"
+      }, function () {
+        var _this = this;
+
+        utils.initProject(event[0], $('#input-field').val()).then(function () {
+          return console.log('saving:', _this.props.projects);
+        }).then(function () {
+          return _this.props.handleProjects(utils.memory);
+        }).catch(console.log);
+      });
+    });
   },
 
   render: function render() {
@@ -120,7 +147,7 @@ var TopNavList = React.createClass({
           React.createElement(
             'button',
             { type: 'button', name: 'button', onClick: this.handleClick },
-            React.createElement('span', { className: ' icon ion-ios-plus-outline' })
+            'Add'
           )
         )
       )
@@ -132,11 +159,9 @@ var ProjectList = React.createClass({
   displayName: 'ProjectList',
 
   render: function render() {
-    var _this = this;
-
     console.log(this.props.projects);
     if (this.props) {
-      var children = this.props.map(function (x) {
+      var children = this.props.projects.map(function (x) {
         return;
         React.createElement(
           'div',
@@ -154,7 +179,7 @@ var ProjectList = React.createClass({
                 React.createElement(
                   'strong',
                   null,
-                  _this.props.projects.name
+                  x.name
                 )
               )
             )
@@ -199,7 +224,7 @@ var BottomNavList = React.createClass({
           { className: 'list-group-item add-container' },
           React.createElement(
             'button',
-            { type: 'button', name: 'button', onClick: '' },
+            { type: 'button', name: 'button' },
             React.createElement('img', { className: 'icon', src: './icons/Userinterface_setting-roll.svg' })
           )
         )
@@ -221,9 +246,8 @@ var ProjectDetailList = React.createClass({
   },
 
   render: function render() {
-    console.log('am i here');
-    if (this.props.proj.length) {
-      var children = this.props.proj.map(function (x) {
+    if (this.props.projects.length) {
+      var children = this.props.projects.map(function (x) {
         return React.createElement(
           'div',
           { className: 'card dependancy col-xs-12' },
@@ -287,20 +311,7 @@ var ProjectDetailList = React.createClass({
         React.createElement(
           'div',
           { className: 'container main-content-wrapper' },
-          React.createElement(
-            'div',
-            { className: 'card-group main-content-card-group ' },
-            React.createElement(
-              'button',
-              { id: 'openFile', onClick: 'openFile()' },
-              'Open'
-            ),
-            React.createElement(
-              'button',
-              { id: 'saveFile', onClick: this.handleClick },
-              'Savafasdfe'
-            )
-          )
+          React.createElement('div', { className: 'card-group main-content-card-group ' })
         )
       );
     }
