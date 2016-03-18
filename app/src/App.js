@@ -7,14 +7,6 @@ import * as utils from './lib/utils.js';
 
 console.log(utils.memory);
 
-console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints "pong"
-
-ipcRenderer.on('asynchronous-reply', function(event, arg) {
-  console.log(arg); // prints "pong"
-});
-
-ipcRenderer.send('asynchronous-message', 'ping');
-
 
 class App extends React.Component {
   constructor() {
@@ -29,9 +21,11 @@ class App extends React.Component {
   }
 
   addProject(e){
-     dialog.showOpenDialog({
-           properties: ['openDirectory']
-         });
+  console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints "pong"
+  ipcRenderer.on('asynchronous-reply', function(event, arg) {
+    console.log(arg); // prints "pong"
+  });
+  ipcRenderer.send('asynchronous-message', 'ping');
   }
 
   componentDidUpdate() {
