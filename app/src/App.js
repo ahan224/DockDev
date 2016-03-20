@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { render } from 'react-dom';
+import { Router, Route, hashHistory } from 'react-router';
 import SideMenu from './components/SideMenu.js';
 import * as utils from './lib/utils.js';
 
@@ -12,12 +13,16 @@ class App extends React.Component {
     this.projectSelect = this.projectSelect.bind(this);
     this.state = {
       projects: {
-        'first': {
+        first: {
           projectName: 'test',
           uuid: 1234556667
         }
       }
-    }
+    };
+  }
+
+  componentDidUpdate() {
+    console.log('state updated', this.state);
   }
 
   addProject(e) {
@@ -27,25 +32,21 @@ class App extends React.Component {
         selectedDir => {
           const name = selectedDir[0].split('/').pop();
           return utils.initProject(selectedDir[0], name)
-            .then(() => this.updateProject(utils.memory))
+            .then(() => this.updateProject(utils.memory));
         }
-      )
+      );
   }
 
   updateProject(memory) {
-    this.setState({ projects: memory })
+    this.setState({ projects: memory });
   }
 
-  settingsClick(e) {
-
-  }
+  // settingsClick(e) {
+  //
+  // }
 
   projectSelect(uuid) {
     console.log(uuid);
-  }
-
-  componentDidUpdate() {
-    console.log('state updated', this.state);
   }
 
   render() {
@@ -61,8 +62,6 @@ class App extends React.Component {
   }
 }
 
-
-render(<App/>, document.getElementById('main'));
 
 // console.log(utils.memory);
 //
