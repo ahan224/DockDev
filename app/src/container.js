@@ -92,8 +92,6 @@ export const deploy = co(function *(machineName, image) {
   return yield exec(`docker save ${ image } > tempImage.tar && docker-machine ssh ${ machineName } docker load < tempImage.tar`, { env });
 });
 
-save('test11', 'busybox');
-
 export const logs = co(function *(machineName, containerId) {
   let env = yield machine.env(machineName);
   return yield exec(`docker logs ${ containerId }`, { env });
