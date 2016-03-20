@@ -36,6 +36,8 @@ gulp.task('main', () => {
 
 
 gulp.task('react', () => {
+  console.log('running');
+
   const bundler = browserify({
     entries: ['./app/src/App.js'],
     transform: babelify.configure({presets: ["react", "es2015"]}),
@@ -51,17 +53,21 @@ gulp.task('react', () => {
 
   const watcher = watchify(bundler);
 
-  return watcher
-    .on('update', () => {
-      watcher.bundle()
-        .on('error', handleErrors)
-        .pipe(source('bundle.js'))
-        .pipe(gulp.dest('app/lib'))
+  function rebundle() {
+    const stream = watcher.bundle();
+    return stream
+      .on('error', handleErrors)
+      .pipe(source('bundle.js'))
+      .pipe(gulp.dest('app/lib'))
+  }
+
+  watcher.on('update', () => {
+      const updateStart = Date.now();
+      rebundle();
+      console.log('Updated! ' + (Date.now() - updateStart) + 'ms')
     })
-    .bundle()
-    .on('error', handleErrors)
-    .pipe(source('bundle.js'))
-    .pipe(gulp.dest('app/lib'))
+
+    return rebundle();
 });
 
 gulp.task('test', () => {

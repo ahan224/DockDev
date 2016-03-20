@@ -5,7 +5,7 @@ import React from 'react';
 // /////////////////////////////////////////////
 var ProjectDetailList = React.createClass({
 
-  handleClick: function(e){
+  handleClick: function(e) {
     console.log('running');
     return console.log(e);
   },
