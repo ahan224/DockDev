@@ -87,7 +87,7 @@ export const readProj = co(function *(basePath) {
   return addBasePath(readProjFile, basePath);
 })
 
-export const writeInitialConfig = co(function *(userSelectedDirectory) {
+export const writeConfig = co(function *(userSelectedDirectory) {
   if (!userSelectedDirectory) userSelectedDirectory = process.env.HOME;
   yield mkdir(join(process.env.HOME, config.configFolder));
   yield writeFile(config.configPath(), JSONStringifyPretty({
@@ -129,37 +129,40 @@ export const loadPaths = co(function *(configFile, userSelectedDirectory) {
     }
   }
 
-// send the data from pathsToSendToUI to the UI
-
-
 // search for the other projects if there were any errors in the data
   if (needToSearch) {
-    let searchArray = [];
-    if (!userSelectedDirectory) userSelectedDirectory = process.env.HOME;
-    // create the parameters for the linux find command
-    searchArray.push(userSelectedDirectory);
-    searchArray.push('-name');
-    searchArray.push(config.projFile);
-    for (var key in configFile.projects) {
-
-      // create the parameters for files to exclude based on the projects that were already found
-      searchArray.push('!');
-      searchArray.push('-path');
-      searchArray.push(projects[key]);
-    }
-    let searchResultsToUI = [];
-
-    // returns an array of data
-    let searchResults = yield findDockdev(searchArray);
-    for (var i = 0; i < searchResults.length; i++) {
-      let fileContents = JSON.parse(yield readFile(join(searchResults[i], config.projPath())));
-      searchResultsToUI.push(fileContents);
-    }
-    // send the data from searchResultsToUI to the UI
-
+    var badPathResults = searchBadPaths(configFile, userSelectedDirectory);
   }
 
+ // need to return here an array of arrays with good and bad
+  return;
+
 });
+
+export const searchBadPaths = co(function *(configFile, userSelectedDirectory)) {
+  let searchArray = [];
+  if (!userSelectedDirectory) userSelectedDirectory = process.env.HOME;
+  // create the parameters for the linux find command
+  searchArray.push(userSelectedDirectory);
+  searchArray.push('-name');
+  searchArray.push(config.projFile);
+  for (var key in configFile.projects) {
+
+    // create the parameters for files to exclude based on the projects that were already found
+    searchArray.push('!');
+    searchArray.push('-path');
+    searchArray.push(projects[key]);
+  }
+  let searchResultsToUI = [];
+
+  // returns an array of data
+  let searchResults = yield findDockdev(searchArray);
+  for (var i = 0; i < searchResults.length; i++) {
+    let fileContents = JSON.parse(yield readFile(join(searchResults[i], config.projPath())));
+    searchResultsToUI.push(fileContents);
+  }
+  return searchResultsToUI;
+}
 
 // reads the main configFile at launch of the app, if the file doesn't exist, it writes the file
 export const readConfig = co(function *(userSelectedDirectory) {
@@ -169,7 +172,7 @@ export const readConfig = co(function *(userSelectedDirectory) {
     readConfigFile = JSON.parse(readConfigFile);
     yield loadPaths(readConfigFile, userSelectedDirectory);
   } catch (e) {
-    yield writeInitialConfig(userSelectedDirectory);
+    yield writeConfig(userSelectedDirectory);
   }
 });
 

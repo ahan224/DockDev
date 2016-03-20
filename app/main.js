@@ -33,15 +33,15 @@ app.on('ready', function () {
   });
 });
 
-ipcMain.on('asynchronous-message', function (event, arg) {
-  console.log(arg); // prints "ping"
-  event.sender.send('asynchronous-reply', 'pong');
-});
-
-ipcMain.on('synchronous-message', function (event, arg) {
-  console.log(arg); // prints "ping"
-  event.returnValue = 'pong';
-});
+// ipcMain.on('asynchronous-message', function(event, arg) {
+//   console.log(arg);  // prints "ping"
+//   event.sender.send('asynchronous-reply', 'pong');
+// });
+//
+// ipcMain.on('synchronous-message', function(event, arg) {
+//   console.log(arg);  // prints "ping"
+//   event.returnValue = 'pong';
+// });
 
 // const ipcRenderer = require('electron').ipcRenderer;
 // const sweetAlert = require('sweetalert2');
