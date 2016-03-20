@@ -3,3 +3,4 @@ bower_components
 .DS_Store
 /app/lib
 /test/userFolder
+/test/tests-compiled.js
