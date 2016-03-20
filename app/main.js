@@ -1,4 +1,3 @@
-'use strict';
 'use-strict';
 
 var _electron = require('electron');
@@ -19,7 +18,7 @@ const app = _electron2.default.app;
 const BrowserWindow = _electron2.default.BrowserWindow;
 const ipcMain = _electron2.default.ipcMain;
 
-let mainWindow = null;
+var mainWindow = null;
 
 app.on('ready', function () {
   mainWindow = new BrowserWindow({ width: 750, height: 550, titleBarStyle: "hidden-inset" });
