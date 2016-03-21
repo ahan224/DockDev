@@ -237,7 +237,8 @@ describe('should sync files to docker machine', () => {
       (0, _fs.writeFileSync)((0, _path.join)(result.basePath, 'test4.txt'));
       (0, _fs.writeFileSync)((0, _path.join)(result.basePath, 'test10.txt'));
 
-      setTimeout(done, 10000);
+      setTimeout(done, 1900);
+      (0, _chai.expect)(true).to.be.true;
       return;
     });
   });
@@ -257,7 +258,7 @@ describe('should write a config file', () => {
     _rimraf2.default.sync(basePath);
 
     // will create in basePath and also searches for projectFolders in the test directory
-    utils.writeConfig(process.env.HOME, basePath);
+    utils.writeConfig(__dirname, basePath);
     result = (0, _fs.readFileSync)(utils.config.configPath(basePath));
   });
 
