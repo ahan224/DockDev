@@ -242,3 +242,30 @@ describe('should sync files to docker machine', () => {
     });
   });
 });
+
+describe('should write a config file', () => {
+  let result;
+  const basePath = (0, _path.join)(__dirname, 'configFolder');
+
+  // need to delete the configFolder and File before, then run the
+  before(() => {
+    try {
+      (0, _fs.mkdirSync)(basePath);
+    } catch (e) {}
+
+    // remove configFolder if it exists
+    _rimraf2.default.sync(basePath);
+
+    // will create in basePath and also searches for projectFolders in the test directory
+    utils.writeConfig(process.env.HOME, basePath);
+    result = (0, _fs.readFileSync)(utils.config.configPath(basePath));
+  });
+
+  // this should probably be moved to the existing project tests (project2)
+  it('writeConfig should write a file', () => {
+    return result.then(data => {
+      (0, _chai.expect)(data.userSelectedDirectory).to.equal(process.env.HOME);
+      (0, _chai.expect)(data.projects).to.be.empty;
+    });
+  });
+});
