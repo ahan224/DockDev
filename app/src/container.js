@@ -1,68 +1,63 @@
-'use strict';
-
 import rp from 'request-promise';
 import * as machine from './machine.js';
 import Promise, { coroutine as co } from 'bluebird';
-import R from 'ramda';
-import * as child_process from 'child_process';
+import { exec as childExec } from 'child_process';
 
-const exec = Promise.promisify(child_process.exec);
-
-// save, commit, search, build, archive
+const exec = Promise.promisify(childExec);
 
 const dockerCommands = {
   start: {
     cmd: 'start',
     method: 'POST',
     uri(containerId) {
-      return `/containers/${ containerId }/${ this.cmd }`;
+      return `/containers/${containerId}/${this.cmd}`;
     }
   },
   stop: {
     cmd: 'stop',
     method: 'POST',
     uri(containerId) {
-      return `/containers/${ containerId }/${ this.cmd }`;
+      return `/containers/${containerId}/${this.cmd}`;
     }
   },
   inspect: {
     cmd: 'json',
     method: 'GET',
     uri(containerId) {
-      return `/containers/${ containerId }/${ this.cmd }`;
+      return `/containers/${containerId}/${this.cmd}`;
     }
   },
   list: {
     cmd: 'json',
     method: 'GET',
     uri() {
-      return `/containers/${ this.cmd }`;
+      return `/containers/${this.cmd}`;
     }
   },
   create: {
     cmd: 'create',
     method: 'POST',
     uri() {
-      return `/containers/${ this.cmd }`;
+      return `/containers/${this.cmd}`;
     }
   },
   restart: {
     cmd: 'restart',
     method: 'POST',
     uri(containerId) {
-      return `/containers/${ containerId }/${ cmd }`;
+      return `/containers/${containerId}/${this.cmd}`;
     }
   },
   remove: {
     cmd: '',
     method: 'DELETE',
     uri(containerId) {
-      return `/containers/${ containerId }?v=1&force=1`;
+      return `/containers/${containerId}?v=1&force=1`;
     }
   }
-}
+};
 
-function commandMaker(cmd){
+function commandMaker(cmd) {
   return co(function *(machineName, containerInfo) {
     const config = yield machine.config(machineName);
     config.uri += cmd.uri(containerInfo);
@@ -70,7 +65,7 @@ function commandMaker(cmd){
     config.json = true;
     if (cmd.cmd === 'create') config.body = containerInfo;
     return yield rp(config);
-  })
+  });
 }
 
 export const start = commandMaker(dockerCommands.start);
@@ -83,26 +78,44 @@ export const remove = commandMaker(dockerCommands.remove);
 
 
 export const pull = co(function *(machineName, image) {
-  let env = yield machine.env(machineName);
-  return yield exec(`docker pull ${ image }`, { env });
+  const env = yield machine.env(machineName);
+  return yield exec(`docker pull ${image}`, { env });
 });
 
 export const deploy = co(function *(machineName, image) {
-  let env = yield machine.env(machineName);
-  return yield exec(`docker save ${ image } > tempImage.tar && docker-machine ssh ${ machineName } docker load < tempImage.tar`, { env });
+  const env = yield machine.env(machineName);
+  return yield exec(`docker save ${image} > tempImage.tar && docker-machine ssh
+    ${machineName} docker load < tempImage.tar`, { env });
 });
 
 export const logs = co(function *(machineName, containerId) {
-  let env = yield machine.env(machineName);
-  return yield exec(`docker logs ${ containerId }`, { env });
+  const env = yield machine.env(machineName);
+  return yield exec(`docker logs ${containerId}`, { env });
 });
 
 export const setContainerParams = (image, projObj) => ({
   image,
-  // Volumes: { '/mnt': {} }
   HostConfig: {
-    Binds: [`/home/docker/dockdev/${ projObj.uuid }:/app`]
+    Binds: [`/home/docker/dockdev/${projObj.uuid}:/app`]
   }
+});
+
+// need to think about how to pick a default machine
+// for now it is hardcoded to 'default' but shouldnt be
+export const addContainer = co(function *(projObj, image) {
+  const containerConfig = setContainerParams(image, projObj);
+  const containerId = (yield create(projObj.machine, containerConfig)).Id;
+  const inspectContainer = yield inspect(projObj.machine, containerId);
+  const dest = inspectContainer.Mounts[0].Source;
+  const name = inspectContainer.Name.substr(1);
+  projObj.containers[containerId] = {image, containerId, name, dest, sync: true};
+  return containerId;
+});
+
+export const removeContainer = co(function *(projObj, containerId) {
+  yield remove(projObj.machine, containerId);
+  delete projObj.containers[containerId];
+  return true;
 });
 
 // remove('default', 'f3e796d19685')
