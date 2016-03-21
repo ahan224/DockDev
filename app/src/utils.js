@@ -26,8 +26,8 @@ export const config = {
   // main config infomration
   configFolder: '.dockdevConfig',
   configFile: 'dockdevConfig.json',
-  configPath() {
-    return join(process.env.HOME, this.configFolder, this.configFile);
+  configPath(locationFolder) {
+    return join(locationFolder, this.configFolder, this.configFile);
   },
 
   // individual project infomration
@@ -87,10 +87,10 @@ export const readProj = co(function *(basePath) {
   return addBasePath(readProjFile, basePath);
 })
 
-export const writeConfig = co(function *(userSelectedDirectory) {
+export const writeConfig = co(function *(userSelectedDirectory, locationFolder) {
   if (!userSelectedDirectory) userSelectedDirectory = process.env.HOME;
-  yield mkdir(join(process.env.HOME, config.configFolder));
-  yield writeFile(config.configPath(), JSONStringifyPretty({
+  yield mkdir(join(locationFolder, config.configFolder));
+  yield writeFile(config.configPath(locationFolder), JSONStringifyPretty({
     userSelectedDirectory,
     projects: {}
   }));
@@ -112,34 +112,26 @@ const findDockdev = (array) => {
 
 // findDockdev(['/Users/dbschwartz83/DockDev', '-name', 'index.html'], handleFolders);
 
-// after reading the main configFile, we are going to load all the paths
-export const loadPaths = co(function *(configFile, userSelectedDirectory) {
-  let needToSearch = false;
-  let pathsToSendToUI = [];
+
+// searches for Good Paths
+export const searchGoodPaths = co(function *(configFile) {
+  let goodPathResults = [];
 
   for (var key in configFile.projects) {
     try {
       let fileContents = JSON.parse(yield readFile(join(configFile.projects[key], config.projPath())));
-      pathsToSendToUI.push(fileContents);
-
+      goodPathResults.push(fileContents);
     } catch (e) {
       console.log(e);
-      needToSearch = true;
       delete configFile.projects[key];
     }
   }
-
-// search for the other projects if there were any errors in the data
-  if (needToSearch) {
-    var badPathResults = searchBadPaths(configFile, userSelectedDirectory);
-  }
-
- // need to return here an array of arrays with good and bad
-  return;
-
+  return goodPathResults;
 });
 
-export const searchBadPaths = co(function *(configFile, userSelectedDirectory)) {
+
+// search Bad Paths
+export const searchBadPaths = co(function *(configFile, userSelectedDirectory) {
   let searchArray = [];
   if (!userSelectedDirectory) userSelectedDirectory = process.env.HOME;
   // create the parameters for the linux find command
@@ -162,25 +154,41 @@ export const searchBadPaths = co(function *(configFile, userSelectedDirectory)) 
     searchResultsToUI.push(fileContents);
   }
   return searchResultsToUI;
-}
+});
+
+// after reading the main configFile, we are going to load all the paths
+export const loadPaths = co(function *(configFile, userSelectedDirectory) {
+  const configProjLength = configFile.projects.length;
+
+  let goodResults = yield searchGoodPaths(configFile);
+
+// search for the other projects if there were any errors in the data
+  if (configProjLength !== goodResults.length) {
+    let badResults = searchBadPaths(configFile, userSelectedDirectory);
+  }
+
+ // return an array of arrays with good and bad paths
+  return [goodResults, badResults];
+
+});
 
 // reads the main configFile at launch of the app, if the file doesn't exist, it writes the file
 export const readConfig = co(function *(userSelectedDirectory) {
 
   try {
-    let readConfigFile = yield readFile(config.configPath());
+    let readConfigFile = yield readFile(config.configPath(process.env.HOME));
     readConfigFile = JSON.parse(readConfigFile);
     yield loadPaths(readConfigFile, userSelectedDirectory);
   } catch (e) {
-    yield writeConfig(userSelectedDirectory);
+    yield writeConfig(userSelectedDirectory, process.env.HOME);
   }
 });
 
 // adds projects uuid and paths to the main config file
 export const addProjToConfig = co(function *(basePath) {
-  let readConfigFile = JSON.parse(yield readConfig(config.configPath()));
+  let readConfigFile = JSON.parse(yield readConfig(config.configPath(process.env.HOME)));
   readConfigFile.projects[basePath] = basePath;
-  yield writeFile(config.configPath(), JSONStringifyPretty(readConfigFile));
+  yield writeFile(config.configPath(process.env.HOME), JSONStringifyPretty(readConfigFile));
 })
 
 // addProjToMemory :: object -> object -> object
