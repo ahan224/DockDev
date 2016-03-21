@@ -1,7 +1,7 @@
 'use strict';
 
 import fs from 'fs';
-import child_process from 'child_process';
+import childProcess from 'child_process';
 import { join } from 'path';
 import Promise, { coroutine as co } from 'bluebird';
 import R from 'ramda';
@@ -13,7 +13,7 @@ import { spawn } from 'child_process';
 export const mkdir = Promise.promisify(fs.mkdir);
 export const writeFile = Promise.promisify(fs.writeFile);
 export const readFile = Promise.promisify(fs.readFile);
-export const exec = Promise.promisify(child_process.exec);
+export const exec = Promise.promisify(childProcess.exec);
 
 /**
 * @param {object} config has project config settings
@@ -26,8 +26,8 @@ export const config = {
   // main config infomration
   configFolder: '.dockdevConfig',
   configFile: 'dockdevConfig.json',
-  configPath() {
-    return join(process.env.HOME, this.configFolder, this.configFile);
+  configPath(locationFolder) {
+    return join(locationFolder, this.configFolder, this.configFile);
   },
 
   // individual project infomration
@@ -66,15 +66,14 @@ export const createDockDev = (projObj) => mkdir(join(projObj.basePath, config.pr
 const cleanProjToWrite = R.compose(
   JSONStringifyPretty,
   R.pick(config.projWriteParams)
-)
+);
 
 // writeProj :: string -> function -> object -> promise(object)
 // writes the config object to the specified path
 // it will overwrite any existing projFile.
 // should be used with readProj for existing projects
-export const writeProj = (projObj) => {
-  return writeFile(join(projObj.basePath, config.projPath()), cleanProjToWrite(projObj));
-};
+export const writeProj = (projObj) =>
+  writeFile(join(projObj.basePath, config.projPath()), cleanProjToWrite(projObj));
 
 // addBasePath :: string -> string -> object
 // takes a json string, parses it, and returns a new object with the basePath included
@@ -85,107 +84,131 @@ const addBasePath = (jsonObj, basePath) => R.merge(JSON.parse(jsonObj), { basePa
 export const readProj = co(function *(basePath) {
   const readProjFile = yield readFile(join(basePath, config.projPath()));
   return addBasePath(readProjFile, basePath);
-})
+});
 
-export const writeInitialConfig = co(function *(userSelectedDirectory) {
+export const writeConfig = co(function *(userSelectedDirectory, locationFolder) {
   if (!userSelectedDirectory) userSelectedDirectory = process.env.HOME;
-  yield mkdir(join(process.env.HOME, config.configFolder));
-  yield writeFile(config.configPath(), JSONStringifyPretty({
+  yield mkdir(join(locationFolder, config.configFolder));
+  yield writeFile(config.configPath(locationFolder), JSONStringifyPretty({
     userSelectedDirectory,
     projects: {}
   }));
 });
 
 const findDockdev = (array) => {
-    let result = '';
-    const find = spawn('find', array);
+  console.log("I am finding things in findDockdev");
+  let result = '';
+  const find = spawn('find', array);
 
-    find.stdout.on('data', data => result += data);
+  find.stdout.on('data', data => {result += data;});
 
-    return new Promise((resolve, reject) => {
-      find.stderr.on('data', reject);
-      find.stdout.on('close', () => {
-        resolve(result.split('\n').slice(0,-1));
-      });
-    })
+  return new Promise((resolve, reject) => {
+    find.stderr.on('data', reject);
+    find.stdout.on('close', () => {
+      resolve(result.split('\n').slice(0, -1));
+    });
+  });
 };
 
 // findDockdev(['/Users/dbschwartz83/DockDev', '-name', 'index.html'], handleFolders);
 
-// after reading the main configFile, we are going to load all the paths
-export const loadPaths = co(function *(configFile, userSelectedDirectory) {
-  let needToSearch = false;
-  let pathsToSendToUI = [];
+
+// searches for Good Paths
+export const searchGoodPaths = co(function *(configFile) {
+  const goodPathResults = [];
 
   for (var key in configFile.projects) {
     try {
-      let fileContents = JSON.parse(yield readFile(join(configFile.projects[key], config.projPath())));
-      pathsToSendToUI.push(fileContents);
-
+      const fileContents = JSON.parse(
+        yield readFile(join(configFile.projects[key], config.projPath()))
+      );
+      goodPathResults.push(fileContents);
     } catch (e) {
       console.log(e);
-      needToSearch = true;
       delete configFile.projects[key];
     }
   }
+  console.log("I am in the search good paths and this is getting sent back: ", goodPathResults)
+  return goodPathResults;
+});
 
-// send the data from pathsToSendToUI to the UI
 
+// search Bad Paths
+export const searchBadPaths = co(function *(goodPathsArray, userSelectedDirectory) {
+  const searchArray = [];
+  if (!userSelectedDirectory) userSelectedDirectory = process.env.HOME;
+  // create the parameters for the linux find command
+  searchArray.push(userSelectedDirectory);
+  searchArray.push('-name');
+  searchArray.push(config.projFile);
 
+  // create the parameters for files to exclude based on the projects that were already found
+  goodPathsArray.forEach((path) => {
+    searchArray.push('!');
+    searchArray.push('-path');
+    searchArray.push(path);
+  });
+
+  const searchResultsToUI = [];
+
+  // returns an array of data
+  const searchResults = yield findDockdev(searchArray);
+  for (let i = 0; i < searchResults.length; i++) {
+    const fileContents = JSON.parse(yield readFile(join(searchResults[i], config.projPath())));
+    searchResultsToUI.push(fileContents);
+  }
+  console.log("I am in the search bad paths and this is getting sent back: ", searchResultsToUI);
+  return searchResultsToUI;
+});
+
+// after reading the main configFile, we are going to load all the paths
+export const loadPaths = co(function *(configFile, userSelectedDirectory) {
+  const configProjLength = Object.keys(configFile.projects).length;
+  console.log("# of config projects: ", configProjLength)
+
+  const goodResults = yield searchGoodPaths(configFile);
+
+  console.log("# of good paths: ", goodResults.length)
+
+  let badResults;
 // search for the other projects if there were any errors in the data
-  if (needToSearch) {
-    let searchArray = [];
-    if (!userSelectedDirectory) userSelectedDirectory = process.env.HOME;
-    // create the parameters for the linux find command
-    searchArray.push(userSelectedDirectory);
-    searchArray.push('-name');
-    searchArray.push(config.projFile);
-    for (var key in configFile.projects) {
-
-      // create the parameters for files to exclude based on the projects that were already found
-      searchArray.push('!');
-      searchArray.push('-path');
-      searchArray.push(projects[key]);
-    }
-    let searchResultsToUI = [];
-
-    // returns an array of data
-    let searchResults = yield findDockdev(searchArray);
-    for (var i = 0; i < searchResults.length; i++) {
-      let fileContents = JSON.parse(yield readFile(join(searchResults[i], config.projPath())));
-      searchResultsToUI.push(fileContents);
-    }
-    // send the data from searchResultsToUI to the UI
-
+  if (configProjLength !== goodResults.length) {
+    badResults = searchBadPaths(goodResults, userSelectedDirectory);
   }
 
+  console.log('Good Results: ', goodResults);
+  console.log('Bad Results: ', badResults);
+ // return an array of arrays with good and bad paths
+  return [goodResults, badResults];
 });
 
 // reads the main configFile at launch of the app, if the file doesn't exist, it writes the file
 export const readConfig = co(function *(userSelectedDirectory) {
-
+  console.log("I am in read Config");
   try {
-    let readConfigFile = yield readFile(config.configPath());
+    let readConfigFile = yield readFile(config.configPath(process.env.HOME));
     readConfigFile = JSON.parse(readConfigFile);
-    yield loadPaths(readConfigFile, userSelectedDirectory);
+    return yield loadPaths(readConfigFile, userSelectedDirectory);
   } catch (e) {
-    yield writeInitialConfig(userSelectedDirectory);
+    yield writeConfig(userSelectedDirectory, process.env.HOME);
+    return {};
   }
 });
 
 // adds projects uuid and paths to the main config file
 export const addProjToConfig = co(function *(basePath) {
-  let readConfigFile = JSON.parse(yield readConfig(config.configPath()));
+  console.log("I am in add Proj to Config");
+  const readConfigFile = JSON.parse(yield readConfig(config.configPath(process.env.HOME)));
   readConfigFile.projects[basePath] = basePath;
-  yield writeFile(config.configPath(), JSONStringifyPretty(readConfigFile));
-})
+  yield writeFile(config.configPath(process.env.HOME), JSONStringifyPretty(readConfigFile));
+});
 
 // addProjToMemory :: object -> object -> object
 // adds the projObj for the project to the memory object
 export const addProjToMemory = R.curry((memory, projObj) => {
   memory[projObj.uuid] = projObj;
-  return projObj
-})
+  return projObj;
+});
 
 export const addToAppMemory = addProjToMemory(memory);
 
@@ -199,22 +222,24 @@ export const initProject = co(function *(basePath, projectName) {
   yield createDockDev(projObj);
   yield writeProj(projObj);
 
-  // addProjToConfig(basePath);
+  addProjToConfig(basePath);
   addToAppMemory(projObj);
 
   return projObj;
-})
+});
+
+initProject(process.env.HOME, 'testProject');
 
 // cmdLine :: string -> string -> promise(string)
 // returns the stdout of the command line call within a promise
-export const cmdLine = R.curry((cmd, args) => exec(`${ cmd } ${ args }`));
+export const cmdLine = R.curry((cmd, args) => exec(`${cmd} ${args}`));
 
 // need to think about how to pick a default machine
 // for now it is hardcoded to 'default' but shouldnt be
 export const addContainer = co(function *(projObj, image) {
   const containerConfig = container.setContainerParams(image, projObj);
   const containerId = (yield container.create(projObj.machine, containerConfig)).Id;
-  const inspectContainer = yield container.inspect(projObj.machine, containerId)
+  const inspectContainer = yield container.inspect(projObj.machine, containerId);
   const dest = inspectContainer.Mounts[0].Source;
   const name = inspectContainer.Name.substr(1);
   projObj.containers[containerId] = {image, containerId, name, dest, sync: true};
@@ -225,4 +250,4 @@ export const removeContainer = co(function *(projObj, containerId) {
   yield container.remove(projObj.machine, containerId);
   delete projObj.containers[containerId];
   return true;
-})
+});
