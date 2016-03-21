@@ -1,10 +1,10 @@
-'use-strict';
-
 import React from 'react';
 import { render } from 'react-dom';
 import { Router, Route, hashHistory } from 'react-router';
-import SideMenu from './components/SideMenu.js';
-import * as utils from './lib/utils.js';
+import AddProject from './components/AddProject';
+import { Link } from 'react-router';
+
+import utils from './app/src/utils.js';
 
 class App extends React.Component {
   constructor() {
@@ -18,12 +18,12 @@ class App extends React.Component {
           uuid: 1234556667
         }
       }
-    };
+    }
   }
 
-  componentDidUpdate() {
-    console.log('state updated', this.state);
-  }
+  // componentDidUpdate() {
+  //   console.log('state updated', this.state);
+  // }
 
   addProject(e) {
     remote.dialog
@@ -45,30 +45,40 @@ class App extends React.Component {
   //
   // }
 
-  projectSelect(uuid) {
-    console.log(uuid);
-  }
+  // projectSelect(uuid) {
+  //   console.log(uuid);
+  // }
 
   render() {
     return (
-      <div className="pane-group">
-        <SideMenu projects={this.state.projects}
-          addProject={this.addProject}
-          settingsClick={this.settingsClick}
-          projectSelect={this.projectSelect}
-        />
-      </div>
+      <div id="header">
+  			<h5>DockDev <small>beta</small></h5>
+  		</div>
+  		<div id="menu">
+  			<div id="createProject">
+  				Add
+  			</div>
+  			<div id="bottomNav">
+  				Settings
+  			</div>
+  		  <div>Home</div>
+  		  <div>About</div>
+  		</div>
+  		<div id="content">
+  		  <div class="container-fluid" id="content-container">
+  		    <div class="row">
+  		      <div class="col-md-6">
+  		        <div class="card">
+  		        </div>
+  		      </div>
+  		      <div class="col-md-6">
+  		        <div class="card">
+  		        </div>
+  		      </div>
+  		    </div>
+  		  </div>
+  		</div>
+
     );
   }
 }
-
-
-// console.log(utils.memory);
-//
-// console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints "pong"
-//
-// ipcRenderer.on('asynchronous-reply', function(event, arg) {
-//   console.log(arg); // prints "pong"
-// });
-//
-// ipcRenderer.send('asynchronous-message', 'ping');
