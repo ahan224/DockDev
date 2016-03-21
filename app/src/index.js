@@ -1,19 +1,18 @@
-'use-strict';
-
 import React from 'react';
 import { render } from 'react-dom';
 import { Router, Route, hashHistory } from 'react-router';
-
 import App from './components/App';
+import AddProject from './components/AddProject';
 
-
-
-
-// import SideMenu from './components/SideMenu.js';
-// import * as utils from './lib/utils.js';
+import About from './components/AddProject';
+import Home from './components/Home';
+// import * as utils from 'lib/utils.js';
 
 render((
-  <Router history={hashHistory}>
-    <Route path="/" component={App} />
-  </Router>
-), document.getElementclassName('app'));
+  <Home/>
+), document.getElementbyId('app'));
+
+<Router history={hashHistory}>
+  <Route path="/" component={App} />
+  <Route path="/about" component={AddProject} />
+</Router>
