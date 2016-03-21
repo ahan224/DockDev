@@ -36,6 +36,8 @@ gulp.task('main', () => {
 
 
 gulp.task('react', () => {
+  console.log('running');
+
   const bundler = browserify({
     entries: ['./app/src/App.js'],
     transform: babelify.configure({presets: ["react", "es2015"]}),

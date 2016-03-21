@@ -6,7 +6,7 @@ const ProjectList = ({ projects, projectSelect }) => {
   const projToRender = projArray.map((proj, idx) => {
     return (
       <div key={proj[1].uuid} onClick={() => projectSelect(proj[1].uuid)}>
-        <li className="list-group-item active-projects">
+        <li className="list-group-item active-projects project-hover">
           <div className="media-body project">
             <div className="col-xs-2">
             </div>
