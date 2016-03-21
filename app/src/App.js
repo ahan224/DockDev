@@ -17,7 +17,7 @@ class App extends React.Component {
           uuid: 1234556667
         }
       }
-    }
+    };
   }
 
   addProject(e) {
@@ -45,7 +45,7 @@ class App extends React.Component {
   }
 
   componentDidUpdate() {
-    console.log('state updated', this.state);
+    console.log('state updated', this.state );
   }
 
   render() {
