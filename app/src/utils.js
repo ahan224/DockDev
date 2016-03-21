@@ -1,12 +1,9 @@
-'use strict';
-
 import fs from 'fs';
 import childProcess from 'child_process';
 import { join } from 'path';
 import Promise, { coroutine as co } from 'bluebird';
 import R from 'ramda';
 import uuid from 'node-uuid';
-import * as container from './container.js';
 import { spawn } from 'child_process';
 
 // promisify certain callback functions
@@ -109,9 +106,6 @@ const findDockdev = (array) => {
     });
   });
 };
-
-// findDockdev(['/Users/dbschwartz83/DockDev', '-name', 'index.html'], handleFolders);
-
 
 // searches for Good Paths
 export const searchGoodPaths = co(function *(configFile) {
@@ -228,26 +222,4 @@ export const initProject = co(function *(basePath, projectName) {
   return projObj;
 });
 
-initProject(process.env.HOME, 'testProject');
-
-// cmdLine :: string -> string -> promise(string)
-// returns the stdout of the command line call within a promise
-export const cmdLine = R.curry((cmd, args) => exec(`${cmd} ${args}`));
-
-// need to think about how to pick a default machine
-// for now it is hardcoded to 'default' but shouldnt be
-export const addContainer = co(function *(projObj, image) {
-  const containerConfig = container.setContainerParams(image, projObj);
-  const containerId = (yield container.create(projObj.machine, containerConfig)).Id;
-  const inspectContainer = yield container.inspect(projObj.machine, containerId);
-  const dest = inspectContainer.Mounts[0].Source;
-  const name = inspectContainer.Name.substr(1);
-  projObj.containers[containerId] = {image, containerId, name, dest, sync: true};
-  return containerId;
-});
-
-export const removeContainer = co(function *(projObj, containerId) {
-  yield container.remove(projObj.machine, containerId);
-  delete projObj.containers[containerId];
-  return true;
-});
+// initProject(process.env.HOME, 'testProject');
