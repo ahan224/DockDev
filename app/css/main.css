@@ -167,3 +167,8 @@ li.list-group-item:active, .btn-primary-outline:focus, .btn-primary-outline.focu
     padding-left: 0;
     border: 0px;
 }
+
+.project-hover:hover {
+  color: red;
+  background-color: white;
+}

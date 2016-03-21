@@ -26,8 +26,8 @@ export const config = {
   // main config infomration
   configFolder: '.dockdevConfig',
   configFile: 'dockdevConfig.json',
-  configPath() {
-    return join(process.env.HOME, this.configFolder, this.configFile);
+  configPath(locationFolder) {
+    return join(locationFolder, this.configFolder, this.configFile);
   },
 
   // individual project infomration
@@ -87,10 +87,10 @@ export const readProj = co(function *(basePath) {
   return addBasePath(readProjFile, basePath);
 })
 
-export const writeInitialConfig = co(function *(userSelectedDirectory) {
+export const writeConfig = co(function *(userSelectedDirectory, locationFolder) {
   if (!userSelectedDirectory) userSelectedDirectory = process.env.HOME;
-  yield mkdir(join(process.env.HOME, config.configFolder));
-  yield writeFile(config.configPath(), JSONStringifyPretty({
+  yield mkdir(join(locationFolder, config.configFolder));
+  yield writeFile(config.configPath(locationFolder), JSONStringifyPretty({
     userSelectedDirectory,
     projects: {}
   }));
@@ -112,52 +112,63 @@ const findDockdev = (array) => {
 
 // findDockdev(['/Users/dbschwartz83/DockDev', '-name', 'index.html'], handleFolders);
 
-// after reading the main configFile, we are going to load all the paths
-export const loadPaths = co(function *(configFile, userSelectedDirectory) {
-  let needToSearch = false;
-  let pathsToSendToUI = [];
+
+// searches for Good Paths
+export const searchGoodPaths = co(function *(configFile) {
+  let goodPathResults = [];
 
   for (var key in configFile.projects) {
     try {
       let fileContents = JSON.parse(yield readFile(join(configFile.projects[key], config.projPath())));
-      pathsToSendToUI.push(fileContents);
-
+      goodPathResults.push(fileContents);
     } catch (e) {
       console.log(e);
-      needToSearch = true;
       delete configFile.projects[key];
     }
   }
+  return goodPathResults;
+});
 
-// send the data from pathsToSendToUI to the UI
 
+// search Bad Paths
+export const searchBadPaths = co(function *(configFile, userSelectedDirectory) {
+  let searchArray = [];
+  if (!userSelectedDirectory) userSelectedDirectory = process.env.HOME;
+  // create the parameters for the linux find command
+  searchArray.push(userSelectedDirectory);
+  searchArray.push('-name');
+  searchArray.push(config.projFile);
+  for (var key in configFile.projects) {
+
+    // create the parameters for files to exclude based on the projects that were already found
+    searchArray.push('!');
+    searchArray.push('-path');
+    searchArray.push(projects[key]);
+  }
+  let searchResultsToUI = [];
+
+  // returns an array of data
+  let searchResults = yield findDockdev(searchArray);
+  for (var i = 0; i < searchResults.length; i++) {
+    let fileContents = JSON.parse(yield readFile(join(searchResults[i], config.projPath())));
+    searchResultsToUI.push(fileContents);
+  }
+  return searchResultsToUI;
+});
+
+// after reading the main configFile, we are going to load all the paths
+export const loadPaths = co(function *(configFile, userSelectedDirectory) {
+  const configProjLength = configFile.projects.length;
+
+  let goodResults = yield searchGoodPaths(configFile);
 
 // search for the other projects if there were any errors in the data
-  if (needToSearch) {
-    let searchArray = [];
-    if (!userSelectedDirectory) userSelectedDirectory = process.env.HOME;
-    // create the parameters for the linux find command
-    searchArray.push(userSelectedDirectory);
-    searchArray.push('-name');
-    searchArray.push(config.projFile);
-    for (var key in configFile.projects) {
-
-      // create the parameters for files to exclude based on the projects that were already found
-      searchArray.push('!');
-      searchArray.push('-path');
-      searchArray.push(projects[key]);
-    }
-    let searchResultsToUI = [];
-
-    // returns an array of data
-    let searchResults = yield findDockdev(searchArray);
-    for (var i = 0; i < searchResults.length; i++) {
-      let fileContents = JSON.parse(yield readFile(join(searchResults[i], config.projPath())));
-      searchResultsToUI.push(fileContents);
-    }
-    // send the data from searchResultsToUI to the UI
-
+  if (configProjLength !== goodResults.length) {
+    let badResults = searchBadPaths(configFile, userSelectedDirectory);
   }
+
+ // return an array of arrays with good and bad paths
+  return [goodResults, badResults];
 
 });
 
@@ -165,19 +176,19 @@ export const loadPaths = co(function *(configFile, userSelectedDirectory) {
 export const readConfig = co(function *(userSelectedDirectory) {
 
   try {
-    let readConfigFile = yield readFile(config.configPath());
+    let readConfigFile = yield readFile(config.configPath(process.env.HOME));
     readConfigFile = JSON.parse(readConfigFile);
     yield loadPaths(readConfigFile, userSelectedDirectory);
   } catch (e) {
-    yield writeInitialConfig(userSelectedDirectory);
+    yield writeConfig(userSelectedDirectory, process.env.HOME);
   }
 });
 
 // adds projects uuid and paths to the main config file
 export const addProjToConfig = co(function *(basePath) {
-  let readConfigFile = JSON.parse(yield readConfig(config.configPath()));
+  let readConfigFile = JSON.parse(yield readConfig(config.configPath(process.env.HOME)));
   readConfigFile.projects[basePath] = basePath;
-  yield writeFile(config.configPath(), JSONStringifyPretty(readConfigFile));
+  yield writeFile(config.configPath(process.env.HOME), JSONStringifyPretty(readConfigFile));
 })
 
 // addProjToMemory :: object -> object -> object
