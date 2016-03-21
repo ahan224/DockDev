@@ -35,9 +35,9 @@ export const config = {
   projFile: 'dockdev.json',
   projWriteParams: ['uuid', 'projectName', 'containers', 'machine'],
   projPath() {
-    return join(this.projFolder, this.projFile)
+    return join(this.projFolder, this.projFile);
   }
-}
+};
 
 // object to store all projects
 export const memory = {};

@@ -1,13 +1,13 @@
+/*eslint-disable */
 'use strict';
 var gulp = require('gulp');
-var babel = require('gulp-babel');
-var watch = require('gulp-watch');
 var notify = require('gulp-notify');
 var rename = require('gulp-rename');
 var browserify = require('browserify');
-var watchify = require('watchify');
 var source = require('vinyl-source-stream');
 var babelify = require('babelify');
+var watch = require('gulp-watch');
+var babel = require('gulp-babel');
 
 function handleErrors() {
  var args = Array.prototype.slice.call(arguments);
@@ -43,21 +43,9 @@ gulp.task('react', () => {
     fullPaths: true
   })
 
-  bundler.external('react');
-  bundler.external('react-dom');
-  bundler.external('./lib/utils.js');
-  bundler.external('ramda');
+  bundler.external(['react', 'react-dom', './lib/utils.js', 'ramda']);
 
-
-  const watcher = watchify(bundler);
-
-  return watcher
-    .on('update', () => {
-      watcher.bundle()
-        .on('error', handleErrors)
-        .pipe(source('bundle.js'))
-        .pipe(gulp.dest('app/lib'))
-    })
+  return bundler
     .bundle()
     .on('error', handleErrors)
     .pipe(source('bundle.js'))
@@ -76,4 +64,5 @@ gulp.task('watch', function() {
   gulp.watch(['app/src/*.js', '!app/src/App.js', '!app/src/main.js'], ['core']);
   gulp.watch('test/tests.js', ['test']);
   gulp.watch('app/src/main.js', ['main']);
+  gulp.watch(['app/src/App.js', 'app/src/components/*'], ['react']);
 });
