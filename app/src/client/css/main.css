@@ -1,0 +1,84 @@
+html,
+body {
+  background: #FFF;
+}
+
+#app {
+  overflow: hidden;
+    overflow-y: scroll;
+}
+
+#header{
+  border-bottom: 1px solid #19191B;
+    position: fixed;
+    top: 0px;
+    background: #242427;
+    width: 100%;
+    z-index: 9;
+    color: white;
+    padding-right: 14px;
+}
+
+#header h5 {
+  text-align: right;
+  padding: 8px 0 0;
+
+}
+
+#menu {
+  position: fixed;
+  top: 39px;
+  bottom: 0;
+  width: 240px;
+  background: #19191B;
+  color: white;
+  /*border-right: 1px solid #DADADA;*/
+}
+#menu > div {
+  width: 100%;
+  color: #DADADA;
+  padding: 15px;
+  border-bottom: 1px solid #DADADA;
+  text-align: center;
+}
+
+#menu > #bottomNav {
+  bottom: 0;
+  position: absolute;
+  text-align: right;
+  border: none;
+}
+
+#content {
+  width: 100%;
+  padding-top: 50px;
+  padding-left: 240px;
+}
+
+.card {
+  min-height: 145px;
+  margin-bottom: 15px;
+  background: #F3F3F3!important;
+}
+
+#addBody {
+    margin: 120px auto;
+    max-width: 400px;
+}
+
+#addBody button {
+  margin-top: 20px;
+}
+
+#addBody h2 {
+  text-align: center;
+}
+
+#addText {
+  margin-top: 20px;
+  font-size: 12px;
+}
+
+.active {
+  color: green;
+}
