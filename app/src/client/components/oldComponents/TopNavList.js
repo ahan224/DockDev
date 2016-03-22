@@ -1,3 +1,5 @@
+'use-strict';
+
 import React from 'react';
 
 const TopNavList = ({ addProject }) => {
@@ -11,7 +13,7 @@ const TopNavList = ({ addProject }) => {
       </li>
       </ul>
     </div>
-  )
-}
+  );
+};
 
 export default TopNavList;
