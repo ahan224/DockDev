@@ -1,7 +1,5 @@
-'use-strict';
-
 import electron from 'electron';
-import * as utils from './lib/utils.js';
+// import * as utils from './lib/utils.js';
 import { join } from 'path';
 
 const app = electron.app;
@@ -14,8 +12,8 @@ app.on('ready', function(){
   mainWindow = new BrowserWindow({width:750,height:550, titleBarStyle: "hidden-inset"});
   mainWindow.loadURL('file://' + join(__dirname, 'index.html'));
 
-  utils.readConfig(process.env.HOME)
-    .catch(console.log);
+  // utils.readConfig(process.env.HOME)
+  //   .catch(console.log);
 
   mainWindow.webContents.openDevTools();
   mainWindow.on('close', function () {
