@@ -28,12 +28,7 @@ const selectSSHandIP = R.compose(
 // accepts source, destination, and machine info
 // returns an array of arguments for rsync
 const createRsyncArgs = (source, dest, machineInfo) =>
-  `-a -e "ssh -i ${machineInfo.SSHKeyPath}
- -o IdentitiesOnly=yes
- -o UserKnownHostsFile=/dev/null
- -o StrictHostKeyChecking=no"
- --delete ${source}
- docker@${machineInfo.IPAddress}:${dest}`;
+  `-a -e "ssh -i ${machineInfo.SSHKeyPath} -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" --delete ${source} docker@${machineInfo.IPAddress}:${dest}`;
 
 function getSyncContainer(projObj) {
   let result;

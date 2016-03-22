@@ -5,7 +5,8 @@ import rimraf from 'rimraf';
 import { readFileSync, mkdirSync, readdirSync, writeFileSync } from 'fs';
 import R from 'ramda';
 import * as rsync from '../app/lib/rsync.js';
-import { addFileWatcher } from '../app/lib/fileWatch.js'
+import { addFileWatcher } from '../app/lib/fileWatch.js';
+import { removeContainer, addContainer } from '../app/lib/container.js';
 
 describe('initiate new DockDev project via individual functions', () => {
   const projectName = 'project1'
@@ -173,7 +174,7 @@ describe('add and modify containers within a project', () => {
 
   it('should add a container to the project', () => {
     return result
-      .then(data => utils.addContainer(data, image))
+      .then(data => addContainer(data, image))
       .then(id => {
         containerId = id;
         expect(containerId).to.not.equal(undefined);
@@ -186,7 +187,7 @@ describe('add and modify containers within a project', () => {
 
   it('should delete a container from a project', () => {
     return result
-      .then(data => utils.removeContainer(data, containerId))
+      .then(data => removeContainer(data, containerId))
       .then(data => {
         expect(data).to.equal(true);
         expect(data.containers).to.be.empty;
@@ -217,7 +218,7 @@ describe('should sync files to docker machine', () => {
     containerId = utils.initProject(basePath, projectName)
       .then(data => {
         result = data;
-        return utils.addContainer(data, image)
+        return addContainer(data, image)
       })
   });
 
@@ -247,7 +248,7 @@ describe('should sync files to docker machine', () => {
   })
 })
 
-describe('should write a config file', () => {
+xdescribe('should write a config file', () => {
   let result;
   const basePath = join(__dirname, 'configFolder')
 

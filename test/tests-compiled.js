@@ -24,6 +24,8 @@ var rsync = _interopRequireWildcard(_rsync);
 
 var _fileWatch = require('../app/lib/fileWatch.js');
 
+var _container = require('../app/lib/container.js');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -176,7 +178,7 @@ describe('add and modify containers within a project', () => {
   });
 
   it('should add a container to the project', () => {
-    return result.then(data => utils.addContainer(data, image)).then(id => {
+    return result.then(data => (0, _container.addContainer)(data, image)).then(id => {
       containerId = id;
       (0, _chai.expect)(containerId).to.not.equal(undefined);
       result.then(data => {
@@ -187,7 +189,7 @@ describe('add and modify containers within a project', () => {
   });
 
   it('should delete a container from a project', () => {
-    return result.then(data => utils.removeContainer(data, containerId)).then(data => {
+    return result.then(data => (0, _container.removeContainer)(data, containerId)).then(data => {
       (0, _chai.expect)(data).to.equal(true);
       (0, _chai.expect)(data.containers).to.be.empty;
     });
@@ -216,7 +218,7 @@ describe('should sync files to docker machine', () => {
 
     containerId = utils.initProject(basePath, projectName).then(data => {
       result = data;
-      return utils.addContainer(data, image);
+      return (0, _container.addContainer)(data, image);
     });
   });
 
@@ -244,7 +246,7 @@ describe('should sync files to docker machine', () => {
   });
 });
 
-describe('should write a config file', () => {
+xdescribe('should write a config file', () => {
   let result;
   const basePath = (0, _path.join)(__dirname, 'configFolder');
 
