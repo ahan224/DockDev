@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import * as utils from './lib/utils.js';
+// import * as utils from './lib/utils.js';
 // import About from './components/AddProject';
-import { Router, Route, hashHistory } from 'react-router'
+import { Router, Route, hashHistory, IndexRoute, Link, RouteHandler } from 'react-router';
 
 import Home from './src/components/Home.js';
 import AddProject from './src/components/AddProject.js';
@@ -38,23 +38,29 @@ class App extends React.Component {
       );
   }
 
-  updateProject(memory) {
+   updateProject (memory) {
     this.setState({ projects: memory });
   }
 
-  settingsClick(e) {
+  settingsClick (e) {
   }
 
   projectSelect(uuid) {
-    console.log(uuid);
+    console.log(uuid)
+  }
+
+  render(){
+    return (
+    <Router history={hashHistory}>
+      <Route path="/" component={Home}/>
+      <Route path="/addproject" handler={Home} component={AddProject} addProj={this.addProject} />
+    </Router>
+    );
   }
 
 }
 
 ReactDom.render(
-    <Router history={hashHistory}>
-      <Route path="/" component={Home}>
-        <Route path="/addproject" component={AddProject} />
-      </Route>
-    </Router>
-  , document.getElementById('app'));
+  <App />
+  , document.getElementById('app')
+);
