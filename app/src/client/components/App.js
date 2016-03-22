@@ -1,5 +1,6 @@
 import React from 'react';
 import NavLink from './NavLink';
+import Projects from './Projects';
 
 class App extends React.Component {
   constructor() {
@@ -20,6 +21,11 @@ class App extends React.Component {
           projectName: 'project3',
           uuid: 3,
           other: 'test3'
+        },
+        10: {
+          projectName: 'project10',
+          uuid: 10,
+          other: 'test3'
         }
       }
     };
@@ -33,10 +39,8 @@ class App extends React.Component {
         </div>
         <ul role="nav" id="menu">
           <li><NavLink to="/" onlyActiveOnIndex>Home</NavLink></li>
-          <li><NavLink to="/about">About</NavLink></li>
-          <li><NavLink to="/repos">Repos</NavLink></li>
           <li><NavLink to="/addProject">Add Project</NavLink></li>
-          <li><NavLink to="/projects">Projects</NavLink></li>
+          <Projects projects={this.state.projects} />
         </ul>
         {React.cloneElement(this.props.children, { projects: this.state.projects })}
       </div>
