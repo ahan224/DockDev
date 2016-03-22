@@ -1,5 +1,4 @@
 /*eslint-disable */
-'use strict';
 var gulp = require('gulp');
 var notify = require('gulp-notify');
 var rename = require('gulp-rename');
@@ -18,40 +17,39 @@ function handleErrors() {
  this.emit('end');
 }
 
-gulp.task('default', ['core', 'react', 'test', 'main', 'watch']);
+gulp.task('default', ['server', 'react', 'test', 'main', 'css', 'watch']);
 
-gulp.task('core', () => {
-  return gulp.src(['app/src/*.js', '!app/src/App.js', '!app/src/main.js'])
+gulp.task('server', () => {
+  return gulp.src('./app/src/server/*')
     .pipe(babel( {plugins: ['transform-es2015-modules-commonjs', 'transform-es2015-shorthand-properties']} ))
     .on('error', handleErrors)
-    .pipe(gulp.dest('app/lib'));
+    .pipe(gulp.dest('./app/build/server'));
 });
 
 gulp.task('main', () => {
-  return gulp.src(['app/src/main.js'])
+  return gulp.src('./app/src/main.js')
     .pipe(babel( {plugins: ['transform-es2015-modules-commonjs', 'transform-es2015-shorthand-properties']} ))
     .on('error', handleErrors)
-    .pipe(gulp.dest('app/'));
+    .pipe(gulp.dest('./app/build'));
 });
 
 
 gulp.task('react', () => {
-  console.log('running');
 
   const bundler = browserify({
-    entries: ['./app/App.js'],
+    entries: ['./app/src/client/index.js'],
     transform: babelify.configure({presets: ["react", "es2015"]}),
     debug: true,
     fullPaths: true
   })
 
-  bundler.external(['react', 'react-dom', './lib/utils.js', 'ramda']);
+  // bundler.external(['react', 'react-dom', './lib/utils.js', 'ramda']);
 
   return bundler
     .bundle()
     .on('error', handleErrors)
     .pipe(source('bundle.js'))
-    .pipe(gulp.dest('app/lib'))
+    .pipe(gulp.dest('./app/build/client'))
 });
 
 gulp.task('test', () => {
@@ -59,12 +57,18 @@ gulp.task('test', () => {
   .pipe(babel({plugins: ['transform-es2015-modules-commonjs', 'transform-es2015-shorthand-properties']}))
   .pipe(rename('tests-compiled.js'))
   .on('error', handleErrors)
-  .pipe(gulp.dest('test/'));
+  .pipe(gulp.dest('./test/'));
 });
 
+gulp.task('css', () => {
+  return gulp.src('./app/src/client/css/*')
+    .pipe(gulp.dest('./app/build/client/css'))
+})
+
 gulp.task('watch', function() {
-  gulp.watch(['app/src/*',], ['core']);
-  gulp.watch('test/tests.js', ['test']);
-  gulp.watch('app/src/main.js', ['main']);
-  gulp.watch(['app/App.js', 'app/src/components/*'], ['react']);
+  gulp.watch(['./app/src/server/*',], ['server']);
+  gulp.watch('./test/tests.js', ['test']);
+  gulp.watch('./app/src/main.js', ['main']);
+  gulp.watch(['./app/src/client/index.js', 'app/src/client/components/*.js'], ['react']);
+  gulp.watch('./app/src/client/css/*', ['css']);
 });
