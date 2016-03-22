@@ -37,7 +37,7 @@ gulp.task('main', () => {
 
 gulp.task('react', () => {
   const bundler = browserify({
-    entries: ['./app/App.js'],
+    entries: ['./app/App.js', './app/src/components/Home.js'],
     transform: babelify.configure({presets: ["react", "es2015"]}),
     debug: true,
     fullPaths: true
@@ -61,8 +61,8 @@ gulp.task('test', () => {
 });
 
 gulp.task('watch', function() {
-  gulp.watch(['app/src/*.js', '!app/src/App.js', '!app/src/main.js'], ['core']);
+  gulp.watch(['app/src/*',], ['core']);
   gulp.watch('test/tests.js', ['test']);
   gulp.watch('app/src/main.js', ['main']);
-  gulp.watch(['app/src/App.js', 'app/src/components/*'], ['react']);
+  gulp.watch(['app/src/App.js', 'app/*', 'app/src/components/*'], ['react']);
 });

@@ -61,3 +61,21 @@ body {
   background: #F3F3F3!important;
 
 }
+
+#addBody {
+    margin: 120px auto;
+    max-width: 400px;
+}
+
+#addBody button {
+  margin-top: 20px;
+}
+
+#addBody h2 {
+  text-align: center;
+}
+
+#addText {
+  margin-top: 20px;
+  font-size: 12px;
+}
