@@ -12,7 +12,7 @@ const Projects = ({ projects }) => {
   );
 
   return (
-    <div id="content">
+    <div id="projectMenu">
       <ul>
         {projLinks}
       </ul>
@@ -25,5 +25,3 @@ Projects.propTypes = {
 };
 
 export default Projects;
-
-// <Link to={`/projects/${proj.id}`}>{proj.projectName}</Link>
