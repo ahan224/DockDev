@@ -2,6 +2,7 @@ import { join } from 'path';
 import Promise, { coroutine as co } from 'bluebird';
 import * as utils from './utils';
 import defaultConfig from './defaultConfig';
+import fs from 'fs';
 
 /**
  * initCongig() returns an object outlining the main config file information
@@ -20,7 +21,7 @@ const initConfig = (defaultConfig) => ({
  * readCongig() returns an object with the main config file information
  * based on the passed in path to the config folder
  *
- * @param {path} configPath
+ * @param {String} configPath
  * @return {Object} configObj
  */
 const readConfig = co(function *(configPath) {
@@ -53,26 +54,97 @@ const writeConfig = (configObj) => {
 const createConfigFolder = (defaultConfig) =>
   utils.mkdir(join(defaultConfig.defaultPath, defaultConfig.configFolder));
 
+  /**
+   * loadPathsFile() returns a promise that a path will reslove whether or not it is good
+   * based on the passed in path
+   *
+   * @param {String} basePath
+   * @return {??} promise to resolve the path
+   */
+const loadPathsFile = (basePath) =>
+  new Promise((resolve) => {
+    fs.readFile(basePath, (err, result) => {
+      if (err) return resolve('ERROR');
+      return resolve(result);
+    });
+  });
+
 /**
- * loadPaths() returns
- * based on the passed in
+ * searchBadPaths() returns an Array of dockdev folder paths, excluding prior good paths
+ * based on the passed in array and user directory
  *
- * @param {Object}
- * @return {}
+ * @param {Array} goodArray
+ * @param {String} userDir
+ * @return {Array} found paths
+ */
+const searchBadPaths = co(function *(goodArray, configObj) {
+  const searchArray = [];
+  if (!ConfigObj.userDir) ConfigObj.userDir = process.env.HOME;
+  // create the parameters for the linux find command
+  searchArray.push(ConfigObj.userDir);
+  searchArray.push('-name');
+  searchArray.push(defaultConfig.projFile);
+
+  // create the parameters for files to exclude based on the projects that were already found
+  goodArray.forEach((path) => {
+    searchArray.push('!');
+    searchArray.push('-path');
+    searchArray.push(path);
+  });
+
+  return yield utils.find(searchArray);
+});
+
+/**
+ * loadPaths() returns a promise that all the paths will resolve and will search for bad
+ * paths if any of the good paths fails to load
+ * based on the passed in config object with all the paths and an emitter and channel to pass data
+ *
+ * @param {Object} configObj
+ * @param {Emitter} emitter
+ * @param {Channel} channel
+ * @return {} promise all paths will resolve
  */
 const loadPaths = (configObj, emitter, channel) => {
   const goodPaths = [];
 
   configObj.projects.forEach(path => {
-    utils.readFile(path)
-      .then(data => emitter.send(channel, data))
-      .catch()
-  })
+    goodPaths.push(loadPathsFile(path)
+      .then(data => {
+        if (data !== 'ERROR') emitter.send(channel, data);
+      }));
+  });
 
-  //emitter.send(channel,)
-}
+  return Promise.all(goodPaths)
+    .then(resultsArray => {
+      if (resultsArray.indexOf('ERROR') !== -1) {
+        const goodToAvoid = resultsArray.filter(path => path !== 'ERROR');
+        searchBadPaths(goodToAvoid, configObj)
+          .then(badResultsArray => {
+            badResultsArray.forEach(badPath => {
+              configObj.projects.push(badPath);
+              loadPathsFile(badPath)
+                .then(badPathData => {
+                  emitter.send(channel, badPathData);
+                });
+            });
+          });
+      }
+    })
+   .catch((err) => console.log(err));
+};
 
-
+//   const searchResultsToUI = [];
+//
+//   // returns an array of data
+//
+//   for (let i = 0; i < searchResults.length; i++) {
+//     const fileContents = JSON.parse(yield readFile(join(searchResults[i], config.projPath())));
+//     searchResultsToUI.push(fileContents);
+//   }
+//
+//   return searchResultsToUI;
+// });
 
 
 //
@@ -105,33 +177,7 @@ const loadPaths = (configObj, emitter, channel) => {
 // });
 //
 //
-// // search Bad Paths
-// export const searchBadPaths = co(function *(goodPathsArray, userSelectedDirectory) {
-//   const searchArray = [];
-//   if (!userSelectedDirectory) userSelectedDirectory = process.env.HOME;
-//   // create the parameters for the linux find command
-//   searchArray.push(userSelectedDirectory);
-//   searchArray.push('-name');
-//   searchArray.push(config.projFile);
-//
-//   // create the parameters for files to exclude based on the projects that were already found
-//   goodPathsArray.forEach((path) => {
-//     searchArray.push('!');
-//     searchArray.push('-path');
-//     searchArray.push(path);
-//   });
-//
-//   const searchResultsToUI = [];
-//
-//   // returns an array of data
-//   const searchResults = yield findDockdev(searchArray);
-//   for (let i = 0; i < searchResults.length; i++) {
-//     const fileContents = JSON.parse(yield readFile(join(searchResults[i], config.projPath())));
-//     searchResultsToUI.push(fileContents);
-//   }
-//
-//   return searchResultsToUI;
-// });
+
 //
 // // after reading the main configFile, we are going to load all the paths
 // export const loadPaths = co(function *(configFile, userSelectedDirectory) {
