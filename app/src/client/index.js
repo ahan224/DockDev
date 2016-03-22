@@ -7,6 +7,8 @@ import Repo from './components/Repo';
 import About from './components/About';
 import Home from './components/Home';
 import AddProject from './components/AddProject';
+import Project from './components/Project';
+import Projects from './components/Projects';
 
 render((
   <Router history={hashHistory}>
@@ -17,6 +19,8 @@ render((
       </Route>
       <Route path="/about" component={About} />
       <Route path="/addProject" component={AddProject} />
+      <Route path="/projects" component={Projects} />
+      <Route path="/projects/:id" component={Project} />
     </Route>
   </Router>
 ), document.getElementById('app'));

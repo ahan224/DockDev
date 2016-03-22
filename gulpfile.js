@@ -43,7 +43,7 @@ gulp.task('react', () => {
     fullPaths: true
   })
 
-  // bundler.external(['react', 'react-dom', './lib/utils.js', 'ramda']);
+  bundler.external(['react', 'react-dom', 'ramda', 'react-router']);
 
   return bundler
     .bundle()
