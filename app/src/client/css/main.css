@@ -53,13 +53,12 @@ body {
   width: 100%;
   padding-top: 50px;
   padding-left: 240px;
-  /*equal to menu width*/
 }
+
 .card {
   min-height: 145px;
   margin-bottom: 15px;
   background: #F3F3F3!important;
-
 }
 
 #addBody {
@@ -80,7 +79,6 @@ body {
   font-size: 12px;
 }
 
-.project-hover:hover {
-  color: red;
-  background-color: white;
+.active {
+  color: green;
 }
