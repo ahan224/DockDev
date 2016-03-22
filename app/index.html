@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
   <head>
     <meta charset="utf-8">
     <title>DocDev</title>
@@ -11,22 +10,16 @@
     <link rel="stylesheet" href="../bower_components/ionicons/css/ionicons.css" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" href="../bower_components/ionicons/fonts/ionicons.ttf" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" type="text/css" href="../node_modules/sweetalert2/dist/sweetalert2.css">
+
+    <script>
+      const ipcRenderer = require('electron').ipcRenderer;
+      const remote = require('electron').remote;
+    </script>
+    
   </head>
 
-  <script>
-    const ipcRenderer = require('electron').ipcRenderer;
-    const remote = require('electron').remote;
-  </script>
-
   <body>
-    <div class="window">
-      <div class="header">
-        <h6>DOCDEV</h6>
-      </div>
-      <div class="window-content" id="main"></div>
-    </div>
+    <div id="app"></div>
+    <script src="./lib/bundle.js"></script>
   </body>
-
-  <script src="./lib/bundle.js"></script>
-
 </html>

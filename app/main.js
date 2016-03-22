@@ -5,17 +5,13 @@ var _electron = require('electron');
 
 var _electron2 = _interopRequireDefault(_electron);
 
-var _utils = require('./lib/utils.js');
-
-var utils = _interopRequireWildcard(_utils);
-
 var _path = require('path');
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const app = _electron2.default.app;
+// import * as utils from './lib/utils.js';
+
 const BrowserWindow = _electron2.default.BrowserWindow;
 const ipcMain = _electron2.default.ipcMain;
 
@@ -25,7 +21,8 @@ app.on('ready', function () {
   mainWindow = new BrowserWindow({ width: 750, height: 550, titleBarStyle: "hidden-inset" });
   mainWindow.loadURL('file://' + (0, _path.join)(__dirname, 'index.html'));
 
-  utils.readConfig(process.env.HOME).catch(console.log);
+  // utils.readConfig(process.env.HOME)
+  //   .catch(console.log);
 
   mainWindow.webContents.openDevTools();
   mainWindow.on('close', function () {
