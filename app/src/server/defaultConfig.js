@@ -20,8 +20,8 @@ const config = {
   configFolder: '.dockdevConfig',
   configFile: 'dockdevConfig.json',
   defaultPath: process.env.HOME,
-  configPath(path = this.defaultPath) {
-    return join(path, this.configFolder, this.configFile);
+  configPath() {
+    return join(process.env.HOME, this.configFolder, this.configFile);
   },
 
   // projects config

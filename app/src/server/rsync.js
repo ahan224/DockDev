@@ -3,7 +3,9 @@ import Promise, { coroutine as co } from 'bluebird';
 import R from 'ramda';
 import * as machine from './machine.js';
 
+// promisify callback function
 const execProm = Promise.promisify(childExec);
+
 // rsync :: string -> promise(string)
 // accepts an array of cmd line args for rsync
 // returns a promise that resolves to teh stdout
