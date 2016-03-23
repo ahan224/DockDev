@@ -119,6 +119,7 @@ const loadPaths = (configObj, emitter, channel) => {
     .then(resultsArray => {
       if (resultsArray.indexOf('ERROR') !== -1) {
         const goodToAvoid = resultsArray.filter(path => path !== 'ERROR');
+        configObj.projects = goodToAvoid;
         searchBadPaths(goodToAvoid, configObj)
           .then(badResultsArray => {
             badResultsArray.forEach(badPath => {
