@@ -3,9 +3,14 @@ import * as machine from './machine.js';
 import Promise, { coroutine as co } from 'bluebird';
 import { exec as childExec } from 'child_process';
 
+// promisify callback function
 const exec = Promise.promisify(childExec);
 
+/**
+* @param {Object} dockerCommands that will be passed into the command line function below
+*/
 const dockerCommands = {
+  // starts a container
   start: {
     cmd: 'start',
     method: 'POST',
@@ -13,6 +18,7 @@ const dockerCommands = {
       return `/containers/${containerId}/${this.cmd}`;
     }
   },
+  // stops a container
   stop: {
     cmd: 'stop',
     method: 'POST',
@@ -20,6 +26,7 @@ const dockerCommands = {
       return `/containers/${containerId}/${this.cmd}`;
     }
   },
+  // inspects a container
   inspect: {
     cmd: 'json',
     method: 'GET',
@@ -27,6 +34,7 @@ const dockerCommands = {
       return `/containers/${containerId}/${this.cmd}`;
     }
   },
+  // ??
   list: {
     cmd: 'json',
     method: 'GET',
@@ -34,6 +42,7 @@ const dockerCommands = {
       return `/containers/${this.cmd}`;
     }
   },
+  // creates a container
   create: {
     cmd: 'create',
     method: 'POST',
@@ -41,6 +50,7 @@ const dockerCommands = {
       return `/containers/${this.cmd}`;
     }
   },
+  // restarts a container
   restart: {
     cmd: 'restart',
     method: 'POST',
@@ -48,6 +58,7 @@ const dockerCommands = {
       return `/containers/${containerId}/${this.cmd}`;
     }
   },
+  // removes a container
   remove: {
     cmd: '',
     method: 'DELETE',
@@ -57,6 +68,13 @@ const dockerCommands = {
   }
 };
 
+/**
+ * commandMaker() returns an anonymous function that takes 2 parameters
+ * based on the passed in command object, which represents a task to perform in the command line
+ *
+ * @param {Object} cmd
+ * @return {Function} returning anonymous function that takes 2 parameters
+ */
 function commandMaker(cmd) {
   return co(function *(machineName, containerInfo) {
     const config = yield machine.config(machineName);
@@ -68,6 +86,14 @@ function commandMaker(cmd) {
   });
 }
 
+/**
+ * each function below will take in two parameters and return a machine config object
+ * which will have the information necessary to perform the commands on the Docker API
+ *
+ * @param {String} machineName
+ * @param {String} containerInfo
+ * @return {Object} returns a promise to supply the config object
+ */
 export const start = commandMaker(dockerCommands.start);
 export const stop = commandMaker(dockerCommands.stop);
 export const list = commandMaker(dockerCommands.list);
