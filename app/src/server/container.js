@@ -34,7 +34,7 @@ const dockerCommands = {
       return `/containers/${containerId}/${this.cmd}`;
     }
   },
-  // ??
+  // creates a list of containers
   list: {
     cmd: 'json',
     method: 'GET',
@@ -102,17 +102,36 @@ export const create = commandMaker(dockerCommands.create);
 export const restart = commandMaker(dockerCommands.restart);
 export const remove = commandMaker(dockerCommands.remove);
 
-
+/**
+ * pull() returns a promise to execute a docker command, 'pull' which will pull
+ * an image from the registry/ host
+ * based on the passed in machine name and image
+ *
+ * @param {String} machineName
+ * @param {String} image
+ * @return {} returns a promise to pull the image
+ */
 export const pull = co(function *(machineName, image) {
   const env = yield machine.env(machineName);
   return yield exec(`docker pull ${image}`, { env });
 });
 
-export const deploy = co(function *(machineName, image) {
+/**
+ * sendImage() returns a promise to execute docker commands:
+ *   'save', 'docker-machine ssh', and 'docker load' which will
+ * send an image to the registry/ host
+ * based on the passed in machine name and image
+ *
+ * @param {String} machineName
+ * @param {String} image
+ * @return {} returns a promise to  the image to the host
+ */
+export const sendImage = co(function *(machineName, image) {
   const env = yield machine.env(machineName);
   return yield exec(`docker save ${image} > tempImage.tar && docker-machine ssh
     ${machineName} docker load < tempImage.tar`, { env });
 });
+
 
 export const logs = co(function *(machineName, containerId) {
   const env = yield machine.env(machineName);
@@ -142,6 +161,22 @@ export const removeContainer = co(function *(projObj, containerId) {
   yield remove(projObj.machine, containerId);
   delete projObj.containers[containerId];
   return true;
+});
+
+/**
+ * manageProject() will perform an action on the project containers
+ * functions that we will pass into the callback include:
+ * start, stop, restart, and remove (see above)
+ * based on initially passing in the project object and the callback
+ *
+ * @param {Object} projObj
+ * @param {Function} containerFn
+ * @return {} will perform an action on the project containers
+ */
+export const manageProject = co(function *(projObj, containerFn) {
+  for (var key in projObj.containers) {
+    containerFn(projObj.machine, key);
+  }
 });
 
 // remove('default', 'f3e796d19685')
