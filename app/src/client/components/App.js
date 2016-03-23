@@ -52,12 +52,9 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <div id="header">
-          <h5>DockDev <small>beta</small></h5>
-        </div>
-        <ul role="nav" id="menu">
-          <li><NavLink to="/" onlyActiveOnIndex>Home</NavLink></li>
-          <li><NavLink to="/addProject">Add Project</NavLink></li>
+        <ul role="nav" id="menu" className="nav">
+          <li className="nav-item"><NavLink to="/" onlyActiveOnIndex>Home</NavLink></li>
+          <li className="nav-item"><NavLink to="/addProject">Add Project</NavLink></li>
           <ProjectLinks projects={this.state.projects} />
         </ul>
         {React.cloneElement(this.props.children,
