@@ -34,7 +34,7 @@ const dockerCommands = {
       return `/containers/${containerId}/${this.cmd}`;
     }
   },
-  // ??
+  // creates a list of containers
   list: {
     cmd: 'json',
     method: 'GET',
@@ -89,7 +89,7 @@ function commandMaker(cmd) {
 /**
  * each function below will take in two parameters and return a machine config object
  * which will have the information necessary to perform the commands on the Docker API
- *
+ *g
  * @param {String} machineName
  * @param {String} containerInfo
  * @return {Object} returns a promise to supply the config object
@@ -142,6 +142,22 @@ export const removeContainer = co(function *(projObj, containerId) {
   yield remove(projObj.machine, containerId);
   delete projObj.containers[containerId];
   return true;
+});
+
+/**
+ * manageProject() will perform an action on the project containers
+ * functions that we will pass into the callback include:
+ * start, stop, restart, and remove (see above)
+ * based on initially passing in the project object and the callback
+ *
+ * @param {Object} projObj
+ * @param {Function} containerFn
+ * @return {} will perform an action on the project containers
+ */
+export const manageProject = co(function *(projObj, containerFn) {
+  for (var key in projObj.containers) {
+    containerFn(projObj.machine, key);
+  }
 });
 
 // remove('default', 'f3e796d19685')
