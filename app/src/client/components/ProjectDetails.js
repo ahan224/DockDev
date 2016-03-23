@@ -4,7 +4,7 @@ const ProjectDetail = ({ projects, params }) => {
   const proj = projects[params.uuid];
   return (
     <div>
-      { proj.projectName }
+      {proj.projectName}
     </div>
   );
 };
