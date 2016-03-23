@@ -1,34 +1,31 @@
 import React from 'react';
 import NavLink from './NavLink';
 import ProjectLinks from './ProjectLinks';
+import * as projConfig from './build/server/projConfig.js';
 
 class App extends React.Component {
   constructor() {
     super();
+    this.addNewProject = this.addNewProject.bind(this);
     this.state = {
       projects: {
         1: {
           projectName: 'project1',
           uuid: 1,
-          other: 'test1'
-        },
-        2: {
-          projectName: 'project2',
-          uuid: 2,
-          other: 'test2'
-        },
-        3: {
-          projectName: 'project3',
-          uuid: 3,
-          other: 'test3'
-        },
-        10: {
-          projectName: 'project10',
-          uuid: 10,
-          other: 'test3'
+          basePath: ''
         }
       }
     };
+  }
+
+  addNewProject(userSelection) {
+    projConfig.initProject(userSelection.basePath, userSelection.projectName)
+      .then(proj => {
+        const projObj = {};
+        projObj[proj.uuid] = proj;
+        this.setState({ projects: projObj });
+      })
+      .catch();
   }
 
   render() {
@@ -42,7 +39,11 @@ class App extends React.Component {
           <li><NavLink to="/addProject">Add Project</NavLink></li>
           <ProjectLinks projects={this.state.projects} />
         </ul>
-        {React.cloneElement(this.props.children, { projects: this.state.projects })}
+        {React.cloneElement(this.props.children,
+          { projects: this.state.projects,
+            addNewProject: this.addNewProject,
+            selectProjectPath: this.selectProjectPath
+          })}
       </div>
     );
   }

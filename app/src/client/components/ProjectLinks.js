@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import R from 'ramda';
 
-const Projects = ({ projects }) => {
+const ProjectList = ({ projects }) => {
   const projArray = R.toPairs(projects);
   const projLinks = projArray.map(proj => (
       <li key={proj[1].uuid}>
@@ -20,8 +20,8 @@ const Projects = ({ projects }) => {
   );
 };
 
-Projects.propTypes = {
+ProjectList.propTypes = {
   projects: React.PropTypes.object
 };
 
-export default Projects;
+export default ProjectList;
