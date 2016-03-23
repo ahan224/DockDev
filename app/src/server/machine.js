@@ -3,20 +3,39 @@ import { exec as childExec, spawn } from 'child_process';
 import Promise, { coroutine as co } from 'bluebird';
 import R from 'ramda';
 
+// promisify certain callback functions
 const readFile = Promise.promisify(fs.readFile);
 const execProm = Promise.promisify(childExec);
 
 // dockerMachine :: string -> promise(string)
 // accepts an array of cmd line args for docker-machine
 // returns a promise that resolves to the stdout
+
+/**
+ * exec() returns a docker-machine terminal command promise that resolves to the stdout
+ * based on the passed in string for the 'docker-machine' terminal command
+ *
+ * @param {String} args
+ * @return {} returns a promise that resolves to the stdout
+ */
 const exec = (args) => execProm(`docker-machine ${args}`);
 
 /**
-* inspect :: string -> promise(object)
-* accepts a machine name and returns the inspect results
-*/
+ * inspect() returns a docker-machine terminal inspect command promise that resolves to the stdout
+ * based on the passed in 'MachineName' string
+ *
+ * @param {String} machineName
+ * @return {} returns a promise that resolves to the stdout
+ */
 export const inspect = (machineName) => exec(`inspect ${machineName}`);
 
+/**
+ * inspect() returns a docker-machine terminal inspect command promise that resolves to the stdout
+ * based on the passed in 'MachineName' string
+ *
+ * @param {String} machineName
+ * @return {} returns a promise that resolves to the stdout
+ */
 export const env = co(function *(machineName) {
   let result = yield exec(`env ${machineName}`);
   result = R.fromPairs(env.split('\n').slice(0, 4).map(val => val.substr(7).split('=')));

@@ -8,6 +8,13 @@ export const writeFile = Promise.promisify(fs.writeFile);
 export const readFile = Promise.promisify(fs.readFile);
 export const exec = Promise.promisify(childProcess.exec);
 
+/**
+ * find() returns an array of data using the 'find' terminal command
+ * based on the passed in array of options for the 'find' terminal command
+ *
+ * @param {Array} array
+ * @return {Array} 'find' results array
+ */
 export const find = (array) => {
   let result = '';
   const spawnFind = childProcess.spawn('find', array);
@@ -22,6 +29,11 @@ export const find = (array) => {
   });
 };
 
-// jsonStringifyPretty :: object -> string
-// predefines JSON stringify with formatting
+/**
+ * jsonStringifyPretty() returns a string (JSON.stringify) with indent formatting
+ * based on the passed in object
+ *
+ * @param {Object} obj
+ * @return {String}
+ */
 export const jsonStringifyPretty = (obj) => JSON.stringify(obj, null, 2);
