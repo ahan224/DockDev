@@ -120,7 +120,7 @@ export const initProject = co(function *(basePath, projectName) {
 
   // TODO: need to work on this part and uncomment this part here
   // addProjToConfig(basePath);
-  addToAppMemory(projObj);
+  // addToAppMemory(projObj);
 
   return projObj;
 });
