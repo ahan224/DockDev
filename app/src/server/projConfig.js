@@ -82,26 +82,6 @@ export const readProj = co(function *(basePath) {
 });
 
 /**
- * addProjToMemory() will place the project object in memory and returns the project object
- * based on initially passing in the memory object and then later the project object
- *
- * @param {Object} memory
- * @param {Object} projObj
- * @return {Object} projObj
- */
-export const addProjToMemory = R.curry((memObj, projObj) => {
-  memObj[projObj.uuid] = projObj;
-  return projObj;
-});
-
-// curried version of the addProjToMemory function (see above)
-export const addToAppMemory = addProjToMemory(memory);
-
-// initProject :: string -> string -> promise(object)
-// combines the sequence of functions to initiate a new projects
-// takes a path and a project name and returns the defaultConfig object
-
-/**
  * initProject() creates the project object, then yields a promise to create the project folder
  * then yields a promise to write the project file, then it adds the project object to memory
  * and finally, it returns the project object
@@ -111,11 +91,20 @@ export const addToAppMemory = addProjToMemory(memory);
  * @param {String} projectName
  * @return {Object} projObj
  */
-export const initProject = co(function *(basePath, projectName) {
-
+export const initProject = co(function *g(basePath, projectName, overwrite) {
   const projObj = createProj(basePath, projectName);
 
-  yield createDockDev(projObj);
+  // allows to overwrite an existing project config
+  if (overwrite) {
+    try {
+      yield createDockDev(projObj);
+    } catch (e) {
+      console.log(e);
+    }
+  } else {
+    yield createDockDev(projObj);
+  }
+
   yield writeProj(projObj);
 
   // TODO: need to work on this part and uncomment this part here
@@ -126,3 +115,18 @@ export const initProject = co(function *(basePath, projectName) {
 });
 
 // initProject(process.env.HOME, 'testProject');
+/**
+ * addProjToMemory() will place the project object in memory and returns the project object
+ * based on initially passing in the memory object and then later the project object
+ *
+ * @param {Object} memory
+ * @param {Object} projObj
+ * @return {Object} projObj
+ */
+// export const addProjToMemory = R.curry((memObj, projObj) => {
+//   memObj[projObj.uuid] = projObj;
+//   return projObj;
+// });
+
+// curried version of the addProjToMemory function (see above)
+// export const addToAppMemory = addProjToMemory(memory);

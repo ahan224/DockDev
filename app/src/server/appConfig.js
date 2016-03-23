@@ -1,7 +1,7 @@
 import { join } from 'path';
 import Promise, { coroutine as co } from 'bluebird';
 import * as utils from './utils';
-import defaultConfig from './defaultConfig';
+// import defaultConfig from './defaultConfig';
 import * as machine from './machine.js';
 import fs from 'fs';
 import { exec as childExec } from 'child_process';
@@ -15,7 +15,7 @@ const exec = Promise.promisify(childExec);
  *
  * @return {} returns true or a promise to install Docker
  */
-const checkDockerInstall = co(function *() {
+export const checkDockerInstall = co(function *g() {
   const env = yield machine.env('default');
   const result = yield exec('docker info', { env });
   if (!result) return yield exec('curl -fsSL https://get.docker.com/ | sh');
@@ -42,7 +42,7 @@ const initConfig = (defaultConfig) => ({
  * @param {String} configPath
  * @return {Object} configObj
  */
-const readConfig = co(function *(configPath) {
+const readConfig = co(function *g(configPath) {
   try {
     return JSON.parse(yield utils.readFile(configPath));
   } catch (e) {
@@ -51,7 +51,7 @@ const readConfig = co(function *(configPath) {
 });
 
 /**
- * writeCongig() return a promise to write the initial config file
+ * writeConfig() return a promise to write the initial config file
  * based on the passed in config object
  *
  * @param {Object} configObj
@@ -71,6 +71,30 @@ const writeConfig = (configObj) => {
  */
 const createConfigFolder = (defaultConfig) =>
   utils.mkdir(join(defaultConfig.defaultPath, defaultConfig.configFolder));
+
+/**
+ * loadConfigFile() returns the config file from ~/.dockdevconfig or creates/writes it
+ *
+ * @param
+ */
+export const loadConfigFile = co(function *g(defaultConfig) {
+  let config = yield readConfig(defaultConfig.configPath());
+
+  // if config is undefined then config file does not exist
+  if (!config) {
+    try {
+      yield createConfigFolder(defaultConfig);
+    } catch (e) {
+      console.log(e);
+    }
+    config = initConfig(defaultConfig);
+    yield writeConfig(config);
+    return config;
+  }
+
+  return config;
+});
+
 
 /**
  * loadPathsFile() returns a promise that a path will reslove whether or not it is good
@@ -123,34 +147,37 @@ const searchBadPaths = co(function *(goodArray, configObj) {
  * @param {Channel} channel
  * @return {} promise all paths will resolve
  */
-const loadPaths = (configObj, emitter, channel) => {
+export const loadPaths = (configObj, callback) => {
   const goodPaths = [];
 
   configObj.projects.forEach(path => {
     goodPaths.push(loadPathsFile(path)
       .then(data => {
-        if (data !== 'ERROR') emitter.send(channel, data);
+        if (data !== 'ERROR') callback(data);
       }));
   });
 
-  return Promise.all(goodPaths)
-    .then(resultsArray => {
-      if (resultsArray.indexOf('ERROR') !== -1) {
-        const goodToAvoid = resultsArray.filter(path => path !== 'ERROR');
-        configObj.projects = goodToAvoid;
-        searchBadPaths(goodToAvoid, configObj)
-          .then(badResultsArray => {
-            badResultsArray.forEach(badPath => {
-              configObj.projects.push(badPath);
-              loadPathsFile(badPath)
-                .then(badPathData => {
-                  emitter.send(channel, badPathData);
-                });
-            });
-          });
-      }
-    })
-   .catch((err) => console.log(err));
+  // Promise.all(goodPaths)
+  //   .then(console.log);
+
+  // return Promise.all(goodPaths)
+  //   .then(resultsArray => {
+  //     if (resultsArray.indexOf('ERROR') !== -1) {
+  //       const goodToAvoid = resultsArray.filter(path => path !== 'ERROR');
+  //       configObj.projects = goodToAvoid;
+  //       searchBadPaths(goodToAvoid, configObj)
+  //         .then(badResultsArray => {
+  //           badResultsArray.forEach(badPath => {
+  //             configObj.projects.push(badPath);
+  //             loadPathsFile(badPath)
+  //               .then(badPathData => {
+  //                 callback(badPathData);
+  //               });
+  //           });
+  //         });
+  //     }
+  //   })
+  //  .catch((err) => console.log(err));
 };
 
 //   const searchResultsToUI = [];
