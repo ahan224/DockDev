@@ -7,6 +7,7 @@ import { join } from 'path';
 *   @param {String} config.configFolder is where app config details are stored
 *   @param {String} config.configFile is the file name for dockdev app config storage
 *   @param {String} config.defaultPath is the path where the app config is stored by default
+*   @param {String} config.DOToken is the placeholder for the user provided Access Token
 *   @param {Function} config.configPath is the full path to the app config file
 *
 * Projects Config
@@ -20,7 +21,8 @@ const config = {
   configFolder: '.dockdevConfig',
   configFile: 'dockdevConfig.json',
   defaultPath: process.env.HOME,
-  configPath(path = this.defaultPath) {
+  DOToken: '',
+  configPath(path = defaultPath) {
     return join(path, this.configFolder, this.configFile);
   },
 
