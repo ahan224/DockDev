@@ -48,7 +48,16 @@ gulp.task('react', () => {
     fullPaths: true
   })
 
-  bundler.external(['react', 'react-dom', 'ramda', 'react-router', 'electron', './build/server/projConfig.js']);
+  bundler.external([
+    'react',
+    'react-dom',
+    'ramda',
+    'react-router',
+    'electron',
+    './build/server/projConfig.js',
+    './build/server/appConfig.js',
+    './build/server/defaultConfig.js'
+  ]);
 
   return bundler
     .bundle()

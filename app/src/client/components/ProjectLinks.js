@@ -2,26 +2,26 @@ import React from 'react';
 import { Link } from 'react-router';
 import R from 'ramda';
 
-const ProjectList = ({ projects }) => {
+const ProjectLinks = ({ projects }) => {
   const projArray = R.toPairs(projects);
   const projLinks = projArray.map(proj => (
-      <li key={proj[1].uuid}>
-        <Link to={`/projects/${proj[1].uuid}`}>{proj[1].projectName}</Link>
+      <li key={proj[1].uuid} className="nav-item">
+        <Link className="nav-link" to={`/projects/${proj[1].uuid}`}>{proj[1].projectName}</Link>
       </li>
     )
   );
 
   return (
     <div id="projectMenu">
-      <ul>
+      <ul className="nav">
         {projLinks}
       </ul>
     </div>
   );
 };
 
-ProjectList.propTypes = {
+ProjectLinks.propTypes = {
   projects: React.PropTypes.object
 };
 
-export default ProjectList;
+export default ProjectLinks;
