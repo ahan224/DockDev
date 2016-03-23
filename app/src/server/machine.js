@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { exec as childExec, spawn } from 'child_process';
+import { exec as childExec } from 'child_process';
 import Promise, { coroutine as co } from 'bluebird';
 import R from 'ramda';
 
@@ -61,32 +61,6 @@ export const env = co(function *(machineName) {
  * @return {} returns a promise that resolves to the stdout
  */
 export const ssh = (machineName, args) => exec(`ssh ${machineName} ${args}`);
-
-/**
- * dropletOnOcean() returns a promise to create a droplet on DigitalOcean
- * based on the passed in accessToken and dropletName
- *
- * @param {String} accessToken
- * @param {String} dropletName
- * @return {} returns a promise to create a droplet on DigitalOcean
- */
-const dropletOnOcean = (accessToken, dropletName) => {
-  let result = '';
-  const createDroplet = spawn('docker-machine',
-    ['create', '--driver', 'digitalocean',
-    '--digitalocean-access-token', accessToken, dropletName]);
-
-  createDroplet.stdout.on('data', data => { result += data; });
-
-  return new Promise((resolve, reject) => {
-    createDroplet.stderr.on('data', reject);
-    createDroplet.stdout.on('close', () => {
-      resolve(result);
-    });
-  });
-};
-
-// createDroplet('eedf80c21a790ed8328a1f64447a2b239ba98c8137051a362b8bee89530968a7', 'test11');
 
 /**
  * config() returns a config object for a given machine with its certificates, uri, and key
