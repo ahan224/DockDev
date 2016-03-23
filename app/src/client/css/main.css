@@ -32,6 +32,7 @@ body {
   width: 240px;
   background: #19191B;
   color: white;
+  pad
   /*border-right: 1px solid #DADADA;*/
 }
 #menu > div {
@@ -81,4 +82,13 @@ body {
 
 .active {
   color: green;
+}
+
+
+.content-wrapper {
+  padding: 10px!important;
+}
+
+.project-detail-nav {
+  float: right;
 }
