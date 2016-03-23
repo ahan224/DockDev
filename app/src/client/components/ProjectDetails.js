@@ -4,7 +4,13 @@ const ProjectDetail = ({ projects, params }) => {
   const proj = projects[params.uuid];
   return (
     <div>
-      {proj.projectName}
+      <h1 className="display-4 text-capitalize">
+        { proj.projectName }
+      </h1>
+      <p className="lead">
+        All the awesome information about your project,
+        container, are right here.  Take a look around.
+      </p>
     </div>
   );
 };
