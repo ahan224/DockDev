@@ -89,7 +89,7 @@ function commandMaker(cmd) {
 /**
  * each function below will take in two parameters and return a machine config object
  * which will have the information necessary to perform the commands on the Docker API
- *g
+ *
  * @param {String} machineName
  * @param {String} containerInfo
  * @return {Object} returns a promise to supply the config object
@@ -102,17 +102,36 @@ export const create = commandMaker(dockerCommands.create);
 export const restart = commandMaker(dockerCommands.restart);
 export const remove = commandMaker(dockerCommands.remove);
 
-
+/**
+ * pull() returns a promise to execute a docker command, 'pull' which will pull
+ * an image from the registry/ host
+ * based on the passed in machine name and image
+ *
+ * @param {String} machineName
+ * @param {String} image
+ * @return {} returns a promise to pull the image
+ */
 export const pull = co(function *(machineName, image) {
   const env = yield machine.env(machineName);
   return yield exec(`docker pull ${image}`, { env });
 });
 
-export const deploy = co(function *(machineName, image) {
+/**
+ * sendImage() returns a promise to execute docker commands:
+ *   'save', 'docker-machine ssh', and 'docker load' which will
+ * send an image to the registry/ host
+ * based on the passed in machine name and image
+ *
+ * @param {String} machineName
+ * @param {String} image
+ * @return {} returns a promise to  the image to the host
+ */
+export const sendImage = co(function *(machineName, image) {
   const env = yield machine.env(machineName);
   return yield exec(`docker save ${image} > tempImage.tar && docker-machine ssh
     ${machineName} docker load < tempImage.tar`, { env });
 });
+
 
 export const logs = co(function *(machineName, containerId) {
   const env = yield machine.env(machineName);
