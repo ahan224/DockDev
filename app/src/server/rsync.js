@@ -6,32 +6,65 @@ import * as machine from './machine.js';
 // promisify callback function
 const execProm = Promise.promisify(childExec);
 
-// rsync :: string -> promise(string)
-// accepts an array of cmd line args for rsync
-// returns a promise that resolves to teh stdout
+/**
+ * rsync() returns a promise that resolves to the stdout
+ * based on the passed in string of arguments
+ *
+ * @param {String} args
+ * @return {} returns a promise that resolves to the stdout
+ */
 const rsync = (args) => execProm(`rsync ${args}`);
 
-// selectWithin :: [string] -> string -> object
-// helper function to select specified props from a nested object
+/**
+ * selectWithin() returns a result object
+ * it is a helper function to select specified props from a nested object
+ * based on the passed in array, key, and object
+ *
+ * @param {Array} Array
+ * @param {String} key
+ * @param {Object} obj
+ * @return {Object} result
+ */
 const selectWithin = R.curry((array, key, obj) => {
   const result = {};
   array.forEach(val => { result[val] = obj[key][val]; });
   return result;
 });
 
-// selectSSHandIP :: object -> object
-// selects ssh and ip address from docker-machine inspect object
+/**
+ * selectSSHandIP() returns a result object
+ * it is a composed function that takes in an object, parses it, and passes it
+ * to selectWithin
+ * Ultimately, it selects ssh and ip address from docker-machine inspect object
+ * based on the passed in object when called
+ *
+ * @param {Object} docker-machine inspect object (passed in below)
+ * @return {Object} result (from selectWithin)
+ */
 const selectSSHandIP = R.compose(
   selectWithin(['SSHKeyPath', 'IPAddress'], 'Driver'),
   JSON.parse
 );
 
-// createRsyncArgs :: string -> string -> object -> [string]
-// accepts source, destination, and machine info
-// returns an array of arguments for rsync
+/**
+ * createRsyncArgs() returns the string of arguments for rsync to run
+ * based on the passed in source, destination, and machine information
+ *
+ * @param {String} source
+ * @param {String} dest
+ * @param {String} machineInfo
+ * @return {String}
+ */
 const createRsyncArgs = (source, dest, machineInfo) =>
   `-a -e "ssh -i ${machineInfo.SSHKeyPath} -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" --delete ${source} docker@${machineInfo.IPAddress}:${dest}`;
 
+/**
+ * getSyncContainer() returns the containerId for the container where sync is turned on
+ * based on the passed in project object
+ *
+ * @param {Object} projObj
+ * @return {String} result
+ */
 function getSyncContainer(projObj) {
   let result;
   for (const container in projObj.containers) {
@@ -43,9 +76,15 @@ function getSyncContainer(projObj) {
   return result;
 }
 
-// generateRsync :: object -> function
-// accepts a config object and returns a function that is
-// called when files change in the base directory of project
+/**
+ * generateRsync() returns a promise to run the rsync terminal command
+ * initially, it calls a helper function which gathers the arguments for rsync
+ * it then runs the rsync terminal command with the given arguments
+ * based on the passed in project object
+ *
+ * @param {Object} projObj
+ * @return {} returns a promise to run the rsync terminal command
+ */
 export function generateRsync(projObj) {
   const getArgs = co(function *() {
     const machineInfo = selectSSHandIP(yield machine.inspect(projObj.machine));
