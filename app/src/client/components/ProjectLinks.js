@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import R from 'ramda';
 
-const Projects = ({ projects }) => {
+const ProjectLinks = ({ projects }) => {
   const projArray = R.toPairs(projects);
   const projLinks = projArray.map(proj => (
       <li key={proj[1].uuid}>
@@ -12,7 +12,7 @@ const Projects = ({ projects }) => {
   );
 
   return (
-    <div id="content">
+    <div id="projectMenu">
       <ul>
         {projLinks}
       </ul>
@@ -20,10 +20,8 @@ const Projects = ({ projects }) => {
   );
 };
 
-Projects.propTypes = {
+ProjectLinks.propTypes = {
   projects: React.PropTypes.object
 };
 
-export default Projects;
-
-// <Link to={`/projects/${proj.id}`}>{proj.projectName}</Link>
+export default ProjectLinks;

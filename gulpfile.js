@@ -21,7 +21,12 @@ gulp.task('default', ['server', 'react', 'test', 'main', 'css', 'watch']);
 
 gulp.task('server', () => {
   return gulp.src('./app/src/server/*')
-    .pipe(babel( {plugins: ['transform-es2015-modules-commonjs', 'transform-es2015-shorthand-properties']} ))
+    .pipe(babel( {plugins: [
+        'transform-es2015-modules-commonjs',
+        'transform-es2015-shorthand-properties',
+        'transform-es2015-parameters'
+      ]}
+    ))
     .on('error', handleErrors)
     .pipe(gulp.dest('./app/build/server'));
 });
@@ -43,7 +48,16 @@ gulp.task('react', () => {
     fullPaths: true
   })
 
-  bundler.external(['react', 'react-dom', 'ramda', 'react-router']);
+  bundler.external([
+    'react',
+    'react-dom',
+    'ramda',
+    'react-router',
+    'electron',
+    './build/server/projConfig.js',
+    './build/server/appConfig.js',
+    './build/server/defaultConfig.js'
+  ]);
 
   return bundler
     .bundle()
