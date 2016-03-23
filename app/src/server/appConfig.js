@@ -10,14 +10,16 @@ import { exec as childExec } from 'child_process';
 const exec = Promise.promisify(childExec);
 
 /**
- * checkDockerInstall() returns an object outlining the main config file information
+ * checkDockerInstall() returns true or a promise to install Docker
  * based on checking the default machine and passing in it's environment variables
  *
- * @return {} returns a promise to determine if docker is installed
+ * @return {} returns true or a promise to install Docker
  */
 const checkDockerInstall = co(function *() {
   const env = yield machine.env('default');
-  return yield exec('docker info', { env });
+  const result = yield exec('docker info', { env });
+  if (!result) return yield exec('curl -fsSL https://get.docker.com/ | sh');
+  return true;
 });
 
 /**
