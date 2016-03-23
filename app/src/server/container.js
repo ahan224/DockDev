@@ -77,7 +77,7 @@ const dockerCommands = {
  */
 function commandMaker(cmd) {
   return co(function *(machineName, containerInfo) {
-    const config = yield machine.config(machineName);
+    const config = yield machine.machineConfig(machineName);
     config.uri += cmd.uri(containerInfo);
     config.method = cmd.method;
     config.json = true;
@@ -117,14 +117,14 @@ export const pull = co(function *(machineName, image) {
 });
 
 /**
- * sendImage() returns a promise to execute docker commands:
+ * sendImage() returns a promise to execute a series of docker commands:
  *   'save', 'docker-machine ssh', and 'docker load' which will
  * send an image to the registry/ host
  * based on the passed in machine name and image
  *
  * @param {String} machineName
  * @param {String} image
- * @return {} returns a promise to  the image to the host
+ * @return {} returns a promise to send the image to the host
  */
 export const sendImage = co(function *(machineName, image) {
   const env = yield machine.env(machineName);
@@ -132,12 +132,27 @@ export const sendImage = co(function *(machineName, image) {
     ${machineName} docker load < tempImage.tar`, { env });
 });
 
-
+/**
+ * logs() returns a promise to execute docker logs on the command line
+ * based on the passed in machine name and container id
+ *
+ * @param {String} machineName
+ * @param {String} containreId
+ * @return {} returns a promise to execute docker logs
+ */
 export const logs = co(function *(machineName, containerId) {
   const env = yield machine.env(machineName);
   return yield exec(`docker logs ${containerId}`, { env });
 });
 
+/**
+ * setContainerParams() returns an object with the image and path to uuid
+ * based on the passed in image and project object
+ *
+ * @param {String} image
+ * @param {Object} projObj
+ * @return {Object} returns an object with the image and path to uuid
+ */
 export const setContainerParams = (image, projObj) => ({
   image,
   HostConfig: {
@@ -147,6 +162,17 @@ export const setContainerParams = (image, projObj) => ({
 
 // need to think about how to pick a default machine
 // for now it is hardcoded to 'default' but shouldnt be
+
+/**
+ * addContainer() will create a container through the docker API
+ * then it will add infromation about the container to the projObj
+ * then it returns a string with the containerId
+ * based on the passed in project object and image
+ *
+ * @param {Object} projObj
+ * @param {String} image
+ * @return {String} containerId
+ */
 export const addContainer = co(function *(projObj, image) {
   const containerConfig = setContainerParams(image, projObj);
   const containerId = (yield create(projObj.machine, containerConfig)).Id;
@@ -157,6 +183,15 @@ export const addContainer = co(function *(projObj, image) {
   return containerId;
 });
 
+/**
+ * removeContainer() returns true after it deletes a container
+ * and removes it from the projcet object
+ * based on the passed in project object and containerId
+ *
+ * @param {Object} projObj
+ * @param {String} containerId
+ * @return {Boolean} true
+ */
 export const removeContainer = co(function *(projObj, containerId) {
   yield remove(projObj.machine, containerId);
   delete projObj.containers[containerId];
