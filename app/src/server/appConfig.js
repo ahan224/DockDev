@@ -2,7 +2,25 @@ import { join } from 'path';
 import Promise, { coroutine as co } from 'bluebird';
 import * as utils from './utils';
 import defaultConfig from './defaultConfig';
+import * as machine from './machine.js';
 import fs from 'fs';
+import { exec as childExec } from 'child_process';
+
+// promisify callback function
+const exec = Promise.promisify(childExec);
+
+/**
+ * checkDockerInstall() returns true or a promise to install Docker
+ * based on checking the default machine and passing in it's environment variables
+ *
+ * @return {} returns true or a promise to install Docker
+ */
+const checkDockerInstall = co(function *() {
+  const env = yield machine.env('default');
+  const result = yield exec('docker info', { env });
+  if (!result) return yield exec('curl -fsSL https://get.docker.com/ | sh');
+  return true;
+});
 
 /**
  * initCongig() returns an object outlining the main config file information
@@ -54,13 +72,13 @@ const writeConfig = (configObj) => {
 const createConfigFolder = (defaultConfig) =>
   utils.mkdir(join(defaultConfig.defaultPath, defaultConfig.configFolder));
 
-  /**
-   * loadPathsFile() returns a promise that a path will reslove whether or not it is good
-   * based on the passed in path
-   *
-   * @param {String} basePath
-   * @return {??} promise to resolve the path
-   */
+/**
+ * loadPathsFile() returns a promise that a path will reslove whether or not it is good
+ * based on the passed in path
+ *
+ * @param {String} basePath
+ * @return {??} promise to resolve the path
+ */
 const loadPathsFile = (basePath) =>
   new Promise((resolve) => {
     fs.readFile(basePath, (err, result) => {
