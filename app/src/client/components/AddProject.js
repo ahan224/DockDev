@@ -1,6 +1,5 @@
 import React from 'react';
 import { remote } from 'electron';
-import R from 'ramda';
 
 
 class AddProject extends React.Component {

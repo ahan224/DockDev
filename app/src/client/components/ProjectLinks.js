@@ -6,10 +6,7 @@ const ProjectLinks = ({ projects }) => {
   const projArray = R.toPairs(projects);
   const projLinks = projArray.map(proj => (
       <li key={proj[1].uuid} className="nav-item">
-        <a class="nav-link" href="#">
-          <Link to={`/projects/${proj[1].uuid}`}>{proj[1].projectName}</Link>
-        </a>
-        {console.log(proj)}
+        <Link className="nav-link" to={`/projects/${proj[1].uuid}`}>{proj[1].projectName}</Link>
       </li>
     )
   );
