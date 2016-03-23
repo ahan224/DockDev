@@ -2,9 +2,9 @@ import React from 'react';
 import R from 'ramda';
 
 const Project = ({ projects, params }) => {
-  const proj = R.toPairs(projects[params.id]);
+  const proj = R.toPairs(projects[params.uuid]);
   return (
-    <div id="content">
+    <div>
       {proj}
     </div>
   );

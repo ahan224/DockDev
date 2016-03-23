@@ -1,6 +1,6 @@
 import React from 'react';
 import NavLink from './NavLink';
-import Projects from './Projects';
+import ProjectLinks from './ProjectLinks';
 
 class App extends React.Component {
   constructor() {
@@ -40,7 +40,7 @@ class App extends React.Component {
         <ul role="nav" id="menu">
           <li><NavLink to="/" onlyActiveOnIndex>Home</NavLink></li>
           <li><NavLink to="/addProject">Add Project</NavLink></li>
-          <Projects projects={this.state.projects} />
+          <ProjectLinks projects={this.state.projects} />
         </ul>
         {React.cloneElement(this.props.children, { projects: this.state.projects })}
       </div>
