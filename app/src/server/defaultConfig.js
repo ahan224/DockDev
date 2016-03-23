@@ -1,7 +1,22 @@
 import { join } from 'path';
 
+/**
+* @param {Object} config has default config settings for project and app level information
+*
+* App Config
+*   @param {String} config.configFolder is where app config details are stored
+*   @param {String} config.configFile is the file name for dockdev app config storage
+*   @param {String} config.defaultPath is the path where the app config is stored by default
+*   @param {Function} config.configPath is the full path to the app config file
+*
+* Projects Config
+*   @param {String} config.projFolder is where project config details are stored
+*   @param {String} config.projFile is the file name for dockdev project config storage
+*   @param {[String]} config.projWriteParams lists the project config props to be written to disk
+*   @param {Function} config.projPath is relative to projects base path (i.e. user's projFolder)
+*/
 const config = {
-  // main config infomration
+  // app config
   configFolder: '.dockdevConfig',
   configFile: 'dockdevConfig.json',
   defaultPath: process.env.HOME,
@@ -9,7 +24,7 @@ const config = {
     return join(path, this.configFolder, this.configFile);
   },
 
-  // individual project infomration
+  // projects config
   projFolder: '.dockdev',
   projFile: 'dockdev.json',
   projWriteParams: ['uuid', 'projectName', 'containers', 'machine'],
