@@ -6,19 +6,13 @@ const ProjectNav = ({ projects, children, params }) => (
     <div className="content-top-nav">
       <ul className="nav nav-inline">
         <li className="nav-item">
-          <a className="nav-link" href="#">
-            <Link to={`/projects/${params.uuid}`}>General</Link>
-          </a>
+          <Link className="nav-link" to={`/projects/${params.uuid}`}>General</Link>
         </li>
         <li className="nav-item">
-          <a className="nav-link" href="#">
-           <Link to={`/projects/${params.uuid}/deploy`}>Deploy</Link>
-          </a>
+          <Link className="nav-link" to={`/projects/${params.uuid}/deploy`}>Deploy</Link>
         </li>
         <li className="nav-item">
-          <a className="nav-link" href="#">
-            <Link to={`/projects/${params.uuid}/settings`}>Settings</Link>
-          </a>
+          <Link className="nav-link" to={`/projects/${params.uuid}/settings`}>Settings</Link>
         </li>
       </ul>
 
@@ -35,22 +29,3 @@ ProjectNav.propTypes = {
 
 
 export default ProjectNav;
-
-
-{/*<div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-  <button type="button" className="btn btn-secondary">
-    <Link to={`/projects/${params.uuid}`}>General</Link>
-  </button>
-  <button type="button" className="btn btn-secondary">
-   <Link to={`/projects/${params.uuid}/deploy`}>Deploy</Link>
-  </button>
-  <button type="button" className="btn btn-secondary">
-    <Link to={`/projects/${params.uuid}/settings`}>Settings</Link>
-  </button>
-</div>*/}
-
-{/*<ul>
-  <li><Link to={`/projects/${params.uuid}`}>General</Link></li>
-  <li><Link to={`/projects/${params.uuid}/settings`}>Settings</Link></li>
-  <li><Link to={`/projects/${params.uuid}/deploy`}>Deploy</Link></li>
-</ul>*/}
