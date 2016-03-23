@@ -9,9 +9,9 @@ import { addFileWatcher } from '../app/lib/fileWatch.js';
 import { removeContainer, addContainer } from '../app/lib/container.js';
 
 describe('initiate new DockDev project via individual functions', () => {
-  const projectName = 'project1'
+  const projectName = 'project1';
   const basePath = join(__dirname, 'userFolder', projectName);
-  const dockDevPath = join(basePath, '.dockdev');
+  // const dockDevPath = join(basePath, '.dockdev');
   let result;
   let projObj;
 
