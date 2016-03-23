@@ -1,18 +1,17 @@
 import React from 'react';
-import R from 'ramda';
 
-const Project = ({ projects, params }) => {
-  const proj = R.toPairs(projects[params.uuid]);
+const ProjectDetail = ({ projects, params }) => {
+  const proj = projects[params.uuid];
   return (
     <div>
-      {proj}
+      { proj.projectName }
     </div>
   );
 };
 
-Project.propTypes = {
+ProjectDetail.propTypes = {
   projects: React.PropTypes.object,
   params: React.PropTypes.object
 };
 
-export default Project;
+export default ProjectDetail;
