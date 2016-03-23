@@ -25,15 +25,15 @@ const exec = (args) => execProm(`docker-machine ${args}`);
  */
 export const inspect = (machineName) => exec(`inspect ${machineName}`);
 
-// TODO this function is supposed to create a machine without a shared folder, but we are unable to find that option at the moment
 /**
- * create() returns a new docker-machine without a shared folder
+ * createMachine() returns a new docker-machine without a shared folder
  * based on the passed in arguments string
  *
  * @param {String} machineName
  * @return {} returns a promise that resolves to the stdout
  */
-export const create = (machineName) => exec(`create --driver virtualbox ${machineName}`);
+export const createMachine = (machineName) =>
+  exec(`create --driver virtualbox --virtualbox-no-share ${machineName}`);
 
 /**
  * env() returns an object with environment variables of a given machine
@@ -63,14 +63,14 @@ export const env = co(function *(machineName) {
 export const ssh = (machineName, args) => exec(`ssh ${machineName} ${args}`);
 
 /**
- * config() returns a config object for a given machine with its certificates, uri, and key
+ * machineConfig() returns a config object for a given machine with its certificates, uri, and key
  * based on the passed in machine name
  *
  * @param {String} machineName
  * @param {String} containerInfo
  * @return {Object} configObj
  */
-export const config = co(function *(machineName) {
+export const machineConfig = co(function *(machineName) {
   const result = JSON.parse(yield inspect(machineName));
   const configObj = {
     uri: `https://${result.Driver.IPAddress}:2376`,
