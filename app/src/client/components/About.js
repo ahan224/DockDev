@@ -1,3 +1,3 @@
 import React from 'react';
 
-export default () => (<div id="content">About</div>);
+export default ({ projects }) => (<div id="content">{projects[3].projectName}</div>);
