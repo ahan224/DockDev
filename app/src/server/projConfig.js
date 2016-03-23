@@ -3,12 +3,8 @@ import { coroutine as co } from 'bluebird';
 import R from 'ramda';
 import uuid from 'node-uuid';
 import * as utils from './utils';
+import * as appConfig from './appConfig';
 import defaultConfig from './defaultConfig';
-
-/**
-* @param {Object} memory object to store all projects
-*/
-export const memory = {};
 
 /**
  * createProj() returns an object with project-level information, including a uuid
@@ -107,26 +103,7 @@ export const initProject = co(function *g(basePath, projectName, overwrite) {
 
   yield writeProj(projObj);
 
-  // TODO: need to work on this part and uncomment this part here
-  // addProjToConfig(basePath);
-  // addToAppMemory(projObj);
+  yield appConfig.addProjToConfig(basePath, defaultConfig);
 
   return projObj;
 });
-
-// initProject(process.env.HOME, 'testProject');
-/**
- * addProjToMemory() will place the project object in memory and returns the project object
- * based on initially passing in the memory object and then later the project object
- *
- * @param {Object} memory
- * @param {Object} projObj
- * @return {Object} projObj
- */
-// export const addProjToMemory = R.curry((memObj, projObj) => {
-//   memObj[projObj.uuid] = projObj;
-//   return projObj;
-// });
-
-// curried version of the addProjToMemory function (see above)
-// export const addToAppMemory = addProjToMemory(memory);

@@ -11,40 +11,36 @@ class App extends React.Component {
     this.addNewProject = this.addNewProject.bind(this);
     this.addExistingProjects = this.addExistingProjects.bind(this);
     this.state = {
-      projects: {
-        1: {
-          projectName: 'project1',
-          uuid: 1,
-          basePath: ''
-        }
-      }
+      projects: {}
     };
   }
 
   componentDidMount() {
     const getConfig = appConfig.loadConfigFile(defaultConfig);
 
+    // add config object to state
+    getConfig.then(config => this.setState({ config }));
+
     // load exising projects into state
-    getConfig.then(config => appConfig.loadPaths(config, this.addExistingProjects));
+    getConfig.then(config => appConfig.loadPaths(config, defaultConfig, this.addExistingProjects));
   }
 
   componentDidUpdate() {
-    console.log(this.state);
+    // console.log(this.state);
   }
 
   addExistingProjects(proj) {
-    console.log('running callback');
-    const projObj = {};
-    projObj[proj.uuid] = proj;
-    this.setState({ projects: { projObj } });
+    const projects = this.state.projects;
+    projects[proj.uuid] = proj;
+    this.setState({ projects });
   }
 
   addNewProject(userSelection) {
     projConfig.initProject(userSelection.basePath, userSelection.projectName, true)
       .then(proj => {
-        const projObj = {};
-        projObj[proj.uuid] = proj;
-        this.setState({ projects: projObj });
+        const projects = this.state.projects;
+        projects[proj.uuid] = proj;
+        this.setState({ projects });
       })
       .catch();
   }
