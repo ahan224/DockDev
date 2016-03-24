@@ -10,6 +10,8 @@ class App extends React.Component {
     super();
     this.addNewProject = this.addNewProject.bind(this);
     this.addExistingProjects = this.addExistingProjects.bind(this);
+    this.addContainer = this.addContainer.bind(this);
+    this.testRedirect = this.testRedirect.bind(this);
     this.state = {
       projects: {}
     };
@@ -26,7 +28,11 @@ class App extends React.Component {
   }
 
   componentDidUpdate() {
-    // console.log(this.state);
+    //
+  }
+
+  testRedirect() {
+    console.log(this.props);
   }
 
   addExistingProjects(proj) {
@@ -45,6 +51,10 @@ class App extends React.Component {
       .catch();
   }
 
+  addContainer(uuid) {
+    console.log(this, uuid);
+  }
+
   render() {
     return (
       <div>
@@ -56,7 +66,8 @@ class App extends React.Component {
         {React.cloneElement(this.props.children,
           { projects: this.state.projects,
             addNewProject: this.addNewProject,
-            selectProjectPath: this.selectProjectPath
+            addContainer: this.addContainer,
+            testRedirect: this.testRedirect
           })}
       </div>
     );
@@ -65,6 +76,10 @@ class App extends React.Component {
 
 App.propTypes = {
   children: React.PropTypes.object
+};
+
+App.contextType = {
+  router: React.PropTypes.func.isRequired
 };
 
 export default App;
