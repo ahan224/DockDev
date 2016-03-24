@@ -1,3 +1,26 @@
+
+/**
+ * addBasePath() returns a new object with the basePath included
+ * based on passing a json string and parsing it
+ *
+ * @param {String} jsonObj
+ * @param {String} basePath
+ * @return {Object} projObj
+ */
+const addBasePath = (jsonObj, basePath) => R.merge(JSON.parse(jsonObj), { basePath });
+
+/**
+ * readProj() yields a promise which, upon completion returns a proj object with a basePath included
+ * based on passing in a basePath for reading and then parsing the file
+ *
+ * @param {String} basePath
+ * @return {Object} projObj
+ */
+export const readProj = co(function *(basePath) {
+  const readProjFile = yield utils.readFile(join(basePath, defaultConfig.projPath()));
+  return addBasePath(readProjFile, basePath);
+});
+
 /**
  * searchBadPaths() returns an Array of dockdev folder paths, excluding prior good paths
  * based on the passed in array and user directory
