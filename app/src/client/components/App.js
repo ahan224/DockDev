@@ -2,47 +2,74 @@ import React from 'react';
 import NavLink from './NavLink';
 import ProjectLinks from './ProjectLinks';
 import * as projConfig from './build/server/projConfig.js';
+import * as appConfig from './build/server/appConfig.js';
+import defaultConfig from './build/server/defaultConfig.js';
 
 class App extends React.Component {
   constructor() {
     super();
     this.addNewProject = this.addNewProject.bind(this);
+    this.addExistingProjects = this.addExistingProjects.bind(this);
+    this.addContainer = this.addContainer.bind(this);
+    this.testRedirect = this.testRedirect.bind(this);
     this.state = {
-      projects: {
-        1: {
-          projectName: 'project1',
-          uuid: 1,
-          basePath: ''
-        }
-      }
+      projects: {}
     };
   }
 
+  componentDidMount() {
+    const getConfig = appConfig.loadConfigFile(defaultConfig);
+
+    // add config object to state
+    getConfig.then(config => this.setState({ config }));
+
+    // load exising projects into state
+    getConfig.then(config => appConfig.loadPaths(config, defaultConfig, this.addExistingProjects));
+  }
+
+  componentDidUpdate() {
+    //
+  }
+
+  testRedirect() {
+    console.log(this.props);
+  }
+
+  addExistingProjects(proj) {
+    const projects = this.state.projects;
+    projects[proj.uuid] = proj;
+    this.setState({ projects });
+  }
+
   addNewProject(userSelection) {
-    projConfig.initProject(userSelection.basePath, userSelection.projectName)
+    projConfig.initProject(userSelection.basePath, userSelection.projectName, true)
       .then(proj => {
-        const projObj = {};
-        projObj[proj.uuid] = proj;
-        this.setState({ projects: projObj });
+        const projects = this.state.projects;
+        projects[proj.uuid] = proj;
+        this.setState({ projects });
       })
       .catch();
+  }
+
+  addContainer(uuid, containerObj) {
+    const projects = this.state.projects;
+    projects[uuid].containers[containerObj.containerId] = containerObj;
+    this.setState({ projects });
   }
 
   render() {
     return (
       <div>
-        <div id="header">
-          <h5>DockDev <small>beta</small></h5>
-        </div>
-        <ul role="nav" id="menu">
-          <li><NavLink to="/" onlyActiveOnIndex>Home</NavLink></li>
-          <li><NavLink to="/addProject">Add Project</NavLink></li>
+        <ul role="nav" id="menu" className="nav">
+          <li className="nav-item"><NavLink to="/" onlyActiveOnIndex>Home</NavLink></li>
+          <li className="nav-item"><NavLink to="/addProject">Add Project</NavLink></li>
           <ProjectLinks projects={this.state.projects} />
         </ul>
         {React.cloneElement(this.props.children,
           { projects: this.state.projects,
             addNewProject: this.addNewProject,
-            selectProjectPath: this.selectProjectPath
+            addContainer: this.addContainer,
+            testRedirect: this.testRedirect
           })}
       </div>
     );
@@ -51,6 +78,10 @@ class App extends React.Component {
 
 App.propTypes = {
   children: React.PropTypes.object
+};
+
+App.contextType = {
+  router: React.PropTypes.func.isRequired
 };
 
 export default App;
