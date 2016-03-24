@@ -5,7 +5,7 @@ import { remote } from 'electron';
 class AddProject extends React.Component {
   constructor() {
     super();
-    this.state = { };
+    this.state = {};
     this.popFileSelector = this.popFileSelector.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.addProject = this.addProject.bind(this);
@@ -48,6 +48,7 @@ class AddProject extends React.Component {
         <button className="btn btn-primary-outline btn-block" onClick={this.addProject}>
           Add
         </button>
+        <button onClick={this.props.testRedirect}>Redirect?</button>
       </div>
     );
   }

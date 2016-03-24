@@ -76,7 +76,7 @@ const dockerCommands = {
  * @return {Function} returning anonymous function that takes 2 parameters
  */
 function commandMaker(cmd) {
-  return co(function *(machineName, containerInfo) {
+  return co(function *g(machineName, containerInfo) {
     const config = yield machine.machineConfig(machineName);
     config.uri += cmd.uri(containerInfo);
     config.method = cmd.method;
@@ -111,7 +111,7 @@ export const remove = commandMaker(dockerCommands.remove);
  * @param {String} image
  * @return {} returns a promise to pull the image
  */
-export const pull = co(function *(machineName, image) {
+export const pull = co(function *g(machineName, image) {
   const env = yield machine.env(machineName);
   return yield exec(`docker pull ${image}`, { env });
 });
@@ -126,7 +126,7 @@ export const pull = co(function *(machineName, image) {
  * @param {String} image
  * @return {} returns a promise to send the image to the host
  */
-export const sendImage = co(function *(machineName, image) {
+export const sendImage = co(function *g(machineName, image) {
   const env = yield machine.env(machineName);
   return yield exec(`docker save ${image} > tempImage.tar && docker-machine ssh
     ${machineName} docker load < tempImage.tar`, { env });
@@ -140,7 +140,7 @@ export const sendImage = co(function *(machineName, image) {
  * @param {String} containreId
  * @return {} returns a promise to execute docker logs
  */
-export const logs = co(function *(machineName, containerId) {
+export const logs = co(function *g(machineName, containerId) {
   const env = yield machine.env(machineName);
   return yield exec(`docker logs ${containerId}`, { env });
 });
@@ -173,14 +173,14 @@ export const setContainerParams = (image, projObj) => ({
  * @param {String} image
  * @return {String} containerId
  */
-export const addContainer = co(function *(projObj, image) {
+export const addContainer = co(function *g(projObj, image) {
   const containerConfig = setContainerParams(image, projObj);
   const containerId = (yield create(projObj.machine, containerConfig)).Id;
   const inspectContainer = yield inspect(projObj.machine, containerId);
   const dest = inspectContainer.Mounts[0].Source;
   const name = inspectContainer.Name.substr(1);
-  projObj.containers[containerId] = {image, containerId, name, dest, sync: true};
-  return containerId;
+  const newContainer = { image, containerId, name, dest, sync: true };
+  return [projObj, newContainer];
 });
 
 /**
@@ -192,7 +192,7 @@ export const addContainer = co(function *(projObj, image) {
  * @param {String} containerId
  * @return {Boolean} true
  */
-export const removeContainer = co(function *(projObj, containerId) {
+export const removeContainer = co(function *g(projObj, containerId) {
   yield remove(projObj.machine, containerId);
   delete projObj.containers[containerId];
   return true;
