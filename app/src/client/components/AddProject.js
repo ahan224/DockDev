@@ -55,7 +55,8 @@ class AddProject extends React.Component {
 }
 
 AddProject.propTypes = {
-  addNewProject: React.PropTypes.func
+  addNewProject: React.PropTypes.func,
+  testRedirect: React.PropTypes.func
 };
 
 export default AddProject;
