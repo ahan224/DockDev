@@ -8,6 +8,7 @@ import ProjectDetails from './components/ProjectDetails';
 import ProjectSettings from './components/ProjectSettings';
 import ProjectDeploy from './components/ProjectDeploy';
 import ProjectNav from './components/ProjectNav';
+import AddContainer from './components/AddContainer';
 
 render((
   <Router history={hashHistory}>
@@ -18,6 +19,7 @@ render((
         <IndexRoute component={ProjectDetails} />
         <Route path="/projects/:uuid/settings" component={ProjectSettings} />
         <Route path="/projects/:uuid/deploy" component={ProjectDeploy} />
+        <Route path="/projects/:uuid/container" component={AddContainer} />
       </Route>
     </Route>
   </Router>
