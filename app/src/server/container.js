@@ -153,10 +153,10 @@ export const logs = co(function *g(machineName, containerId) {
  * @param {Object} projObj
  * @return {Object} returns an object with the image and path to uuid
  */
-export const setContainerParams = (image, projObj) => ({
+export const setContainerParams = (image, uuid) => ({
   image,
   HostConfig: {
-    Binds: [`/home/docker/dockdev/${projObj.uuid}:/app`]
+    Binds: [`/home/docker/dockdev/${uuid}:/app`]
   }
 });
 
@@ -173,14 +173,14 @@ export const setContainerParams = (image, projObj) => ({
  * @param {String} image
  * @return {String} containerId
  */
-export const addContainer = co(function *g(projObj, image) {
-  const containerConfig = setContainerParams(image, projObj);
-  const containerId = (yield create(projObj.machine, containerConfig)).Id;
-  const inspectContainer = yield inspect(projObj.machine, containerId);
+export const add = co(function *g(uuid, image) {
+  const containerConfig = setContainerParams(image, uuid);
+  const containerId = (yield create('default', containerConfig)).Id;
+  const inspectContainer = yield inspect('default', containerId);
   const dest = inspectContainer.Mounts[0].Source;
   const name = inspectContainer.Name.substr(1);
-  const newContainer = { image, containerId, name, dest, sync: true };
-  return [projObj, newContainer];
+  const newContainer = { uuid, image, containerId, name, dest, sync: true };
+  return newContainer;
 });
 
 /**

@@ -9,6 +9,9 @@ const ProjectNav = ({ projects, addContainer, children, params }) => (
           <Link className="nav-link" to={`/projects/${params.uuid}`}>General</Link>
         </li>
         <li className="nav-item">
+          <Link className="nav-link" to={`/projects/${params.uuid}/container`}>Add Container</Link>
+        </li>
+        <li className="nav-item">
           <Link className="nav-link" to={`/projects/${params.uuid}/deploy`}>Deploy</Link>
         </li>
         <li className="nav-item">
