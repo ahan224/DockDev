@@ -51,8 +51,10 @@ class App extends React.Component {
       .catch();
   }
 
-  addContainer(uuid) {
-    console.log(this, uuid);
+  addContainer(uuid, containerObj) {
+    const projects = this.state.projects;
+    projects[uuid].containers[containerObj.containerId] = containerObj;
+    this.setState({ projects });
   }
 
   render() {

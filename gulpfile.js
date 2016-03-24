@@ -56,7 +56,9 @@ gulp.task('react', () => {
     'electron',
     './build/server/projConfig.js',
     './build/server/appConfig.js',
-    './build/server/defaultConfig.js'
+    './build/server/defaultConfig.js',
+    './build/server/container.js'
+
   ]);
 
   return bundler
