@@ -33,9 +33,9 @@ export const createProj = (basePath, projectName) => ({
  * @param {Object} projObj
  * @return {} creates a folder
  */
-export const createDockDev = (projObj) =>
-  utils.mkdir(join(projObj.basePath, defaultConfig.projFolder));
-
+export const createDockDev = (projObj) => {
+  return utils.mkdir(join(projObj.basePath, defaultConfig.projFolder));
+};
 /**
  * cleanProjToWrite() returns a formatted object with information to be stored in the project file
  * based on composing R.pick (which parameters to write) and indent formatting (jsonStringifyPretty)
