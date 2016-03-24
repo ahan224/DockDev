@@ -3,6 +3,28 @@ body {
   background: #FFF;
 }
 
+html {
+  font-size: 14px;
+}
+
+@include media-breakpoint-up(sm) {
+  html {
+    font-size: 16px;
+  }
+}
+
+@include media-breakpoint-up(md) {
+  html {
+    font-size: 20px;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  html {
+    font-size: 28px;
+  }
+}
+
 #app {
   overflow: hidden;
     overflow-y: scroll;
@@ -27,19 +49,27 @@ body {
 
 #menu {
   position: fixed;
-  top: 39px;
+  top: 0;
   bottom: 0;
   width: 240px;
   background: #19191B;
   color: white;
+  padding-top: 55px;
+  margin-bottom: 0;
+  padding-left: 10px;
   /*border-right: 1px solid #DADADA;*/
 }
+
+#menu a {
+  color:white;
+}
+
 #menu > div {
   width: 100%;
   color: #DADADA;
   padding: 15px;
-  border-bottom: 1px solid #DADADA;
-  text-align: center;
+  /*border-bottom: 1px solid #DADADA;*/
+  /*text-align: center;*/
 }
 
 #menu > #bottomNav {
@@ -51,8 +81,10 @@ body {
 
 #content {
   width: 100%;
-  padding-top: 50px;
-  padding-left: 240px;
+  padding-left: 259px;
+  padding-right: 20px;
+  /*border: 5px solid #96BAC5;*/
+  /*background: lightblue;*/
 }
 
 .card {
@@ -81,4 +113,31 @@ body {
 
 .active {
   color: green;
+}
+
+
+.content-wrapper {
+  padding: 10px!important;
+}
+
+.project-detail-nav {
+  float: right;
+}
+
+.content-top-nav {
+  border-bottom: 1px solid #F1F1F3;
+    padding: 10px 9px 10px 9px;
+    margin-bottom: 20px;
+    margin: 0 -20px 20px -19px;
+    text-align: right;
+    min-height: 44px;
+}
+
+.content-top-nav button {
+  border: none;
+}
+
+.content-top-nav button:hover {
+  background: none;
+  text-decoration: none;
 }

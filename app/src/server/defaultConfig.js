@@ -22,7 +22,7 @@ const config = {
   configFile: 'dockdevConfig.json',
   defaultPath: process.env.HOME,
   DOToken: '',
-  configPath(path = defaultPath) {
+  configPath(path = this.defaultPath) {
     return join(path, this.configFolder, this.configFile);
   },
 
