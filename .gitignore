@@ -3,3 +3,4 @@ node_modules
 /app/build
 /test/userFolder
 /test/tests-compiled.js
+bower_components
