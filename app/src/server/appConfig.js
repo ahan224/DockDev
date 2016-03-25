@@ -148,28 +148,34 @@ export const addProjToConfig = co(function *g(basePath, defaultConfig) {
 });
 
 // load app --> returns config object
-export const initApp = co(function *g(defaultConfig, router) {
-  const machineInstalled = yield checkDockerMachineInstalled();
-
-  if (!machineInstalled) {
+export const initApp = co(function *g(defaultConfig, router, addConfig, addProject) {
+  try {
+    yield checkDockerMachineInstalled();
+  } catch (e) {
     router.replace('/init/1');
-    yield installDockerMachine();
+    return false;
   }
 
-  const dockerInstalled = yield checkDockerInstall();
-
-  if (!dockerInstalled) {
-    router.replace('init/2');
-    yield installDocker();
+  try {
+    yield checkDockerInstall();
+  } catch (e) {
+    router.replace('/init/2');
+    return false;
   }
 
   const checkDockDevMachine = yield machine.list();
   if (checkDockDevMachine.indexOf('dockdev') === -1) {
-    router.replace('init/3');
+    router.replace('/init/3');
     yield machine.createMachine('dockdev');
   }
 
   router.replace('/');
 
-  return yield loadConfigFile(defaultConfig);
+  const config = yield loadConfigFile(defaultConfig);
+
+  addConfig(config);
+
+  loadPaths(config, defaultConfig, addProject);
+
+  return true;
 });
