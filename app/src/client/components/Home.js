@@ -1,6 +1,7 @@
 import React from 'react';
 
-export default (props) => {
+export default ({ context }) => {
+  console.log(context);
   return (
     <div id="content">
       <div id="content-top-nav"></div>
