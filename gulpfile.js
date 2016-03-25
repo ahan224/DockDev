@@ -57,8 +57,8 @@ gulp.task('react', () => {
     './build/server/projConfig.js',
     './build/server/appConfig.js',
     './build/server/defaultConfig.js',
-    './build/server/container.js'
-
+    './build/server/container.js',
+    './build/server/availableImages.js',
   ]);
 
   return bundler

@@ -36,8 +36,8 @@ class App extends React.Component {
     this.setState({ config });
   }
 
-  addNewProject(userSelection) {
-    projConfig.initProject(userSelection.basePath, userSelection.projectName, true)
+  addNewProject(path, name) {
+    projConfig.initProject(path, name, true)
       .then(proj => {
         const projects = this.state.projects;
         projects[proj.uuid] = proj;
@@ -51,6 +51,7 @@ class App extends React.Component {
     projects[uuid].containers[containerObj.containerId] = containerObj;
     this.setState({ projects });
     projConfig.writeProj(projects[uuid]);
+    this.context.router.replace(`/projects/${uuid}`);
   }
 
   render() {
