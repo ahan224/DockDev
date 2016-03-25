@@ -19,7 +19,7 @@ export const createProj = (basePath, projectName) => ({
   projectName,
   basePath,
   containers: {},
-  machine: 'default'
+  machine: defaultConfig.machine,
 });
 
 /**
