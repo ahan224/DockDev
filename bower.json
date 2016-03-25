@@ -1,0 +1,22 @@
+{
+  "name": "dockdev",
+  "description": "docker for development",
+  "main": "main.js",
+  "license": "MIT",
+  "homepage": "https://github.com/samhagan/DockDev",
+  "moduleType": [
+    "es6"
+  ],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "v4.0.0-alpha.2",
+    "tether": "~1.2.0"
+  }
+}
