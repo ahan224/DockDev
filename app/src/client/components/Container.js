@@ -1,21 +1,19 @@
 import React from 'react';
 
 const Container = (props) => {
+
+  console.log('ContainerComponent: ',props);
   return (
-    <li>
-      <ul>
-        <li>
-          <h3>{props.details[1].image}</h3>
-        </li>
-        <li>
-          <p>Some description here.</p>
-        </li>
-      </ul>
-      <button>Start</button>
-      <button>Stop</button>
-      <button>Restart</button>
-      <button>Delete</button>
-    </li>
+    <div className="col-xs-6 col-sm-4">
+      <div className="card card-block">
+        <h3 className="card-title">
+          { props.details[1].image }
+          <span className="version">v1.1.1.0</span>
+        </h3>
+        <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a href="#" className=" pull-right">Details...</a>
+      </div>
+    </div>
   );
 };
 
