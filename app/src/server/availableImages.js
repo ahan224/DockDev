@@ -18,10 +18,17 @@ const dbs = [
   'couchbase',
 ];
 
+function ImageObj(name) {
+  this.name = name;
+  this.versions = [];
+}
+
 export function getServers() {
-  return servers;
+  return servers.map(val => new ImageObj(val));
 }
 
 export function getDbs() {
-  return dbs;
+  return dbs.map(val => new ImageObj(val));
 }
+
+getServers();
