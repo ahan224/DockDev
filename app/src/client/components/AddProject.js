@@ -1,6 +1,6 @@
 import React from 'react';
 import { remote } from 'electron';
-
+import { Link } from 'react-router';
 
 class AddProject extends React.Component {
   constructor() {
@@ -23,13 +23,13 @@ class AddProject extends React.Component {
 
   addProject() {
     this.props.addNewProject(this.state);
+    console.log(this.state);
   }
 
   render() {
     return (
       <div id="content">
         <div className="content-top-nav"></div>
-
         <h2>Add Project</h2>
         <p id="addText">
           DockDev will create a container for you
