@@ -1,38 +1,29 @@
 import React from 'react';
 import NavLink from './NavLink';
 import ProjectLinks from './ProjectLinks';
-import * as projConfig from './build/server/projConfig.js';
-import * as appConfig from './build/server/appConfig.js';
-import defaultConfig from './build/server/defaultConfig.js';
+import * as projConfig from './server/projConfig.js';
+import * as appConfig from './server/appConfig.js';
+import defaultConfig from './server/defaultConfig.js';
 
 class App extends React.Component {
-  constructor() {
-    super();
+  constructor(props, context) {
+    super(props, context);
     this.addNewProject = this.addNewProject.bind(this);
     this.addExistingProjects = this.addExistingProjects.bind(this);
     this.addContainer = this.addContainer.bind(this);
-    this.testRedirect = this.testRedirect.bind(this);
+    this.addAppConfig = this.addAppConfig.bind(this);
     this.state = {
-      projects: {}
+      projects: {},
     };
   }
 
   componentDidMount() {
-    const getConfig = appConfig.loadConfigFile(defaultConfig);
-
-    // add config object to state
-    getConfig.then(config => this.setState({ config }));
-
-    // load exising projects into state
-    getConfig.then(config => appConfig.loadPaths(config, defaultConfig, this.addExistingProjects));
-  }
-
-  componentDidUpdate() {
-    //
-  }
-
-  testRedirect() {
-    console.log(this.props);
+    appConfig.initApp(
+      defaultConfig,
+      this.context.router,
+      this.addAppConfig,
+      this.addExistingProjects
+    );
   }
 
   addExistingProjects(proj) {
@@ -41,8 +32,12 @@ class App extends React.Component {
     this.setState({ projects });
   }
 
-  addNewProject(userSelection) {
-    projConfig.initProject(userSelection.basePath, userSelection.projectName, true)
+  addAppConfig(config) {
+    this.setState({ config });
+  }
+
+  addNewProject(path, name) {
+    projConfig.initProject(path, name, true)
       .then(proj => {
         const projects = this.state.projects;
         projects[proj.uuid] = proj;
@@ -55,6 +50,7 @@ class App extends React.Component {
     const projects = this.state.projects;
     projects[uuid].containers[containerObj.containerId] = containerObj;
     this.setState({ projects });
+    projConfig.writeProj(projects[uuid]);
   }
 
   render() {
@@ -66,22 +62,25 @@ class App extends React.Component {
           <ProjectLinks projects={this.state.projects} />
         </ul>
         {React.cloneElement(this.props.children,
-          { projects: this.state.projects,
+          {
+            projects: this.state.projects,
             addNewProject: this.addNewProject,
             addContainer: this.addContainer,
-            testRedirect: this.testRedirect
-          })}
+            context: this.context,
+          }
+        )}
       </div>
     );
   }
 }
 
 App.propTypes = {
-  children: React.PropTypes.object
+  children: React.PropTypes.object,
 };
 
-App.contextType = {
-  router: React.PropTypes.func.isRequired
+App.contextTypes = {
+  router: React.PropTypes.object.isRequired,
 };
+
 
 export default App;

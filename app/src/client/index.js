@@ -9,12 +9,14 @@ import ProjectSettings from './components/ProjectSettings';
 import ProjectDeploy from './components/ProjectDeploy';
 import ProjectNav from './components/ProjectNav';
 import AddContainer from './components/AddContainer';
+import Init from './components/Init';
 
 render((
   <Router history={hashHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={Home} />
       <Route path="/addProject" component={AddProject} />
+      <Route path="/init/:id" component={Init} />
       <Route path="/projects/:uuid" component={ProjectNav} >
         <IndexRoute component={ProjectDetails} />
         <Route path="/projects/:uuid/settings" component={ProjectSettings} />

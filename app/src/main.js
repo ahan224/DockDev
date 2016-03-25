@@ -8,8 +8,9 @@ const BrowserWindow = electron.BrowserWindow;
 let mainWindow = null;
 
 app.on('ready', () => {
-  mainWindow = new BrowserWindow({ width: 850, height: 550, titleBarStyle: 'hidden-inset' });
-  mainWindow.loadURL(join('file://', __dirname, '..', 'index.html'));
+
+  mainWindow = new BrowserWindow({ width: 950, height: 650, titleBarStyle: 'hidden-inset' });
+  mainWindow.loadURL(join('file://', __dirname, 'index.html'));
 
   mainWindow.webContents.openDevTools();
   mainWindow.on('close', () => {

@@ -7,10 +7,10 @@ const Container = (props) => {
     <li>
       <ul>
         <li>
-          {props.details[1].image}
+          <h3>{props.details[1].image}</h3>
         </li>
         <li>
-
+          <p>Some description here.</p>
         </li>
       </ul>
       <button>Start</button>
