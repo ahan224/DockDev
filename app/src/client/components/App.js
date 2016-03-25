@@ -1,9 +1,9 @@
 import React from 'react';
 import NavLink from './NavLink';
 import ProjectLinks from './ProjectLinks';
-import * as projConfig from './build/server/projConfig.js';
-import * as appConfig from './build/server/appConfig.js';
-import defaultConfig from './build/server/defaultConfig.js';
+import * as projConfig from './server/projConfig.js';
+import * as appConfig from './server/appConfig.js';
+import defaultConfig from './server/defaultConfig.js';
 
 class App extends React.Component {
   constructor(props, context) {
