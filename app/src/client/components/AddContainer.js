@@ -1,4 +1,32 @@
 import React from 'react';
+<<<<<<< HEAD
+import * as container from './build/server/container.js';
+import { Link } from 'react-router';
+
+import createBrowserHistory from 'history/lib/createBrowserHistory'
+
+const AddContainer = ({ params, addContainer }) => {
+  let image = '';
+  const handler = event => {image = event.target.value;};
+
+  const submit = () => {
+    console.log(
+    container.add(params.uuid, image)
+      .then(result => addContainer(params.uuid, result)));
+  };
+
+  return (
+    <div className="row">
+      <div className="col-xs-8">
+        <input type="text" className="form-control form-control-md" onChange={handler} placeholder="Container Name"/>
+      </div>
+      <div>
+        <button onClick={submit} className="btn btn-primary-outline" name="submit">Add</button>
+      </div>
+    </div>
+  );
+};
+=======
 import * as container from './server/container.js';
 import * as images from './server/availableImages.js';
 import DockerImage from './DockerImage';
@@ -86,17 +114,23 @@ class AddContainer extends React.Component {
     });
 
     return (
-      <div>
-        <p>Servers</p>
-        {serverDisplay}
-        <br />
-        <p>Databases</p>
-        {dbDisplay}
-        <button onClick={this.submit}>Add</button>
+      <div className="row">
+        <div className="col-xs-12" id="servers">
+          <h4>Servers</h4>
+          <button className="btn btn-sm btn-primary-outline container-save" onClick={this.submit}>Save</button>
+          <div className="divider"></div>
+          {serverDisplay}
+        </div>
+        <div className="col-xs-12" id="servers">
+          <h4>Databases</h4>
+          <div className="divider"></div>
+          {dbDisplay}
+        </div>
       </div>
     );
   }
 }
+>>>>>>> 380aa529de45feb0b09edc4e46d1063aa5b1f772
 
 AddContainer.propTypes = {
   params: React.PropTypes.object,
@@ -142,8 +176,4 @@ AddContainer.propTypes = {
 //     </div>
 //   );
 // };
-
-
-
-
 export default AddContainer;
