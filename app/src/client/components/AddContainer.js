@@ -60,7 +60,7 @@ class AddContainer extends React.Component {
     });
 
     last
-      .then(this.props.context.router.replace(`/projects/${this.props.params.uuid}`))
+      .then(() => this.props.context.router.replace(`/projects/${this.props.params.uuid}`))
       .catch(err => console.log(err));
   }
 
