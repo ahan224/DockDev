@@ -81,6 +81,11 @@ export const machineConfig = co(function *(machineName) {
   return configObj;
 });
 
+
+export const version = () => exec('version');
+
+export const list = () => exec('ls');
+
 //
 // // also stops a Droplet on digitalocean
 // const stopMachine = machineName => dockerMachine(`stop ${ machineName }`);

@@ -8,18 +8,25 @@ import { exec as childExec } from 'child_process';
 // promisify callback function
 const exec = Promise.promisify(childExec);
 
+const checkDockerMachineInstalled = co(function *g() {
+  const result = yield machine.version();
+  return result.substr(0, 6) === 'docker';
+});
+
+const installDockerMachine = () => exec('curl -L https://github.com/docker/machine/releases/download/v0.6.0/docker-machine-`uname -s`-`uname -m` > /usr/local/bin/docker-machine && chmod +x /usr/local/bin/docker-machine')
+
 /**
  * checkDockerInstall() returns true or a promise to install Docker
  * based on checking the default machine and passing in it's environment variables
  *
  * @return {} returns true or a promise to install Docker
  */
-export const checkDockerInstall = co(function *g() {
-  const env = yield machine.env('default');
-  const result = yield exec('docker info', { env });
-  if (!result) return yield exec('curl -fsSL https://get.docker.com/ | sh');
-  return true;
+const checkDockerInstall = co(function *g() {
+  const result = yield exec('docker');
+  return result.split('\n').length > 1;
 });
+
+const installDocker = () => exec('curl -fsSL https://get.docker.com/ | sh');
 
 /**
  * initCongig() returns an object outlining the main config file information
@@ -101,11 +108,13 @@ export const loadConfigFile = co(function *g(defaultConfig) {
  * @param {String} basePath
  * @return {??} promise to resolve the path
  */
-const loadPathsFile = path =>
+const loadPathsFile = (path, defaultConfig) =>
   new Promise((resolve) => {
-    fs.readFile(path, (err, result) => {
+    fs.readFile(join(path, defaultConfig.projPath()), (err, result) => {
       if (err) return resolve('ERROR');
-      return resolve(result);
+      const proj = JSON.parse(result.toString());
+      proj.basePath = path;
+      return resolve(proj);
     });
   });
 
@@ -123,9 +132,9 @@ export const loadPaths = (configObj, defaultConfig, callback) => {
   const goodPaths = [];
 
   configObj.projects.forEach(path => {
-    goodPaths.push(loadPathsFile(join(path, defaultConfig.projPath()))
+    goodPaths.push(loadPathsFile(path, defaultConfig)
       .then(data => {
-        if (data !== 'ERROR') callback(JSON.parse(data.toString()));
+        if (data !== 'ERROR') callback(data);
       }));
   });
 };
@@ -136,4 +145,31 @@ export const addProjToConfig = co(function *g(basePath, defaultConfig) {
   const readConfigFile = yield readConfig(configPath);
   readConfigFile.projects.push(basePath);
   yield utils.writeFile(configPath, utils.jsonStringifyPretty(readConfigFile));
+});
+
+// load app --> returns config object
+export const initApp = co(function *g(defaultConfig, router) {
+  const machineInstalled = yield checkDockerMachineInstalled();
+
+  if (!machineInstalled) {
+    router.replace('/init/1');
+    yield installDockerMachine();
+  }
+
+  const dockerInstalled = yield checkDockerInstall();
+
+  if (!dockerInstalled) {
+    router.replace('init/2');
+    yield installDocker();
+  }
+
+  const checkDockDevMachine = yield machine.list();
+  if (checkDockDevMachine.indexOf('dockdev') === -1) {
+    router.replace('init/3');
+    yield machine.createMachine('dockdev');
+  }
+
+  router.replace('/');
+
+  return yield loadConfigFile(defaultConfig);
 });
