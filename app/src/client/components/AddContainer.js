@@ -86,13 +86,18 @@ class AddContainer extends React.Component {
     });
 
     return (
-      <div>
-        <p>Servers</p>
-        {serverDisplay}
-        <br />
-        <p>Databases</p>
-        {dbDisplay}
-        <button onClick={this.submit}>Add</button>
+      <div className="row">
+        <div className="col-xs-12" id="servers">
+          <h4>Servers</h4>
+          <button className="btn btn-sm btn-primary-outline container-save" onClick={this.submit}>Save</button>
+          <div className="divider"></div>
+          {serverDisplay}
+        </div>
+        <div className="col-xs-12" id="servers">
+          <h4>Databases</h4>
+          <div className="divider"></div>
+          {dbDisplay}
+        </div>
       </div>
     );
   }

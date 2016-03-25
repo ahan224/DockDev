@@ -2,16 +2,16 @@ import React from 'react';
 
 const Container = (props) => {
   return (
-    <li className="container-list">
-      <div className="container-box">
-        <h4 className="text-container">{ props.details[1].image }</h4>
-        <p className="text-version">v1.1.1.0</p>
-        <p className="text-description">
-          A Docker project management tool that automatically syncs files,
-          seamlessly integrate Docker with existing workflow, and
-          manage Docker projects and easily deploy them</p>
+    <div className="col-xs-6 col-sm-4">
+      <div className="card card-block">
+        <h3 className="card-title">
+          { props.details[1].image }
+          <span className="version">v1.1.1.0</span>
+        </h3>
+        <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a href="#" className=" pull-right">Details...</a>
       </div>
-    </li>
+    </div>
   );
 };
 
