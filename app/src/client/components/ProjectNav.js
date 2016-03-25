@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router';
+import { Router, Route, Link } from 'react-router'
 
 const ProjectNav = ({ projects, addContainer, children, params, context }) => (
   <div id="content">

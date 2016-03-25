@@ -1,6 +1,8 @@
 import React from 'react';
 
 const Container = (props) => {
+
+  console.log('ContainerComponent: ',props);
   return (
     <div className="col-xs-6 col-sm-4">
       <div className="card card-block">
