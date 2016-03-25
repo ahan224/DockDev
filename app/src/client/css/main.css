@@ -141,3 +141,7 @@ html {
   background: none;
   text-decoration: none;
 }
+
+li, ul {
+  list-style-type: none;
+}

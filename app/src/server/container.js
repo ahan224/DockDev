@@ -16,7 +16,7 @@ const dockerCommands = {
     method: 'POST',
     uri(containerId) {
       return `/containers/${containerId}/${this.cmd}`;
-    }
+    },
   },
   // stops a container
   stop: {
@@ -24,7 +24,7 @@ const dockerCommands = {
     method: 'POST',
     uri(containerId) {
       return `/containers/${containerId}/${this.cmd}`;
-    }
+    },
   },
   // inspects a container
   inspect: {
@@ -32,7 +32,7 @@ const dockerCommands = {
     method: 'GET',
     uri(containerId) {
       return `/containers/${containerId}/${this.cmd}`;
-    }
+    },
   },
   // creates a list of containers
   list: {
@@ -40,7 +40,7 @@ const dockerCommands = {
     method: 'GET',
     uri() {
       return `/containers/${this.cmd}`;
-    }
+    },
   },
   // creates a container
   create: {
@@ -48,7 +48,7 @@ const dockerCommands = {
     method: 'POST',
     uri() {
       return `/containers/${this.cmd}`;
-    }
+    },
   },
   // restarts a container
   restart: {
@@ -56,7 +56,7 @@ const dockerCommands = {
     method: 'POST',
     uri(containerId) {
       return `/containers/${containerId}/${this.cmd}`;
-    }
+    },
   },
   // removes a container
   remove: {
@@ -64,8 +64,8 @@ const dockerCommands = {
     method: 'DELETE',
     uri(containerId) {
       return `/containers/${containerId}?v=1&force=1`;
-    }
-  }
+    },
+  },
 };
 
 /**
@@ -156,8 +156,8 @@ export const logs = co(function *g(machineName, containerId) {
 export const setContainerParams = (image, uuid) => ({
   image,
   HostConfig: {
-    Binds: [`/home/docker/dockdev/${uuid}:/app`]
-  }
+    Binds: [`/home/docker/dockdev/${uuid}:/app`],
+  },
 });
 
 // need to think about how to pick a default machine

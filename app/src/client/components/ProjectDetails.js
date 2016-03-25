@@ -28,7 +28,9 @@ const ProjectDetail = ({ projects, params }) => {
         All the awesome information about your project,
         container, are right here.  Take a look around.
       </p>
-      {containers}
+      <ul>
+        {containers}
+      </ul>
     </div>
   );
 };
