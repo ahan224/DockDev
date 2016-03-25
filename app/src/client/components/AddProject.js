@@ -29,7 +29,6 @@ class AddProject extends React.Component {
     return (
       <div id="content">
         <div className="content-top-nav"></div>
-
         <h2>Add Project</h2>
         <p id="addText">
           DockDev will create a container for you
