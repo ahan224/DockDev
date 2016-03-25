@@ -11,26 +11,29 @@ class App extends React.Component {
     this.addNewProject = this.addNewProject.bind(this);
     this.addExistingProjects = this.addExistingProjects.bind(this);
     this.addContainer = this.addContainer.bind(this);
-    this.testRedirect = this.testRedirect.bind(this);
+    this.addAppConfig = this.addAppConfig.bind(this);
     this.state = {
-      projects: {}
+      projects: {},
     };
   }
 
   componentDidMount() {
-    const getConfig = appConfig.initApp(defaultConfig, this.context.router);
-
-    // add config object to state
-    getConfig.then(config => this.setState({ config }));
-
-    // load exising projects into state
-    getConfig.then(config => appConfig.loadPaths(config, defaultConfig, this.addExistingProjects));
+    appConfig.initApp(
+      defaultConfig,
+      this.context.router,
+      this.addAppConfig,
+      this.addExistingProjects
+    );
   }
 
   addExistingProjects(proj) {
     const projects = this.state.projects;
     projects[proj.uuid] = proj;
     this.setState({ projects });
+  }
+
+  addAppConfig(config) {
+    this.setState({ config });
   }
 
   addNewProject(userSelection) {
@@ -50,10 +53,6 @@ class App extends React.Component {
     projConfig.writeProj(projects[uuid]);
   }
 
-  testRedirect() {
-    this.context.router.replace('/');
-  }
-
   render() {
     return (
       <div>
@@ -67,8 +66,7 @@ class App extends React.Component {
             projects: this.state.projects,
             addNewProject: this.addNewProject,
             addContainer: this.addContainer,
-            testRedirect: this.testRedirect,
-            context: this.context
+            context: this.context,
           }
         )}
       </div>
@@ -77,11 +75,11 @@ class App extends React.Component {
 }
 
 App.propTypes = {
-  children: React.PropTypes.object
+  children: React.PropTypes.object,
 };
 
 App.contextTypes = {
-  router: React.PropTypes.object.isRequired
+  router: React.PropTypes.object.isRequired,
 };
 
 
