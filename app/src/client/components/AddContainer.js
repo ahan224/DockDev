@@ -7,6 +7,8 @@ class AddContainer extends React.Component {
   constructor() {
     super();
     this.clickServer = this.clickServer.bind(this);
+    this.clickDb = this.clickDb.bind(this);
+    this.submit = this.submit.bind(this);
     this.state = {
       selServer: 'node',
       selDbs: [],
@@ -25,27 +27,82 @@ class AddContainer extends React.Component {
     this.setState({ servers, dbs });
   }
 
-  clickServer(server) {
+  clickServer(selServer) {
     return () => {
-      console.log(server);
-      this.setState({ server });
+      this.setState({ selServer });
     };
   }
 
-  render() {
-    // if val = selServer, add a class to it
-    const serverDisplay = this.state.servers.map((val, idx) =>
-      <DockerImage key={idx} name={val} handler={this.clickServer(val)} />);
+  clickDb(selDb) {
+    return () => {
+      // if already in the array, remove it
+      const selDbs = this.state.selDbs;
+      const idx = selDbs.indexOf(selDb);
+      if (idx > -1) {
+        selDbs.splice(idx, 1);
+      } else {
+        selDbs.push(selDb);
+      }
+      this.setState({ selDbs });
+    };
+  }
 
-    // same concept for databases
+  submit() {
+    let last;
+    if (this.state.selServer) {
+      last = container.add(this.props.params.uuid, this.state.selServer);
+      last.then(result => this.props.addContainer(this.props.params.uuid, result));
+    }
+
+    this.state.selDbs.forEach(val => {
+      last = container.add(this.props.params.uuid, val);
+      last.then(result => this.props.addContainer(this.props.params.uuid, result));
+    });
+
+    last
+      .then(this.props.context.router.replace(`/projects/${this.props.params.uuid}`))
+      .catch(err => console.log(err));
+  }
+
+  render() {
+    const serverDisplay = this.state.servers.map((val, idx) => {
+      const style = {};
+      if (val.name === this.state.selServer) style.color = 'red';
+      return (
+        <DockerImage key={idx} style={style}
+          name={val.name} handler={this.clickServer(val.name)}
+        />
+      );
+    });
+
+    const dbDisplay = this.state.dbs.map((val, idx) => {
+      const style = {};
+      if (this.state.selDbs.indexOf(val.name) > -1) style.color = 'blue';
+      return (
+        <DockerImage key={idx} style={style}
+          name={val.name} handler={this.clickDb(val.name)}
+        />
+      );
+    });
 
     return (
       <div>
+        <p>Servers</p>
         {serverDisplay}
+        <br />
+        <p>Databases</p>
+        {dbDisplay}
+        <button onClick={this.submit}>Add</button>
       </div>
     );
   }
 }
+
+AddContainer.propTypes = {
+  params: React.PropTypes.object,
+  addContainer: React.PropTypes.func,
+  context: React.PropTypes.object,
+};
 
 
 // const AddContainer = ({ params, addContainer }) => {
@@ -86,10 +143,7 @@ class AddContainer extends React.Component {
 //   );
 // };
 
-AddContainer.propTypes = {
-  params: React.PropTypes.object,
-  addContainer: React.PropTypes.func,
-};
+
 
 
 export default AddContainer;

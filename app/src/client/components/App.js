@@ -51,7 +51,6 @@ class App extends React.Component {
     projects[uuid].containers[containerObj.containerId] = containerObj;
     this.setState({ projects });
     projConfig.writeProj(projects[uuid]);
-    this.context.router.replace(`/projects/${uuid}`);
   }
 
   render() {
