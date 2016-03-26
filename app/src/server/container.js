@@ -1,8 +1,10 @@
 import rp from 'request-promise';
 import * as machine from './machine.js';
 import Promise, { coroutine as co } from 'bluebird';
-import { exec as childExec } from 'child_process';
+import { exec as childExec, spawn } from 'child_process';
 import defaultConfig from './defaultConfig';
+import R from 'ramda';
+import uuidNode from 'node-uuid';
 
 // promisify callback function
 const exec = Promise.promisify(childExec);
@@ -104,7 +106,7 @@ function commandMaker(cmd) {
     config.uri += cmd.uri(containerInfo);
     config.method = cmd.method;
     config.json = true;
-    if (cmd.cmd === 'create' || cmd.cmd === 'network') config.body = containerInfo;
+    if (cmd.cmd === 'create') config.body = containerInfo;
     return yield rp(config);
   });
 }
@@ -140,6 +142,20 @@ export const networkInspect = commandMaker(dockerCommands.networkInspect);
 export const pull = co(function *g(machineName, image) {
   const env = yield machine.env(machineName);
   return yield exec(`docker pull ${image}`, { env });
+});
+
+export const pullSpawn = co(function *g(machineName, image, uuid, tmpContainerId, callback) {
+  const env = yield machine.env(machineName);
+  process.env = R.merge(process.env, env);
+
+  const pullReq = spawn('docker', ['pull', image]);
+
+  pullReq.stdout.on('data', data => callback(uuid, { tmpContainerId, image, status: 'pending', data }));
+
+  yield new Promise((resolve, reject) => {
+    pullReq.stderr.on('data', reject);
+    pullReq.on('close', resolve);
+  });
 });
 
 /**
@@ -183,8 +199,8 @@ export const setContainerParams = (image, uuid) => ({
   image,
   HostConfig: {
     Binds: [`/home/docker/dockdev/${uuid}:/app`],
+    NetworkMode: uuid,
   },
-  NetworkMode: uuid,
 });
 
 export const setNetworkParams = (uuid) => ({
@@ -201,26 +217,38 @@ export const setNetworkParams = (uuid) => ({
  * @param {String} image
  * @return {String} containerId
  */
-export const add = co(function *g(uuid, image) {
+export const add = co(function *g(uuid, image, callback) {
   const containerConfig = setContainerParams(image, uuid);
+
+  const tmpContainerId = uuidNode.v4();
+
+  callback(uuid, { tmpContainerId, image, status: 'pending', data: '' });
 
   // check to make sure image is on the local computer
   if (!(yield images(defaultConfig.machine, image)).length) {
-    yield pull(defaultConfig.machine, image);
-  }
-
-  // check that network exists for container
-  try {
-    yield networkInspect(defaultConfig.machine, uuid);
-  } catch (e) {
-    yield networkCreate(defaultConfig.machine, setNetworkParams(uuid));
+    try {
+      yield pullSpawn(defaultConfig.machine, image, uuid, tmpContainerId, callback);
+    } catch (err) {
+      return callback(uuid, { tmpContainerId, image, status: 'error', err });
+    }
   }
 
   const containerId = (yield create(defaultConfig.machine, containerConfig)).Id;
   const inspectContainer = yield inspect(defaultConfig.machine, containerId);
   const dest = inspectContainer.Mounts[0].Source;
   const name = inspectContainer.Name.substr(1);
-  const newContainer = { uuid, image, containerId, name, dest, sync: true };
+  const newContainer = {
+    uuid,
+    image,
+    tmpContainerId,
+    containerId,
+    name,
+    dest,
+    sync: true,
+    status: 'complete',
+  };
+
+  callback(uuid, newContainer);
   return newContainer;
 });
 

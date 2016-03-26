@@ -47,11 +47,38 @@ class App extends React.Component {
       .catch();
   }
 
-  addContainer(uuid, containerObj) {
+  addContainer(uuid, status) {
     const projects = this.state.projects;
-    projects[uuid].containers[containerObj.containerId] = containerObj;
-    this.setState({ projects });
+
+    if (status.status === 'pending') {
+      let data = '';
+      if (projects[uuid].containers[status.tmpContainerId]) {
+        data = projects[uuid].containers[status.tmpContainerId].data + status.data.toString();
+      }
+      projects[uuid].containers[status.tmpContainerId] = {
+        tmpContainerId: status.tmpContainerId,
+        status: 'pending',
+        data,
+        image: status.image,
+      };
+    }
+
+    if (status.status === 'error') {
+      projects[uuid].containers[status.tmpContainerId] = {
+        tmpContainerId: status.tmpContainerId,
+        status: 'error',
+        err: status.err.toString(),
+        image: status.image,
+      };
+    }
+
+    if (status.status === 'complete') {
+      delete projects[uuid].containers[status.tmpContainerId];
+      projects[uuid].containers[status.containerId] = status;
+    }
+
     projConfig.writeProj(projects[uuid]);
+    this.setState({ projects });
   }
 
   render() {
