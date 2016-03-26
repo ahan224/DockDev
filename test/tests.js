@@ -34,9 +34,6 @@ import defaultConfig from '../app/build/server/defaultConfig.js';
 //       });
 //   });
 // });
-=======
-import * as defaultConfig from '../app/build/server/defaultConfig.js';
->>>>>>> 4dff9998496b4d51db2f8364acaabd7fe0d3be26
 
 describe('initiate new DockDev project via individual functions', () => {
   const projectName = 'project1';
@@ -200,10 +197,7 @@ describe('add and modify containers within a project', () => {
         result.then(data => {
           expect(data.containers[containerId].image).to.equal(image);
           expect(data.containers[containerId].containerId).to.equal(containerId);
-<<<<<<< HEAD
           done();
-=======
->>>>>>> 4dff9998496b4d51db2f8364acaabd7fe0d3be26
         });
       });
   });
@@ -268,9 +262,6 @@ describe('should sync files to docker machine', () => {
         expect(true).to.be.true;
         return;
       });
-<<<<<<< HEAD
-  });
-=======
   });
 });
 
@@ -299,5 +290,4 @@ xdescribe('should write a config file', () => {
         expect(data.projects).to.be.empty;
       });
   });
->>>>>>> 4dff9998496b4d51db2f8364acaabd7fe0d3be26
 });

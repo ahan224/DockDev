@@ -4,6 +4,7 @@ import ProjectLinks from './ProjectLinks';
 import * as projConfig from './server/projConfig.js';
 import * as appConfig from './server/appConfig.js';
 import defaultConfig from './server/defaultConfig.js';
+import * as container from './server/container.js';
 
 class App extends React.Component {
   constructor(props, context) {
@@ -12,8 +13,10 @@ class App extends React.Component {
     this.addExistingProjects = this.addExistingProjects.bind(this);
     this.addContainer = this.addContainer.bind(this);
     this.addAppConfig = this.addAppConfig.bind(this);
+    this.manageActiveProject = this.manageActiveProject.bind(this);
     this.state = {
       projects: {},
+      activeProject: false,
     };
   }
 
@@ -30,6 +33,29 @@ class App extends React.Component {
     const projects = this.state.projects;
     projects[proj.uuid] = proj;
     this.setState({ projects });
+  }
+
+  manageActiveProject(callback, uuid) {
+    if (this.state.activeProject &&
+        callback === container.start ||
+        (callback === container.restart && this.state.activeProject !== uuid)) {
+      for (let containerId in this.state.projects[this.state.activeProject].containers) {
+        console.log('stopAll', containerId);
+        container.stop('dockdev', containerId);
+      }
+    }
+
+    for (let containerId in this.state.projects[uuid].containers) {
+      console.log('start', containerId);
+      callback('dockdev', containerId);
+    }
+
+    if ((callback === container.remove || callback === container.stop) &&
+         uuid === this.state.activeProject) {
+      this.setState({ activeProject: false });
+    } else {
+      this.setState({ activeProject: uuid });
+    }
   }
 
   addAppConfig(config) {
@@ -67,6 +93,7 @@ class App extends React.Component {
             projects: this.state.projects,
             addNewProject: this.addNewProject,
             addContainer: this.addContainer,
+            manageActiveProject: this.manageActiveProject,
             context: this.context,
           }
         )}
