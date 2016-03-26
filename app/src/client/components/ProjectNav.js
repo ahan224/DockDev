@@ -1,7 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router';
+import { Router, Route, Link } from 'react-router'
 
-const ProjectNav = ({ projects, addContainer, children, params }) => (
+const ProjectNav = ({ projects, addContainer, children, params, context }) => (
   <div id="content">
     <div className="content-top-nav">
       <ul className="nav nav-inline">
@@ -20,7 +20,7 @@ const ProjectNav = ({ projects, addContainer, children, params }) => (
       </ul>
 
     </div>
-    {React.cloneElement(children, { projects, addContainer })}
+    {React.cloneElement(children, { projects, addContainer, context })}
   </div>
 );
 
@@ -28,7 +28,8 @@ ProjectNav.propTypes = {
   children: React.PropTypes.object,
   projects: React.PropTypes.object,
   params: React.PropTypes.object,
-  addContainer: React.PropTypes.func
+  addContainer: React.PropTypes.func,
+  context: React.PropTypes.object
 };
 
 

@@ -2,6 +2,7 @@ import rp from 'request-promise';
 import * as machine from './machine.js';
 import Promise, { coroutine as co } from 'bluebird';
 import { exec as childExec } from 'child_process';
+import defaultConfig from './defaultConfig';
 
 // promisify callback function
 const exec = Promise.promisify(childExec);
@@ -16,7 +17,7 @@ const dockerCommands = {
     method: 'POST',
     uri(containerId) {
       return `/containers/${containerId}/${this.cmd}`;
-    }
+    },
   },
   // stops a container
   stop: {
@@ -24,7 +25,7 @@ const dockerCommands = {
     method: 'POST',
     uri(containerId) {
       return `/containers/${containerId}/${this.cmd}`;
-    }
+    },
   },
   // inspects a container
   inspect: {
@@ -32,7 +33,7 @@ const dockerCommands = {
     method: 'GET',
     uri(containerId) {
       return `/containers/${containerId}/${this.cmd}`;
-    }
+    },
   },
   // creates a list of containers
   list: {
@@ -40,7 +41,7 @@ const dockerCommands = {
     method: 'GET',
     uri() {
       return `/containers/${this.cmd}`;
-    }
+    },
   },
   // creates a container
   create: {
@@ -48,7 +49,7 @@ const dockerCommands = {
     method: 'POST',
     uri() {
       return `/containers/${this.cmd}`;
-    }
+    },
   },
   // restarts a container
   restart: {
@@ -56,7 +57,7 @@ const dockerCommands = {
     method: 'POST',
     uri(containerId) {
       return `/containers/${containerId}/${this.cmd}`;
-    }
+    },
   },
   // removes a container
   remove: {
@@ -64,8 +65,30 @@ const dockerCommands = {
     method: 'DELETE',
     uri(containerId) {
       return `/containers/${containerId}?v=1&force=1`;
-    }
-  }
+    },
+  },
+  images: {
+    cmd: 'json',
+    method: 'GET',
+    uri(imageName) {
+      if (imageName) return `/images/${this.cmd}?filter=${imageName}`;
+      return `/images/${this.cmd}?all`;
+    },
+  },
+  networkCreate: {
+    cmd: 'create',
+    method: 'POST',
+    uri() {
+      return `/networks/${this.cmd}`;
+    },
+  },
+  networkInspect: {
+    cmd: '',
+    method: 'GET',
+    uri(uuid) {
+      return `/networks/${uuid}`;
+    },
+  },
 };
 
 /**
@@ -81,7 +104,7 @@ function commandMaker(cmd) {
     config.uri += cmd.uri(containerInfo);
     config.method = cmd.method;
     config.json = true;
-    if (cmd.cmd === 'create') config.body = containerInfo;
+    if (cmd.cmd === 'create' || cmd.cmd === 'network') config.body = containerInfo;
     return yield rp(config);
   });
 }
@@ -101,6 +124,9 @@ export const inspect = commandMaker(dockerCommands.inspect);
 export const create = commandMaker(dockerCommands.create);
 export const restart = commandMaker(dockerCommands.restart);
 export const remove = commandMaker(dockerCommands.remove);
+export const images = commandMaker(dockerCommands.images);
+export const networkCreate = commandMaker(dockerCommands.networkCreate);
+export const networkInspect = commandMaker(dockerCommands.networkInspect);
 
 /**
  * pull() returns a promise to execute a docker command, 'pull' which will pull
@@ -156,12 +182,14 @@ export const logs = co(function *g(machineName, containerId) {
 export const setContainerParams = (image, uuid) => ({
   image,
   HostConfig: {
-    Binds: [`/home/docker/dockdev/${uuid}:/app`]
-  }
+    Binds: [`/home/docker/dockdev/${uuid}:/app`],
+  },
+  NetworkMode: uuid,
 });
 
-// need to think about how to pick a default machine
-// for now it is hardcoded to 'default' but shouldnt be
+export const setNetworkParams = (uuid) => ({
+  name: uuid,
+});
 
 /**
  * addContainer() will create a container through the docker API
@@ -175,8 +203,21 @@ export const setContainerParams = (image, uuid) => ({
  */
 export const add = co(function *g(uuid, image) {
   const containerConfig = setContainerParams(image, uuid);
-  const containerId = (yield create('default', containerConfig)).Id;
-  const inspectContainer = yield inspect('default', containerId);
+
+  // check to make sure image is on the local computer
+  if (!(yield images(defaultConfig.machine, image)).length) {
+    yield pull(defaultConfig.machine, image);
+  }
+
+  // check that network exists for container
+  try {
+    yield networkInspect(defaultConfig.machine, uuid);
+  } catch (e) {
+    yield networkCreate(defaultConfig.machine, setNetworkParams(uuid));
+  }
+
+  const containerId = (yield create(defaultConfig.machine, containerConfig)).Id;
+  const inspectContainer = yield inspect(defaultConfig.machine, containerId);
   const dest = inspectContainer.Mounts[0].Source;
   const name = inspectContainer.Name.substr(1);
   const newContainer = { uuid, image, containerId, name, dest, sync: true };

@@ -17,7 +17,7 @@ function handleErrors() {
  this.emit('end');
 }
 
-gulp.task('default', ['server', 'react', 'test', 'main', 'css', 'watch']);
+gulp.task('default', ['server', 'react', 'test', 'main', 'css', 'html', 'bower', 'watch']);
 
 gulp.task('server', () => {
   return gulp.src('./app/src/server/*')
@@ -54,11 +54,11 @@ gulp.task('react', () => {
     'ramda',
     'react-router',
     'electron',
-    './build/server/projConfig.js',
-    './build/server/appConfig.js',
-    './build/server/defaultConfig.js',
-    './build/server/container.js'
-
+    './server/projConfig.js',
+    './server/appConfig.js',
+    './server/defaultConfig.js',
+    './server/container.js',
+    './server/availableImages.js',
   ]);
 
   return bundler
@@ -81,10 +81,22 @@ gulp.task('css', () => {
     .pipe(gulp.dest('./app/build/client/css'))
 })
 
+gulp.task('html', () => {
+  return gulp.src('./app/index.html')
+    .pipe(gulp.dest('./app/build'))
+})
+
+gulp.task('bower', () => {
+  return gulp.src('./bower_components/*/**')
+    .pipe(gulp.dest('./app/build/client/bower_components'))
+})
+
 gulp.task('watch', function() {
   gulp.watch(['./app/src/server/*',], ['server']);
   gulp.watch('./test/tests.js', ['test']);
   gulp.watch('./app/src/main.js', ['main']);
   gulp.watch(['./app/src/client/index.js', 'app/src/client/components/*.js'], ['react']);
   gulp.watch('./app/src/client/css/*', ['css']);
+  gulp.watch('./app/index.html', ['html']);
+  gulp.watch('./bower_components/*/**', ['bower']);
 });

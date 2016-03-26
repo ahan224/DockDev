@@ -19,7 +19,7 @@ export const createProj = (basePath, projectName) => ({
   projectName,
   basePath,
   containers: {},
-  machine: 'default'
+  machine: defaultConfig.machine,
 });
 
 /**
@@ -56,28 +56,6 @@ export const writeProj = (projObj) =>
   utils.writeFile(join(projObj.basePath, defaultConfig.projPath()), cleanProjToWrite(projObj));
 
 /**
- * addBasePath() returns a new object with the basePath included
- * based on passing a json string and parsing it
- *
- * @param {String} jsonObj
- * @param {String} basePath
- * @return {Object} projObj
- */
-const addBasePath = (jsonObj, basePath) => R.merge(JSON.parse(jsonObj), { basePath });
-
-/**
- * readProj() yields a promise which, upon completion returns a proj object with a basePath included
- * based on passing in a basePath for reading and then parsing the file
- *
- * @param {String} basePath
- * @return {Object} projObj
- */
-export const readProj = co(function *(basePath) {
-  const readProjFile = yield utils.readFile(join(basePath, defaultConfig.projPath()));
-  return addBasePath(readProjFile, basePath);
-});
-
-/**
  * initProject() creates the project object, then yields a promise to create the project folder
  * then yields a promise to write the project file, then it adds the project object to memory
  * and finally, it returns the project object
@@ -102,6 +80,7 @@ export const initProject = co(function *g(basePath, projectName, overwrite) {
   }
 
   yield writeProj(projObj);
+  projObj.basePath = basePath;
 
   yield appConfig.addProjToConfig(basePath, defaultConfig);
 
