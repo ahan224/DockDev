@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-// import * as utils from '../app/build/server/utils.js';
 import { join } from 'path';
 import rimraf from 'rimraf';
 import { readFileSync, mkdirSync, readdirSync, writeFileSync } from 'fs';
@@ -9,6 +8,32 @@ import { addFileWatcher } from '../app/build/server/fileWatch.js';
 import { removeContainer, addContainer } from '../app/build/server/container.js';
 import * as projConfig from '../app/build/server/projConfig.js';
 import defaultConfig from '../app/build/server/defaultConfig.js';
+
+// 
+// describe('should write an app level config file', () => {
+//   let result;
+//   const basePath = join(__dirname, 'configFolder');
+//
+// // need to delete the configFolder and File before, then run the
+//   before(() => {
+//     // remove configFolder if it exists
+//     rimraf.sync(basePath);
+//
+//     // will create in basePath and also searches for projectFolders in the test directory
+//     mkdirSync(basePath);
+//   });
+//
+//   // this should probably be moved to the existing project tests (project2)
+//   it('writeConfig should write a file', () => {
+//     appConfig.writeConfig(__dirname, basePath);
+//     result = readFileSync(defaultConfig.configPath(basePath));
+//     return result
+//       .then(data => {
+//         expect(data.userSelectedDirectory).to.equal(process.env.HOME);
+//         expect(data.projects).to.be.empty;
+//       });
+//   });
+// });
 
 describe('initiate new DockDev project via individual functions', () => {
   const projectName = 'project1';
@@ -236,33 +261,6 @@ describe('should sync files to docker machine', () => {
         setTimeout(done, 1900);
         expect(true).to.be.true;
         return;
-      });
-  });
-});
-
-xdescribe('should write a config file', () => {
-  let result;
-  const basePath = join(__dirname, 'configFolder');
-
-// need to delete the configFolder and File before, then run the
-  before(() => {
-    try { mkdirSync(basePath); }
-    catch (e) {}
-
-    // remove configFolder if it exists
-    rimraf.sync(basePath);
-
-    // will create in basePath and also searches for projectFolders in the test directory
-    projConfig.writeConfig(__dirname, basePath);
-    result = readFileSync(defaultConfig.configPath(basePath));
-  });
-
-  // this should probably be moved to the existing project tests (project2)
-  it('writeConfig should write a file', () => {
-    return result
-      .then(data => {
-        expect(data.userSelectedDirectory).to.equal(process.env.HOME);
-        expect(data.projects).to.be.empty;
       });
   });
 });
