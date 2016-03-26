@@ -42,6 +42,7 @@ class App extends React.Component {
         const projects = this.state.projects;
         projects[proj.uuid] = proj;
         this.setState({ projects });
+        this.context.router.replace(`/projects/${proj.uuid}`);
       })
       .catch();
   }

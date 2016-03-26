@@ -17,24 +17,36 @@ const AddProject = ({ addNewProject }) => {
   return (
     <div id="content">
       <div className="content-top-nav"></div>
+        <div className="centered-content center-block">
+          <h2>Add Project</h2>
+          {/*<p id="addText">
+            DockDev will create a container for you
+            after you assign a name and select a folder/create a directory.
+          </p>*/}
+          <div className="col-xs-12 form-input-spacing">
+            <input
+              className="form-control form-control-lg border-bottom-input"
+              type="text"
+              placeholder="Name"
+              onChange={projNameHandler}
+              />
+          </div>
+            <div className="col-xs-12 form-input-spacing">
+              <label className="file width-12">
+                <input type="file" id="file" />
+                <span className="file-custom border-bottom-input" onClick={popFileSelector}></span>
+              </label>
+          </div>
+            <div className="col-xs-6">
+              Cancel
+            </div>
+            <div className="col-xs-6">
+              <button className="btn btn-primary-outline btn-block" onClick={submit}>
+                Add
+              </button>
+            </div>
+        </div>
 
-      <h2>Add Project</h2>
-      <p id="addText">
-        DockDev will create a container for you
-        after you assign a name and select a folder/create a directory.
-      </p>
-      <input
-        className="form-control form-control-lg"
-        type="text"
-        placeholder="Name"
-        onChange={projNameHandler}
-      />
-      <button className="btn btn-primary-outline btn-block"onClick={popFileSelector}>
-        Select Path
-      </button>
-      <button className="btn btn-primary-outline btn-block" onClick={submit}>
-        Add
-      </button>
     </div>
   );
 };

@@ -22,6 +22,7 @@ const config = {
   configFile: 'dockdevConfig.json',
   defaultPath: process.env.HOME,
   DOToken: '',
+  machine: 'dockdev',
   configPath(path = this.defaultPath) {
     return join(path, this.configFolder, this.configFile);
   },
@@ -32,7 +33,7 @@ const config = {
   projWriteParams: ['uuid', 'projectName', 'containers', 'machine'],
   projPath() {
     return join(this.projFolder, this.projFile);
-  }
+  },
 };
 
 export default config;
