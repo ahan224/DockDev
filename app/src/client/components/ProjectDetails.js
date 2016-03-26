@@ -1,8 +1,9 @@
 import React from 'react';
 import R from 'ramda';
 import Container from './Container';
+import * as container from './server/container.js';
 
-const ProjectDetail = ({ projects, params }) => {
+const ProjectDetail = ({ projects, manageActiveProject, params }) => {
   // console.log(projects);
   // for (var keys in projects) {
   //     console.log('KEYS:',projects[keys].uuid);
@@ -16,18 +17,23 @@ const ProjectDetail = ({ projects, params }) => {
   const proj = projects[params.uuid];
   const containers = R.toPairs(proj.containers)
     .map(container => <Container key={container[0]} details={container}>
-                      </Container>
+                      </Container>);
 
-           );
+  const start = () => manageActiveProject(container.start, params.uuid);
+  const stop = () => manageActiveProject(container.stop, params.uuid);
+  const restart = () => manageActiveProject(container.restart, params.uuid);
+  const remove = () => manageActiveProject(container.remove, params.uuid);
+
+
   return (
     <div className="col-xs-12">
       <h1 className="display-4 text-capitalize">
         {proj.projectName} Details
       </h1>
-      {/*<button>Start</button>
-      <button>Stop</button>
-      <button>Restart</button>
-      <button>Delete</button>*/}
+      <button onClick={start}>Start</button>
+      <button onClick={stop}>Stop</button>
+      <button onClick={restart}>Restart</button>
+      <button onClick={remove}>Delete</button>
       <p className="lead">
         All the awesome information about your project,
         container, are right here.  Take a look around.
