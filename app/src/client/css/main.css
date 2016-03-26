@@ -81,10 +81,35 @@ html {
 
 #content {
   width: 100%;
+  margin: 0 auto;
   padding-left: 259px;
   padding-right: 20px;
   /*border: 5px solid #96BAC5;*/
   /*background: lightblue;*/
+}
+
+.centered-content {
+    max-width: 400px;
+}
+
+.width-12 {
+  width: 100%;
+}
+
+.file-custom::before {
+  border: none!important;
+  background: none!important;
+}
+
+.form-input-spacing {
+  margin: 25px 0;
+}
+
+.border-bottom-input {
+  border-top: 0!important;
+  border-left: 0!important;
+  border-right: 0!important;
+  border-radius: 0!important;
 }
 
 .card {
@@ -140,4 +165,56 @@ html {
 .content-top-nav button:hover {
   background: none;
   text-decoration: none;
+}
+
+ul, li {
+  list-style-type: none;
+}
+
+.container-list {
+  list-style-type: none;
+  display: inline-block;
+  margin: 2em;
+}
+
+.container-save {
+  float: right;
+  margin-top: -38px;
+}
+
+/*.container-box {
+  display: inline-block;
+  border: 1px solid black;
+  padding: 2em;
+  width: 300px;
+  height: 300px;
+}*/
+
+#servers {
+    margin-bottom: 35px;
+    margin-top: 35px;
+}
+
+.divider {
+  border-bottom: 1px solid #DCD9D9;
+  margin-bottom: 35px;
+}
+
+.text-container {
+  float: left;
+}
+
+.text-version {
+  float: right;
+  color: gray;
+}
+
+.text-description {
+  clear: left;
+}
+
+.button-container {
+  margin: 2em;
+  width: 300px;
+  height: 300px;
 }

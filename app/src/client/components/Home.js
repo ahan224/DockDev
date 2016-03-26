@@ -1,10 +1,10 @@
 import React from 'react';
 
-export default (props) => {
+export default ({ context }) => {
   return (
     <div id="content">
       <div id="content-top-nav"></div>
-      Home
+      DockDev
     </div>
   );
 };

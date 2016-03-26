@@ -9,7 +9,7 @@ import { removeContainer, addContainer } from '../app/build/server/container.js'
 import * as projConfig from '../app/build/server/projConfig.js';
 import defaultConfig from '../app/build/server/defaultConfig.js';
 
-// 
+//
 // describe('should write an app level config file', () => {
 //   let result;
 //   const basePath = join(__dirname, 'configFolder');
@@ -34,6 +34,9 @@ import defaultConfig from '../app/build/server/defaultConfig.js';
 //       });
 //   });
 // });
+=======
+import * as defaultConfig from '../app/build/server/defaultConfig.js';
+>>>>>>> 4dff9998496b4d51db2f8364acaabd7fe0d3be26
 
 describe('initiate new DockDev project via individual functions', () => {
   const projectName = 'project1';
@@ -197,7 +200,10 @@ describe('add and modify containers within a project', () => {
         result.then(data => {
           expect(data.containers[containerId].image).to.equal(image);
           expect(data.containers[containerId].containerId).to.equal(containerId);
+<<<<<<< HEAD
           done();
+=======
+>>>>>>> 4dff9998496b4d51db2f8364acaabd7fe0d3be26
         });
       });
   });
@@ -262,5 +268,36 @@ describe('should sync files to docker machine', () => {
         expect(true).to.be.true;
         return;
       });
+<<<<<<< HEAD
   });
+=======
+  });
+});
+
+xdescribe('should write a config file', () => {
+  let result;
+  const basePath = join(__dirname, 'configFolder');
+
+// need to delete the configFolder and File before, then run the
+  before(() => {
+    try { mkdirSync(basePath); }
+    catch (e) {}
+
+    // remove configFolder if it exists
+    rimraf.sync(basePath);
+
+    // will create in basePath and also searches for projectFolders in the test directory
+    projConfig.writeConfig(__dirname, basePath);
+    result = readFileSync(defaultConfig.configPath(basePath));
+  });
+
+  // this should probably be moved to the existing project tests (project2)
+  it('writeConfig should write a file', () => {
+    return result
+      .then(data => {
+        expect(data.userSelectedDirectory).to.equal(process.env.HOME);
+        expect(data.projects).to.be.empty;
+      });
+  });
+>>>>>>> 4dff9998496b4d51db2f8364acaabd7fe0d3be26
 });
