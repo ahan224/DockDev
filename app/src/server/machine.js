@@ -81,14 +81,16 @@ export const machineConfig = co(function *(machineName) {
   return configObj;
 });
 
-
+/**
+ * version() returns the docker machine version
+ *
+ * @return {} returns the docker machine version
+ */
 export const version = () => exec('version');
 
+/**
+ * version() returns a list of docker machines
+ *
+ * @return {} returns a list docker machines
+ */
 export const list = () => exec('ls');
-
-//
-// // also stops a Droplet on digitalocean
-// const stopMachine = machineName => dockerMachine(`stop ${ machineName }`);
-//
-// // also removes a Droplet on DigitalOcean
-// const removeMachine = machineName => dockerMachine(`rm -y ${ machineName }`);
