@@ -4,6 +4,7 @@ import R from 'ramda';
 import uuid from 'node-uuid';
 import * as utils from './utils';
 import * as appConfig from './appConfig';
+import { setNetworkParams, networkCreate } from './container';
 import defaultConfig from './defaultConfig';
 
 /**
@@ -83,6 +84,8 @@ export const initProject = co(function *g(basePath, projectName, overwrite) {
   projObj.basePath = basePath;
 
   yield appConfig.addProjToConfig(basePath, defaultConfig);
+
+  yield networkCreate(defaultConfig.machine, setNetworkParams(projObj.uuid));
 
   return projObj;
 });
