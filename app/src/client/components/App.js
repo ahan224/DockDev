@@ -12,6 +12,7 @@ class App extends React.Component {
     this.addExistingProjects = this.addExistingProjects.bind(this);
     this.addContainer = this.addContainer.bind(this);
     this.addAppConfig = this.addAppConfig.bind(this);
+    this.delContainer = this.delContainer.bind(this);
     this.state = {
       projects: {},
     };
@@ -52,11 +53,11 @@ class App extends React.Component {
 
     if (status.status === 'pending') {
       let data = '';
-      if (projects[uuid].containers[status.tmpContainerId]) {
-        data = projects[uuid].containers[status.tmpContainerId].data + status.data.toString();
+      if (projects[uuid].containers[status.containerId]) {
+        data = projects[uuid].containers[status.containerId].data + status.data.toString();
       }
-      projects[uuid].containers[status.tmpContainerId] = {
-        tmpContainerId: status.tmpContainerId,
+      projects[uuid].containers[status.containerId] = {
+        containerId: status.containerId,
         status: 'pending',
         data,
         image: status.image,
@@ -64,8 +65,8 @@ class App extends React.Component {
     }
 
     if (status.status === 'error') {
-      projects[uuid].containers[status.tmpContainerId] = {
-        tmpContainerId: status.tmpContainerId,
+      projects[uuid].containers[status.containerId] = {
+        containerId: status.containerId,
         status: 'error',
         err: status.err.toString(),
         image: status.image,
@@ -77,6 +78,14 @@ class App extends React.Component {
       projects[uuid].containers[status.containerId] = status;
     }
 
+    projConfig.writeProj(projects[uuid]);
+    this.setState({ projects });
+  }
+
+  // need to delete container from docker - handle pending/error containers
+  delContainer(uuid, container) {
+    const projects = this.state.projects;
+    delete projects[uuid].containers[container.containerId];
     projConfig.writeProj(projects[uuid]);
     this.setState({ projects });
   }
@@ -94,6 +103,7 @@ class App extends React.Component {
             projects: this.state.projects,
             addNewProject: this.addNewProject,
             addContainer: this.addContainer,
+            delContainer: this.delContainer,
             context: this.context,
           }
         )}
