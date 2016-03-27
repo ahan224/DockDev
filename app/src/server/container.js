@@ -144,13 +144,14 @@ export const pull = co(function *g(machineName, image) {
   return yield exec(`docker pull ${image}`, { env });
 });
 
-export const pullSpawn = co(function *g(machineName, image, uuid, tmpContainerId, callback) {
+export const pullSpawn = co(function *g(machineName, image, uuid, containerId, callback) {
   const env = yield machine.env(machineName);
   process.env = R.merge(process.env, env);
 
   const pullReq = spawn('docker', ['pull', image]);
 
-  pullReq.stdout.on('data', data => callback(uuid, { tmpContainerId, image, status: 'pending', data }));
+  pullReq.stdout.on('data', data =>
+    callback(uuid, { containerId, image, status: 'pending', data }));
 
   yield new Promise((resolve, reject) => {
     pullReq.stderr.on('data', reject);
@@ -220,20 +221,21 @@ export const setNetworkParams = (uuid) => ({
 export const add = co(function *g(uuid, image, callback) {
   const containerConfig = setContainerParams(image, uuid);
 
-  const tmpContainerId = uuidNode.v4();
+  let containerId = uuidNode.v4();
 
-  callback(uuid, { tmpContainerId, image, status: 'pending', data: '' });
+  callback(uuid, { containerId, image, status: 'pending', data: '' });
 
   // check to make sure image is on the local computer
   if (!(yield images(defaultConfig.machine, image)).length) {
     try {
-      yield pullSpawn(defaultConfig.machine, image, uuid, tmpContainerId, callback);
+      yield pullSpawn(defaultConfig.machine, image, uuid, containerId, callback);
     } catch (err) {
-      return callback(uuid, { tmpContainerId, image, status: 'error', err });
+      return callback(uuid, { containerId, image, status: 'error', err });
     }
   }
 
-  const containerId = (yield create(defaultConfig.machine, containerConfig)).Id;
+  const tmpContainerId = containerId;
+  containerId = (yield create(defaultConfig.machine, containerConfig)).Id;
   const inspectContainer = yield inspect(defaultConfig.machine, containerId);
   const dest = inspectContainer.Mounts[0].Source;
   const name = inspectContainer.Name.substr(1);
