@@ -36,22 +36,24 @@ class App extends React.Component {
   }
 
   manageActiveProject(callback, uuid) {
-    if (this.state.activeProject &&
+    const projects = this.state.projects;
+    const activeProject = this.state.activeProject;
+    if (activeProject &&
         callback === container.start ||
-        (callback === container.restart && this.state.activeProject !== uuid)) {
-      for (let containerId in this.state.projects[this.state.activeProject].containers) {
+        (callback === container.restart && activeProject !== uuid)) {
+      for (let containerId in projects[activeProject].containers) {
         console.log('stopAll', containerId);
-        container.stop('dockdev', containerId);
+        container.stop(projects[activeProject].machine, containerId);
       }
     }
 
-    for (let containerId in this.state.projects[uuid].containers) {
+    for (let containerId in projects[uuid].containers) {
       console.log('start', containerId);
-      callback('dockdev', containerId);
+      callback(projects[uuid].machine, containerId);
     }
 
     if ((callback === container.remove || callback === container.stop) &&
-         uuid === this.state.activeProject) {
+         uuid === activeProject) {
       this.setState({ activeProject: false });
     } else {
       this.setState({ activeProject: uuid });
