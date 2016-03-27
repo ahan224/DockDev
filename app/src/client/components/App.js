@@ -48,34 +48,34 @@ class App extends React.Component {
       .catch();
   }
 
-  addContainer(uuid, status) {
+  addContainer(uuid, statusObj) {
     const projects = this.state.projects;
 
-    if (status.status === 'pending') {
+    if (statusObj.status === 'pending') {
       let data = '';
-      if (projects[uuid].containers[status.containerId]) {
-        data = projects[uuid].containers[status.containerId].data + status.data.toString();
+      if (projects[uuid].containers[statusObj.containerId]) {
+        data = projects[uuid].containers[statusObj.containerId].data + statusObj.data.toString();
       }
-      projects[uuid].containers[status.containerId] = {
-        containerId: status.containerId,
+      projects[uuid].containers[statusObj.containerId] = {
+        containerId: statusObj.containerId,
         status: 'pending',
         data,
-        image: status.image,
+        image: statusObj.image,
       };
     }
 
-    if (status.status === 'error') {
-      projects[uuid].containers[status.containerId] = {
-        containerId: status.containerId,
+    if (statusObj.status === 'error') {
+      projects[uuid].containers[statusObj.containerId] = {
+        containerId: statusObj.containerId,
         status: 'error',
-        err: status.err.toString(),
-        image: status.image,
+        err: statusObj.err.toString(),
+        image: statusObj.image,
       };
     }
 
-    if (status.status === 'complete') {
-      delete projects[uuid].containers[status.tmpContainerId];
-      projects[uuid].containers[status.containerId] = status;
+    if (statusObj.status === 'complete') {
+      delete projects[uuid].containers[statusObj.tmpContainerId];
+      projects[uuid].containers[statusObj.containerId] = status;
     }
 
     projConfig.writeProj(projects[uuid]);
