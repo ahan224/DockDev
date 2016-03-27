@@ -40,7 +40,7 @@ class App extends React.Component {
     const activeProject = this.state.activeProject;
     if (activeProject &&
         callback === container.start ||
-        (callback === container.restart && activeProject !== uuid)) {
+        callback === container.restart) {
       for (let containerId in projects[activeProject].containers) {
         console.log('stopAll', containerId);
         container.stop(projects[activeProject].machine, containerId);
