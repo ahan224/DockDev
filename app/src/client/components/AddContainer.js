@@ -1,32 +1,4 @@
 import React from 'react';
-// <<<<<<< HEAD
-// import * as container from './build/server/container.js';
-// import { Link } from 'react-router';
-//
-// import createBrowserHistory from 'history/lib/createBrowserHistory'
-//
-// const AddContainer = ({ params, addContainer }) => {
-//   let image = '';
-//   const handler = event => {image = event.target.value;};
-//
-//   const submit = () => {
-//     console.log(
-//     container.add(params.uuid, image)
-//       .then(result => addContainer(params.uuid, result)));
-//   };
-//
-//   return (
-//     <div className="row">
-//       <div className="col-xs-8">
-//         <input type="text" className="form-control form-control-md" onChange={handler} placeholder="Container Name"/>
-//       </div>
-//       <div>
-//         <button onClick={submit} className="btn btn-primary-outline" name="submit">Add</button>
-//       </div>
-//     </div>
-//   );
-// };
-// =======
 import * as container from './server/container.js';
 import * as images from './server/availableImages.js';
 import DockerImage from './DockerImage';
@@ -76,20 +48,12 @@ class AddContainer extends React.Component {
   }
 
   submit() {
-    let last;
-    if (this.state.selServer) {
-      last = container.add(this.props.params.uuid, this.state.selServer);
-      last.then(result => this.props.addContainer(this.props.params.uuid, result));
-    }
-
-    this.state.selDbs.forEach(val => {
-      last = container.add(this.props.params.uuid, val);
-      last.then(result => this.props.addContainer(this.props.params.uuid, result));
+    const containers = this.state.selDbs.concat(this.state.selServer);
+    containers.forEach(val => {
+      container.add(this.props.params.uuid, val, this.props.addContainer);
     });
 
-    last
-      .then(() => this.props.context.router.replace(`/projects/${this.props.params.uuid}`))
-      .catch(err => console.log(err));
+    this.props.context.router.replace(`/projects/${this.props.params.uuid}`);
   }
 
   render() {
@@ -117,7 +81,12 @@ class AddContainer extends React.Component {
       <div className="row">
         <div className="col-xs-12" id="servers">
           <h4>Servers</h4>
-          <button className="btn btn-sm btn-primary-outline container-save" onClick={this.submit}>Save</button>
+          <button
+            className="btn btn-sm btn-primary-outline container-save"
+            onClick={this.submit}
+          >
+            Save
+          </button>
           <div className="divider"></div>
           {serverDisplay}
         </div>
