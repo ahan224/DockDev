@@ -54,6 +54,10 @@ class App extends React.Component {
     projConfig.writeProj(projects[uuid]);
   }
 
+  togglePopover() {
+    $('[data-toggle="popover"]').popover();
+  }
+
   render() {
     return (
       <div>
@@ -68,6 +72,7 @@ class App extends React.Component {
             addNewProject: this.addNewProject,
             addContainer: this.addContainer,
             context: this.context,
+            togglePopover: this.togglePopover,
           }
         )}
       </div>
