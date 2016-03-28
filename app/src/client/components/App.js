@@ -4,6 +4,7 @@ import ProjectLinks from './ProjectLinks';
 import * as projConfig from './server/projConfig.js';
 import * as appConfig from './server/appConfig.js';
 import defaultConfig from './server/defaultConfig.js';
+import * as container from './server/container.js';
 
 class App extends React.Component {
   constructor(props, context) {
@@ -13,8 +14,10 @@ class App extends React.Component {
     this.addContainer = this.addContainer.bind(this);
     this.addAppConfig = this.addAppConfig.bind(this);
     this.delContainer = this.delContainer.bind(this);
+    this.manageProjects = this.manageProjects.bind(this);
     this.state = {
       projects: {},
+      activeProject: false,
     };
   }
 
@@ -31,6 +34,46 @@ class App extends React.Component {
     const projects = this.state.projects;
     projects[proj.uuid] = proj;
     this.setState({ projects });
+  }
+
+  manageProjects(callback, uuid) {
+    const projects = this.state.projects;
+    const activeProject = this.state.activeProject;
+
+    // if start or restart are the commands, stop the currently active project
+    if (activeProject && (callback === container.start || callback === container.restart)) {
+      for (let containerId in projects[activeProject].containers) {
+        console.log('stopAll', containerId);
+        container.stop(projects[activeProject].machine, containerId);
+      }
+    }
+
+    // perform the callback (start, stop, restart, or remove) on all the containers
+    for (let containerId in projects[uuid].containers) {
+      console.log('docker command', containerId);
+      callback(projects[uuid].machine, containerId);
+    }
+
+    /** if you are removing all the containers, you are deleting the project and this
+    * will remove it from the project config and also delete the project folder and file
+    * it will also update state and then re-initialize the app so that the links go away
+    */
+    if (callback === container.remove) {
+      appConfig.removeProjFromConfig(projects[uuid].basePath, defaultConfig)
+        .then(() => {
+          this.context.router.replace('/');
+          delete projects[uuid];
+          this.setState({ projects });
+        })
+        .catch(err => console.log(err));
+    }
+
+    // Note that I am using the remove instead of removeContainer but if we want to be more careful we should probably do it the other way and then make sure to re-write the project folder each time?? Thoughts?
+    if ((callback === container.remove || callback === container.stop) && uuid === activeProject) {
+      this.setState({ activeProject: false });
+    } else {
+      this.setState({ activeProject: uuid });
+    }
   }
 
   addAppConfig(config) {
@@ -83,9 +126,9 @@ class App extends React.Component {
   }
 
   // need to delete container from docker - handle pending/error containers
-  delContainer(uuid, container) {
+  delContainer(uuid, containerObj) {
     const projects = this.state.projects;
-    delete projects[uuid].containers[container.containerId];
+    delete projects[uuid].containers[containerObj.containerId];
     projConfig.writeProj(projects[uuid]);
     this.setState({ projects });
   }
@@ -104,6 +147,7 @@ class App extends React.Component {
             addNewProject: this.addNewProject,
             addContainer: this.addContainer,
             delContainer: this.delContainer,
+            manageProjects: this.manageProjects,
             context: this.context,
           }
         )}

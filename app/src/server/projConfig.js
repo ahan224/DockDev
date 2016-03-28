@@ -56,6 +56,17 @@ const cleanProjToWrite = R.compose(
 export const writeProj = (projObj) =>
   utils.writeFile(join(projObj.basePath, defaultConfig.projPath()), cleanProjToWrite(projObj));
 
+  /**
+   * deleteProj() returns a promise to write the dockdev.josn file with the project information
+   * based on passing in the project object
+   *  should be used with readProj for existing projects
+   *
+   * @param {Object} projObj
+   * @return {} writes (or overwrites) the project file (dockdev.json)
+   */
+  export const deleteProj = (basePath) =>
+    utils.writeFile(join(projObj.basePath, defaultConfig.projPath()), cleanProjToWrite(projObj));
+
 /**
  * initProject() creates the project object, then yields a promise to create the project folder
  * then yields a promise to write the project file, then it adds the project object to memory
