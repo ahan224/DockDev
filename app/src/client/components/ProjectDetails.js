@@ -2,10 +2,17 @@ import React from 'react';
 import R from 'ramda';
 import Container from './Container';
 
-const ProjectDetail = ({ projects, params }) => {
+const ProjectDetail = ({ projects, params, delContainer }) => {
   const proj = projects[params.uuid];
   const containers = R.toPairs(proj.containers)
-    .map(container => <Container key={container[0]} details={container} />);
+    .map(container =>
+      <Container
+        key={container[0]}
+        details={container[1]}
+        uuid={params.uuid}
+        delContainer={delContainer}
+      />
+    );
 
   return (
     <div className="col-xs-12">
@@ -41,6 +48,10 @@ const ProjectDetail = ({ projects, params }) => {
 ProjectDetail.propTypes = {
   projects: React.PropTypes.object,
   params: React.PropTypes.object,
+<<<<<<< HEAD
+=======
+  delContainer: React.PropTypes.func,
+>>>>>>> 9321e8d77ebdfd05a0889efffb3bb6b44a8c84f7
 };
 
 export default ProjectDetail;
