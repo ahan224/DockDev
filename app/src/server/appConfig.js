@@ -4,9 +4,11 @@ import * as utils from './utils';
 import * as machine from './machine.js';
 import fs from 'fs';
 import { exec as childExec } from 'child_process';
+import rimraf from 'rimraf';
 
 // promisify callback function
 const exec = Promise.promisify(childExec);
+const rimrafProm = Promise.promisify(rimraf);
 
 /**
  * checkDockerMachineInstalled() returns true if docker machine is installed or false if not
@@ -172,6 +174,8 @@ export const removeProjFromConfig = co(function *g(basePath, defaultConfig) {
   const readConfigFile = yield readConfig(configPath);
   readConfigFile.projects = readConfigFile.projects.filter(path => path !== basePath);
   yield utils.writeFile(configPath, utils.jsonStringifyPretty(readConfigFile));
+  yield rimrafProm(join(basePath, defaultConfig.projFolder));
+  return true;
 });
 
 /**
