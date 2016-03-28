@@ -12,6 +12,10 @@ const ProjectDetail = ({ projects, params }) => {
   // console.log("params: ", params);
   // console.log("name:", projects.projectName);
 
+  function alertIT(){
+    $("[data-toggle=popover]").popover({"placement": "bottom"});
+    // alert('click');
+  }
 
   const proj = projects[params.uuid];
   const containers = R.toPairs(proj.containers)
@@ -21,17 +25,17 @@ const ProjectDetail = ({ projects, params }) => {
            );
   return (
     <div className="col-xs-12">
-      <h1 className="display-4 text-capitalize">
+      <h3 className="text-capitalize">
         {proj.projectName} Details
-      </h1>
+      </h3>
       {/*<button>Start</button>
       <button>Stop</button>
       <button>Restart</button>
       <button>Delete</button>*/}
-      <p className="lead">
+      {/*<p>
         All the awesome information about your project,
         container, are right here.  Take a look around.
-      </p>
+      </p>*/}
       <div className="row">
         <div className="col-xs-12" id="servers">
           <h4>Servers</h4>
@@ -40,7 +44,9 @@ const ProjectDetail = ({ projects, params }) => {
         {containers}
       </div>
       <div className="row" id="databases">
-
+        <h4>Databases</h4>
+        <div className="divider"></div>
+        {containers}
       </div>
     </div>
   );
@@ -52,3 +58,6 @@ ProjectDetail.propTypes = {
 };
 
 export default ProjectDetail;
+
+
+{/*<button type="button" className="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?" onClick={alertIT}>Click to toggle popover</button>*/}

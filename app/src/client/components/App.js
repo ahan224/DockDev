@@ -4,6 +4,7 @@ import ProjectLinks from './ProjectLinks';
 import * as projConfig from './server/projConfig.js';
 import * as appConfig from './server/appConfig.js';
 import defaultConfig from './server/defaultConfig.js';
+import addFolderIcon from './AddFolderIcon';
 
 class App extends React.Component {
   constructor(props, context) {
@@ -54,20 +55,33 @@ class App extends React.Component {
     projConfig.writeProj(projects[uuid]);
   }
 
+  exampleClick(e){
+    console.log(e.target);
+  }
+
   render() {
     return (
       <div>
         <ul role="nav" id="menu" className="nav">
-          <li className="nav-item"><NavLink to="/" onlyActiveOnIndex>Home</NavLink></li>
-          <li className="nav-item"><NavLink to="/addProject">Add Project</NavLink></li>
+          <li className="nav-item">
+            <NavLink to="/" onlyActiveOnIndex>
+              <label onClick={this.exampleClick}>Projects</label><span className="add-proj-icon">{addFolderIcon}</span>
+            </NavLink>
+          </li>
+          {/*<li className="nav-item">
+            <NavLink to="/addProject">Add Project</NavLink>
+          </li>*/}
           <ProjectLinks projects={this.state.projects} />
         </ul>
+
+
         {React.cloneElement(this.props.children,
           {
             projects: this.state.projects,
             addNewProject: this.addNewProject,
             addContainer: this.addContainer,
             context: this.context,
+            exampleClick: this.exampleClick,
           }
         )}
       </div>
