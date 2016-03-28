@@ -235,7 +235,7 @@ export const setNetworkParams = (uuid) => ({
  * add() returns a new container object. It will first attempt to use a local image
  * but if not found it will pull an image from the docker API
  * then it will create a container and return an object with container info
- * based on the passed in uuid, image, and callback
+ * based on the passed in uuid, image, and callbacky
  *
  * @param {String} uuid
  * @param {String} image
