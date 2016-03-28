@@ -97,7 +97,7 @@ class AddContainer extends React.Component {
       const style = {};
       if (val.name === this.state.selServer) style.color = 'red';
       return (
-        <DockerImage key={idx} style={style}
+        <DockerImage key={idx} style={style} className="col-xs-6"
           name={val.name} handler={this.clickServer(val.name)}
         />
       );
@@ -121,7 +121,7 @@ class AddContainer extends React.Component {
           <div className="divider"></div>
           {serverDisplay}
         </div>
-        <div className="col-xs-12" id="servers">
+        <div className="col-xs-12" id="databases">
           <h4>Databases</h4>
           <div className="divider"></div>
           {dbDisplay}
@@ -136,6 +136,10 @@ AddContainer.propTypes = {
   addContainer: React.PropTypes.func,
   context: React.PropTypes.object,
 };
+
+
+
+
 
 
 // const AddContainer = ({ params, addContainer }) => {
