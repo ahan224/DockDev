@@ -7,6 +7,7 @@ const DockerImage = ({ name, handler, style }) => (
       <h3 className="card-title">
             {name}
         <span className="version">.</span>
+        <p className="collapse">Collapse</p>
       </h3>
       <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
       <a href="#" className=" pull-right">Details...</a>
