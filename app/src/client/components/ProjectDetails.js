@@ -1,8 +1,9 @@
 import React from 'react';
 import R from 'ramda';
 import Container from './Container';
+import * as container from './server/container.js';
 
-const ProjectDetail = ({ projects, params, delContainer }) => {
+const ProjectDetail = ({ projects, params, delContainer, manageProjects }) => {
   const proj = projects[params.uuid];
   const containers = R.toPairs(proj.containers)
     .map(container =>
@@ -13,15 +14,21 @@ const ProjectDetail = ({ projects, params, delContainer }) => {
         delContainer={delContainer}
       />
     );
+
+  const start = () => manageProjects(container.start, params.uuid);
+  const stop = () => manageProjects(container.stop, params.uuid);
+  const restart = () => manageProjects(container.restart, params.uuid);
+  const remove = () => manageProjects(container.remove, params.uuid);
+
   return (
     <div className="col-xs-12">
       <h1 className="display-4 text-capitalize">
         {proj.projectName} Details
       </h1>
-      {/*<button>Start</button>
-      <button>Stop</button>
-      <button>Restart</button>
-      <button>Delete</button>*/}
+      <button onClick={start}>Start</button>
+      <button onClick={stop}>Stop</button>
+      <button onClick={restart}>Restart</button>
+      <button onClick={remove}>Delete</button>
       <p className="lead">
         All the awesome information about your project,
         container, are right here.  Take a look around.
@@ -44,6 +51,7 @@ ProjectDetail.propTypes = {
   projects: React.PropTypes.object,
   params: React.PropTypes.object,
   delContainer: React.PropTypes.func,
+  manageProjects: React.PropTypes.func,
 };
 
 export default ProjectDetail;

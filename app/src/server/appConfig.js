@@ -160,6 +160,21 @@ export const addProjToConfig = co(function *g(basePath, defaultConfig) {
 });
 
 /**
+ * removeProjFromConfig() will delete a project's path to the main config file
+ * based on the passed in project base path and the default config object
+ *
+ * @param {String} basePath
+ * @param {Object} defaultConfig
+ * @return {}
+ */
+export const removeProjFromConfig = co(function *g(basePath, defaultConfig) {
+  const configPath = defaultConfig.configPath();
+  const readConfigFile = yield readConfig(configPath);
+  readConfigFile.projects = readConfigFile.projects.filter(path => path !== basePath);
+  yield utils.writeFile(configPath, utils.jsonStringifyPretty(readConfigFile));
+});
+
+/**
  * initApp() will run through several processes at app initiation. First,
  * it will check if docker machine is installed, then docker, then check
  * if there is a dockdev machine created yet, then it will redirect to the
