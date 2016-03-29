@@ -56,6 +56,7 @@ class AddContainer extends React.Component {
   }
 
   clickServer(selServer) {
+    console.log(selServer);
     return () => {
       this.setState({ selServer });
     };
@@ -74,6 +75,8 @@ class AddContainer extends React.Component {
       this.setState({ selDbs });
     };
   }
+
+
 
   submit() {
     let last;
@@ -95,7 +98,7 @@ class AddContainer extends React.Component {
   render() {
     const serverDisplay = this.state.servers.map((val, idx) => {
       const style = {};
-      if (val.name === this.state.selServer) style.color = 'red';
+      // if (val.name === this.state.selServer) style.color = 'red';
       return (
         <DockerImage key={idx} style={style} className="col-xs-6"
           name={val.name} handler={this.clickServer(val.name)}
@@ -103,9 +106,14 @@ class AddContainer extends React.Component {
       );
     });
 
+    //adds blue text onclick to container selection
     const dbDisplay = this.state.dbs.map((val, idx) => {
       const style = {};
-      if (this.state.selDbs.indexOf(val.name) > -1) style.color = 'blue';
+      if (this.state.selDbs.indexOf(val.name) > -1) {
+        style.color = 'white',
+        style.backgroundColor = 'blue',
+        style.borderRadius = '6px'
+      };
       return (
         <DockerImage key={idx} style={style}
           name={val.name} handler={this.clickDb(val.name)}
