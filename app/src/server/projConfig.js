@@ -6,6 +6,7 @@ import * as utils from './utils';
 import * as appConfig from './appConfig';
 import { setNetworkParams, networkCreate } from './container';
 import defaultConfig from './defaultConfig';
+import * as machine from './machine';
 
 /**
  * createProj() returns an object with project-level information, including a uuid
@@ -87,6 +88,7 @@ export const initProject = co(function *g(basePath, projectName, overwrite) {
   yield appConfig.addProjToConfig(basePath, defaultConfig);
 
   yield networkCreate(defaultConfig.machine, setNetworkParams(projObj.uuid));
+  yield machine.ssh(projObj.machine, `mkdir /home/docker/dockdev/${projObj.uuid}`);
 
   return projObj;
 });
