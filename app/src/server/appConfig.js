@@ -177,7 +177,6 @@ export const removeProjFromConfig = co(function *g(projObj, defaultConfig) {
   readConfigFile.projects = readConfigFile.projects.filter(path => path !== projObj.basePath);
   yield utils.writeFile(configPath, utils.jsonStringifyPretty(readConfigFile));
   yield rimrafProm(join(projObj.basePath, defaultConfig.projFolder));
-  yield networkDelete(projObj.machine, projObj.uuid);
   return true;
 });
 

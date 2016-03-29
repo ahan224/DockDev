@@ -95,4 +95,6 @@ export const version = () => exec('version');
  */
 export const list = () => exec('ls');
 
-// ssh('dockdev', 'mkdir -m 777 /home/docker/dockdev/');
+
+export const removeMachineFolder = (projObj) =>
+  ssh(projObj.machine, `rm -rf /home/docker/dockdev/${projObj.uuid}`);
