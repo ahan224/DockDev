@@ -4,7 +4,8 @@ import ProjectLinks from './ProjectLinks';
 import * as projConfig from './server/projConfig.js';
 import * as appConfig from './server/appConfig.js';
 import defaultConfig from './server/defaultConfig.js';
-import * as container from './server/container.js';
+// import * as container from './server/container.js';
+import * as manageProj from './server/manageProj.js';
 import fileWatch from './server/fileWatch.js';
 
 class App extends React.Component {
@@ -15,11 +16,14 @@ class App extends React.Component {
     this.addContainer = this.addContainer.bind(this);
     this.addAppConfig = this.addAppConfig.bind(this);
     this.delContainer = this.delContainer.bind(this);
-    this.manageProjects = this.manageProjects.bind(this);
     this.addFileWatcher = this.addFileWatcher.bind(this);
+    this.stopProject = this.stopProject.bind(this);
+    this.startProject = this.startProject.bind(this);
+    this.restartProject = this.restartProject.bind(this);
+    this.removeProject = this.removeProject.bind(this);
     this.state = {
       projects: {},
-      activeProject: false,
+      activeProject: '',
     };
   }
 
@@ -86,6 +90,70 @@ class App extends React.Component {
     this.setState({ projects });
   }
 
+  addAppConfig(config) {
+    this.setState({ config });
+  }
+
+  addNewProject(path, name) {
+    projConfig.initProject(path, name, true)
+      .then(proj => {
+        const projects = this.state.projects;
+        projects[proj.uuid] = proj;
+        this.setState({ projects });
+        this.context.router.replace(`/projects/${proj.uuid}`);
+      })
+      .catch();
+  }
+
+  stopProject(uuid) {
+    const projects = this.state.projects;
+    manageProj.stopProject(projects[uuid])
+      .then(proj => {
+        if (proj.uuid === this.state.activeProject) {
+          this.setState({ activeProject: '' });
+        }
+      })
+      .catch();
+  }
+
+  startProject(uuid) {
+    const projects = this.state.projects;
+    const activeProject = projects[this.state.activeProject];
+    manageProj.startProject(projects[uuid], activeProject)
+      .then(proj => {
+        projects[uuid] = proj;
+        this.setState({ projects });
+        this.setState({ activeProject: proj.uuid });
+      })
+      .catch();
+  }
+
+  restartProject(uuid) {
+    const projects = this.state.projects;
+    const activeProject = projects[this.state.activeProject];
+    manageProj.restartProject(projects[uuid], activeProject)
+      .then(proj => {
+        this.setState({ activeProject: proj.uuid });
+      })
+      .catch();
+  }
+
+  removeProject(uuid) {
+    const projects = this.state.projects;
+    const activeProject = projects[this.state.activeProject];
+    manageProj.removeProject(projects[uuid])
+      .then(() => {
+        if (activeProject === uuid) {
+          this.setState({ activeProject: '' });
+        }
+        appConfig.removeProjFromConfig(projects[uuid], defaultConfig);
+        this.context.router.replace('/');
+        delete projects[uuid];
+        this.setState({ projects });
+      })
+      .catch();
+  }
+
   render() {
     return (
       <div>
@@ -100,10 +168,13 @@ class App extends React.Component {
             addNewProject: this.addNewProject,
             addContainer: this.addContainer,
             delContainer: this.delContainer,
-            manageProjects: this.manageProjects,
             context: this.context,
             addFileWatcher: this.addFileWatcher,
             activeProject: this.state.activeProject,
+            stopProject: this.stopProject,
+            startProject: this.startProject,
+            restartProject: this.restartProject,
+            removeProject: this.removeProject,
           }
         )}
       </div>
