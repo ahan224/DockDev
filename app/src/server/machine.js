@@ -42,7 +42,7 @@ export const createMachine = (machineName) =>
  * @param {String} machineName
  * @return {Object} result
  */
-export const env = co(function *(machineName) {
+export const env = co(function *g(machineName) {
   let result = yield exec(`env ${machineName}`);
   result = R.fromPairs(result.split('\n').slice(0, 4).map(val => val.substr(7).split('=')));
   for (const prop in result) {
