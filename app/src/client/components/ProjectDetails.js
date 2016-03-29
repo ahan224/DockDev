@@ -2,6 +2,7 @@ import React from 'react';
 import R from 'ramda';
 import Container from './Container';
 
+
 const ProjectDetail = ({ projects, params }) => {
   // console.log(projects);
   // for (var keys in projects) {
@@ -11,11 +12,6 @@ const ProjectDetail = ({ projects, params }) => {
   // }
   // console.log("params: ", params);
   // console.log("name:", projects.projectName);
-
-  function alertIT(){
-    $("[data-toggle=popover]").popover({"placement": "bottom"});
-    // alert('click');
-  }
 
   const proj = projects[params.uuid];
   const containers = R.toPairs(proj.containers)
@@ -28,14 +24,6 @@ const ProjectDetail = ({ projects, params }) => {
       <h3 className="text-capitalize">
         {proj.projectName} Details
       </h3>
-      {/*<button>Start</button>
-      <button>Stop</button>
-      <button>Restart</button>
-      <button>Delete</button>*/}
-      {/*<p>
-        All the awesome information about your project,
-        container, are right here.  Take a look around.
-      </p>*/}
       <div className="row">
         <div className="col-xs-12" id="servers">
           <h4>Servers</h4>
