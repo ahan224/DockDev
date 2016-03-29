@@ -92,12 +92,12 @@ export function generateRsync(projObj) {
     const targetContainerId = getSyncContainer(projObj);
     const dest = projObj.containers[targetContainerId].dest;
 
-    try {
-      yield machine.ssh(projObj.machine, `mkdir ${dest}`);
-      // yield machine.ssh(projObj.machine, `chmod 777 ${dest}`);
-    } catch (e) {
-      // console.log(e);
-    }
+    // try {
+    //   yield machine.ssh(projObj.machine, `mkdir ${dest}`);
+    //   // yield machine.ssh(projObj.machine, `chmod 777 ${dest}`);
+    // } catch (e) {
+    //   // console.log(e);
+    // }
 
     return createRsyncArgs(`${projObj.basePath}/`, dest, machineInfo);
   });

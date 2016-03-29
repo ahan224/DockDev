@@ -5,12 +5,15 @@ const ProjectNav = ({
     projects,
     addContainer,
     delContainer,
-    manageProjects,
     children,
     params,
     context,
     addFileWatcher,
     activeProject,
+    startProject,
+    stopProject,
+    restartProject,
+    removeProject,
   }) => (
   <div id="content">
     <div className="content-top-nav">
@@ -35,9 +38,12 @@ const ProjectNav = ({
       addContainer,
       context,
       delContainer,
-      manageProjects,
       addFileWatcher,
       activeProject,
+      startProject,
+      stopProject,
+      restartProject,
+      removeProject,
     })}
   </div>
 );

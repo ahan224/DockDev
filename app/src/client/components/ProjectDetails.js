@@ -1,16 +1,19 @@
 import React from 'react';
 import R from 'ramda';
 import Container from './Container';
-import * as container from './server/container.js';
 
 const ProjectDetail = ({
     projects,
     params,
     delContainer,
-    manageProjects,
     addFileWatcher,
     activeProject,
+    startProject,
+    stopProject,
+    restartProject,
+    removeProject,
   }) => {
+  // console.log(projects[params.uuid]);
   const proj = projects[params.uuid];
   const containers = R.toPairs(proj.containers)
     .map(cont =>
@@ -22,10 +25,10 @@ const ProjectDetail = ({
       />
     );
 
-  const start = () => manageProjects(container.start, params.uuid);
-  const stop = () => manageProjects(container.stop, params.uuid);
-  const restart = () => manageProjects(container.restart, params.uuid);
-  const remove = () => manageProjects(container.remove, params.uuid);
+  const start = () => startProject(params.uuid);
+  const stop = () => stopProject(params.uuid);
+  const restart = () => restartProject(params.uuid);
+  const remove = () => removeProject(params.uuid);
   const watcher = () => addFileWatcher(params.uuid);
 
   return (
@@ -60,9 +63,12 @@ ProjectDetail.propTypes = {
   projects: React.PropTypes.object,
   params: React.PropTypes.object,
   delContainer: React.PropTypes.func,
-  manageProjects: React.PropTypes.func,
   addFileWatcher: React.PropTypes.func,
   activeProject: React.PropTypes.string,
+  startProject: React.PropTypes.func,
+  stopProject: React.PropTypes.func,
+  restartProject: React.PropTypes.func,
+  removeProject: React.PropTypes.func,
 };
 
 export default ProjectDetail;
