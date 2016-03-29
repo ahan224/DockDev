@@ -3,7 +3,14 @@ import R from 'ramda';
 import Container from './Container';
 import * as container from './server/container.js';
 
-const ProjectDetail = ({ projects, params, delContainer, manageProjects, addFileWatcher }) => {
+const ProjectDetail = ({
+    projects,
+    params,
+    delContainer,
+    manageProjects,
+    addFileWatcher,
+    activeProject,
+  }) => {
   const proj = projects[params.uuid];
   const containers = R.toPairs(proj.containers)
     .map(cont =>
@@ -55,6 +62,7 @@ ProjectDetail.propTypes = {
   delContainer: React.PropTypes.func,
   manageProjects: React.PropTypes.func,
   addFileWatcher: React.PropTypes.func,
+  activeProject: React.PropTypes.string,
 };
 
 export default ProjectDetail;

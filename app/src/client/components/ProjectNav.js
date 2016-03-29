@@ -2,7 +2,15 @@ import React from 'react';
 import { Link } from 'react-router';
 
 const ProjectNav = ({
-    projects, addContainer, delContainer, manageProjects, children, params, context, addFileWatcher,
+    projects,
+    addContainer,
+    delContainer,
+    manageProjects,
+    children,
+    params,
+    context,
+    addFileWatcher,
+    activeProject,
   }) => (
   <div id="content">
     <div className="content-top-nav">
@@ -29,6 +37,7 @@ const ProjectNav = ({
       delContainer,
       manageProjects,
       addFileWatcher,
+      activeProject,
     })}
   </div>
 );
@@ -42,6 +51,7 @@ ProjectNav.propTypes = {
   delContainer: React.PropTypes.func,
   manageProjects: React.PropTypes.func,
   addFileWatcher: React.PropTypes.func,
+  activeProject: React.PropTypes.string,
 };
 
 
