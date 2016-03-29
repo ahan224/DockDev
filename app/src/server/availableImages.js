@@ -1,5 +1,5 @@
 // list of available server images for the user
-const servers = [
+export const servers = [
   'node',
   'python',
   'go',
