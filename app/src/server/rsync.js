@@ -1,10 +1,11 @@
-import { exec as childExec } from 'child_process';
-import Promise, { coroutine as co } from 'bluebird';
+// import { exec as childExec } from 'child_process';
+import { coroutine as co } from 'bluebird';
 import R from 'ramda';
 import * as machine from './machine.js';
+import { exec } from './utils';
 
 // promisify callback function
-const execProm = Promise.promisify(childExec);
+// const execProm = Promise.promisify(childExec);
 
 /**
  * rsync() returns a promise that resolves to the stdout
@@ -13,7 +14,7 @@ const execProm = Promise.promisify(childExec);
  * @param {String} args
  * @return {} returns a promise that resolves to the stdout
  */
-const rsync = (args) => execProm(`rsync ${args}`);
+const rsync = (args) => exec(`rsync ${args}`);
 
 /**
  * selectWithin() returns a result object
@@ -68,7 +69,7 @@ const createRsyncArgs = (source, dest, machineInfo) =>
 function getSyncContainer(projObj) {
   let result;
   for (const container in projObj.containers) {
-    if (projObj.containers[container].sync) {
+    if (projObj.containers[container].server) {
       result = projObj.containers[container].containerId;
       break;
     }
@@ -86,13 +87,14 @@ function getSyncContainer(projObj) {
  * @return {} returns a promise to run the rsync terminal command
  */
 export function generateRsync(projObj) {
-  const getArgs = co(function *() {
+  const getArgs = co(function *g() {
     const machineInfo = selectSSHandIP(yield machine.inspect(projObj.machine));
     const targetContainerId = getSyncContainer(projObj);
     const dest = projObj.containers[targetContainerId].dest;
 
     try {
       yield machine.ssh(projObj.machine, `mkdir ${dest}`);
+      // yield machine.ssh(projObj.machine, `chmod 777 ${dest}`);
     } catch (e) {
       // console.log(e);
     }
@@ -102,7 +104,7 @@ export function generateRsync(projObj) {
 
   const args = getArgs();
 
-  return co(function *() {
+  return co(function *g() {
     return yield rsync(yield args);
   });
 }

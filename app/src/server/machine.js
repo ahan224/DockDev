@@ -94,3 +94,5 @@ export const version = () => exec('version');
  * @return {} returns a list docker machines
  */
 export const list = () => exec('ls');
+
+// ssh('dockdev', 'mkdir -m 777 /home/docker/dockdev/');

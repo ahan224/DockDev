@@ -5,6 +5,7 @@ import * as projConfig from './server/projConfig.js';
 import * as appConfig from './server/appConfig.js';
 import defaultConfig from './server/defaultConfig.js';
 import * as container from './server/container.js';
+import fileWatch from './server/fileWatch.js';
 
 class App extends React.Component {
   constructor(props, context) {
@@ -15,6 +16,7 @@ class App extends React.Component {
     this.addAppConfig = this.addAppConfig.bind(this);
     this.delContainer = this.delContainer.bind(this);
     this.manageProjects = this.manageProjects.bind(this);
+    this.addFileWatcher = this.addFileWatcher.bind(this);
     this.state = {
       projects: {},
       activeProject: false,
@@ -43,23 +45,33 @@ class App extends React.Component {
     // if start or restart are the commands, stop the currently active project
     if (activeProject && (callback === container.start || callback === container.restart)) {
       for (let containerId in projects[activeProject].containers) {
-        console.log('stopAll', containerId);
         container.stop(projects[activeProject].machine, containerId);
+        projects[activeProject].fileWatcher.close();
       }
     }
 
+    let server;
     // perform the callback (start, stop, restart, or remove) on all the containers
     for (let containerId in projects[uuid].containers) {
-      console.log('docker command', containerId);
+      if (projects[uuid].containers[containerId].server) {
+        server = projects[uuid].containers[containerId];
+      }
       callback(projects[uuid].machine, containerId);
     }
 
-    /** if you are removing all the containers, you are deleting the project and this
-    * will remove it from the project config and also delete the project folder and file
-    * it will also update state and then re-initialize the app so that the links go away
-    */
+    // check file watching for start, restart and stop
+    if (server) {
+      if (callback === container.start || callback === container.restart) {
+        this.addFileWatcher(uuid);
+      }
+      if (callback === container.stop) {
+        projects[uuid].fileWatcher.close();
+      }
+    }
+
+
     if (callback === container.remove) {
-      appConfig.removeProjFromConfig(projects[uuid].basePath, defaultConfig)
+      appConfig.removeProjFromConfig(projects[uuid], defaultConfig)
         .then(() => {
           this.context.router.replace('/');
           delete projects[uuid];
@@ -68,7 +80,6 @@ class App extends React.Component {
         .catch(err => console.log(err));
     }
 
-    // Note that I am using the remove instead of removeContainer but if we want to be more careful we should probably do it the other way and then make sure to re-write the project folder each time?? Thoughts?
     if ((callback === container.remove || callback === container.stop) && uuid === activeProject) {
       this.setState({ activeProject: false });
     } else {
@@ -118,7 +129,7 @@ class App extends React.Component {
 
     if (statusObj.status === 'complete') {
       delete projects[uuid].containers[statusObj.tmpContainerId];
-      projects[uuid].containers[statusObj.containerId] = status;
+      projects[uuid].containers[statusObj.containerId] = statusObj;
     }
 
     projConfig.writeProj(projects[uuid]);
@@ -130,6 +141,12 @@ class App extends React.Component {
     const projects = this.state.projects;
     delete projects[uuid].containers[containerObj.containerId];
     projConfig.writeProj(projects[uuid]);
+    this.setState({ projects });
+  }
+
+  addFileWatcher(uuid) {
+    const projects = this.state.projects;
+    fileWatch(projects[uuid]);
     this.setState({ projects });
   }
 
@@ -149,6 +166,7 @@ class App extends React.Component {
             delContainer: this.delContainer,
             manageProjects: this.manageProjects,
             context: this.context,
+            addFileWatcher: this.addFileWatcher,
           }
         )}
       </div>

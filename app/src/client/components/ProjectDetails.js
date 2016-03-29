@@ -3,13 +3,13 @@ import R from 'ramda';
 import Container from './Container';
 import * as container from './server/container.js';
 
-const ProjectDetail = ({ projects, params, delContainer, manageProjects }) => {
+const ProjectDetail = ({ projects, params, delContainer, manageProjects, addFileWatcher }) => {
   const proj = projects[params.uuid];
   const containers = R.toPairs(proj.containers)
-    .map(container =>
+    .map(cont =>
       <Container
-        key={container[0]}
-        details={container[1]}
+        key={cont[0]}
+        details={cont[1]}
         uuid={params.uuid}
         delContainer={delContainer}
       />
@@ -19,6 +19,7 @@ const ProjectDetail = ({ projects, params, delContainer, manageProjects }) => {
   const stop = () => manageProjects(container.stop, params.uuid);
   const restart = () => manageProjects(container.restart, params.uuid);
   const remove = () => manageProjects(container.remove, params.uuid);
+  const watcher = () => addFileWatcher(params.uuid);
 
   return (
     <div className="col-xs-12">
@@ -29,6 +30,7 @@ const ProjectDetail = ({ projects, params, delContainer, manageProjects }) => {
       <button onClick={stop}>Stop</button>
       <button onClick={restart}>Restart</button>
       <button onClick={remove}>Delete</button>
+      <button onClick={watcher}>Watcher</button>
       <p className="lead">
         All the awesome information about your project,
         container, are right here.  Take a look around.
@@ -52,6 +54,7 @@ ProjectDetail.propTypes = {
   params: React.PropTypes.object,
   delContainer: React.PropTypes.func,
   manageProjects: React.PropTypes.func,
+  addFileWatcher: React.PropTypes.func,
 };
 
 export default ProjectDetail;
