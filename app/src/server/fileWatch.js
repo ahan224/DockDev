@@ -9,10 +9,14 @@ import { generateRsync } from './rsync.js';
  * @param {Object} projObj
  * @return {Emitter} all
  */
-export function addFileWatcher(projObj) {
+function fileWatch(projObj) {
   const watcher = projObj.fileWatcher = chokidar.watch(projObj.basePath);
 
   const projectSync = generateRsync(projObj);
 
   watcher.on('all', projectSync);
+
+  return watcher;
 }
+
+export default fileWatch;
