@@ -5,6 +5,8 @@ import * as machine from './machine.js';
 import fs from 'fs';
 import { exec as childExec } from 'child_process';
 import rimraf from 'rimraf';
+import { networkDelete } from './container';
+import defaultConfig from './defaultConfig';
 
 // promisify callback function
 const exec = Promise.promisify(childExec);
@@ -169,12 +171,13 @@ export const addProjToConfig = co(function *g(basePath, defaultConfig) {
  * @param {Object} defaultConfig
  * @return {}
  */
-export const removeProjFromConfig = co(function *g(basePath, defaultConfig) {
+export const removeProjFromConfig = co(function *g(projObj, defaultConfig) {
   const configPath = defaultConfig.configPath();
   const readConfigFile = yield readConfig(configPath);
-  readConfigFile.projects = readConfigFile.projects.filter(path => path !== basePath);
+  readConfigFile.projects = readConfigFile.projects.filter(path => path !== projObj.basePath);
   yield utils.writeFile(configPath, utils.jsonStringifyPretty(readConfigFile));
-  yield rimrafProm(join(basePath, defaultConfig.projFolder));
+  yield rimrafProm(join(projObj.basePath, defaultConfig.projFolder));
+  yield networkDelete(projObj.machine, projObj.uuid);
   return true;
 });
 
@@ -209,7 +212,8 @@ export const initApp = co(function *g(defaultConfig, router, addConfig, addProje
   const checkDockDevMachine = yield machine.list();
   if (checkDockDevMachine.indexOf('dockdev') === -1) {
     router.replace('/init/3');
-    yield machine.createMachine('dockdev');
+    yield machine.createMachine(defaultConfig.machine);
+    yield machine.ssh(defaultConfig.machine, 'mkdir -m 777 /home/docker/dockdev/');
   }
 
   router.replace('/');

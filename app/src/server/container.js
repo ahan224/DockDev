@@ -3,6 +3,7 @@ import * as machine from './machine.js';
 import Promise, { coroutine as co } from 'bluebird';
 import { exec as childExec, spawn } from 'child_process';
 import defaultConfig from './defaultConfig';
+import * as availableImages from './availableImages';
 import R from 'ramda';
 import uuidNode from 'node-uuid';
 
@@ -94,6 +95,14 @@ const dockerCommands = {
       return `/networks/${uuid}`;
     },
   },
+  // delete a network
+  networkDelete: {
+    cmd: '',
+    method: 'DELETE',
+    uri(uuid) {
+      return `/networks/${uuid}`;
+    },
+  },
 };
 
 /**
@@ -131,6 +140,7 @@ export const restart = commandMaker(dockerCommands.restart);
 export const remove = commandMaker(dockerCommands.remove);
 export const images = commandMaker(dockerCommands.images);
 export const networkCreate = commandMaker(dockerCommands.networkCreate);
+export const networkDelete = commandMaker(dockerCommands.networkDelete);
 export const networkInspect = commandMaker(dockerCommands.networkInspect);
 
 /**
@@ -160,14 +170,14 @@ export const pull = co(function *g(machineName, image) {
  * @param {Function} callback
  * @return {} returns a promise to pull the image or reject if there is an error
  */
-export const pullSpawn = co(function *g(machineName, image, uuid, containerId, callback) {
+export const pullSpawn = co(function *g(machineName, image, uuid, server, containerId, callback) {
   const env = yield machine.env(machineName);
   process.env = R.merge(process.env, env);
 
   const pullReq = spawn('docker', ['pull', image]);
 
   pullReq.stdout.on('data', data =>
-    callback(uuid, { containerId, image, status: 'pending', data }));
+    callback(uuid, { containerId, image, server, status: 'pending', data }));
 
   yield new Promise((resolve, reject) => {
     pullReq.stderr.on('data', reject);
@@ -244,17 +254,18 @@ export const setNetworkParams = (uuid) => ({
  */
 export const add = co(function *g(uuid, image, callback) {
   const containerConfig = setContainerParams(image, uuid);
+  const server = availableImages.servers.indexOf(image) > -1;
 
   let containerId = uuidNode.v4();
 
-  callback(uuid, { containerId, image, status: 'pending', data: '' });
+  callback(uuid, { containerId, image, server, status: 'pending', data: '' });
 
   // check to make sure image is on the local computer
   if (!(yield images(defaultConfig.machine, image)).length) {
     try {
-      yield pullSpawn(defaultConfig.machine, image, uuid, containerId, callback);
+      yield pullSpawn(defaultConfig.machine, image, uuid, server, containerId, callback);
     } catch (err) {
-      return callback(uuid, { containerId, image, status: 'error', err });
+      return callback(uuid, { containerId, image, server, status: 'error', err });
     }
   }
 
@@ -270,7 +281,7 @@ export const add = co(function *g(uuid, image, callback) {
     containerId,
     name,
     dest,
-    sync: true,
+    server,
     status: 'complete',
   };
 
