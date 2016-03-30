@@ -58,7 +58,7 @@ h1 {
   width: 200px;
   background: #FFF;
   color: white;
-  padding-top: 55px;
+  padding-top: 35px;
   margin-bottom: 0;
   padding-left: 10px;
   border-right: 1px solid #DADADA;
@@ -68,37 +68,105 @@ h1 {
   color:#504E4E;
 }
 
-.add-proj-icon {
-  float: right;
-  margin-right: 21px;
-  width: 25px;
-  height: 25px;
-  background: url(../src/client/icons/add-proj-icon.svg) no-repeat top left;
+.proj-anchor {
+  border: 1px dashed white;
+  height: 44px;
+  padding: 8px 0px 0px 2px;
+}
 
+#menu li:first-child {
+  padding-top: 5px;
+}
+
+#projectMenu {
+  padding-top: 0!important;
+  padding-bottom: 6px!important;
+}
+
+.proj-content {
+  position: relative;
+  /* border: 1px dashed; */
+  /* right: 26px; */
+  top: -11px;
+  text-align: right;
+  margin: 0 -10px;
+  background: #757CDE;
+  color: white;
+  padding: 10px;
+}
+
+.project-wrapper {
+  position: relative;
+    /* top: -25px; */
+    /*border: 1px dashed;*/
+    /* z-index: 0; */
+    top: 12px;
+}
+
+.project-wrapper h5 {
+  font-size: 20px;
+}
+
+.proj-nav .nav li a {
+  color: white;
+}
+
+.proj-detail-title {
+  padding: 0px;
+  position: absolute;
+  top: -38px;
+  /*border: 1px dashed red;*/
+  color: white;
+}
+
+.proj-nav .nav {
+    position: relative;
+    /*border: 1px dashed;*/
+    /* right: 26px; */
+    text-align: right;
+    background: #6363E5;
+    padding: 10px;
+    margin: -10px;
+}
+
+.add-proj-icon {
+  position: absolute;
+    right: 16px;
+    width: 28px;
+    height: 28px;
+}
+
+.add-proj-icon img {
+  width: 100%;
+  padding: 0 4px;
 }
 
 #menu > div {
   width: 100%;
   color: #DADADA;
-  padding: 15px;
+  /*padding: 15px;*/
   /*border-bottom: 1px solid #DADADA;*/
   /*text-align: center;*/
 }
 
 #menu > #bottomNav {
-  bottom: 0;
-  position: absolute;
-  text-align: right;
-  border: none;
+  width: 100%;
+  margin: 0 auto;
+  overflow: auto;
+  padding: 10px;
+}
+
+#menu label {
+  margin: 0;
+  font-weight: bold;
+  font-size: 18px;
 }
 
 #content {
   width: 100%;
   margin: 0 auto;
-  padding-left: 230px;
-  padding-right: 30px;
-  /*border: 5px solid #96BAC5;*/
-  /*background: lightblue;*/
+  overflow: auto;
+  padding:10px;
 }
 
 .centered-content {
@@ -126,7 +194,7 @@ h1 {
 }
 
 .card {
-  min-height: 145px;
+  /*min-height: 145px;*/
   margin-bottom: 15px;
   /*background: #F3F3F3!important;*/
     border-top-right-radius: 0px;
@@ -165,17 +233,21 @@ h1 {
   float: right;
 }
 
+#right-column {
+  padding-left: 199px;
+}
+
 .content-top-nav {
   border-bottom: 1px solid #F1F1F3;
-    padding: 10px 9px 10px 9px;
-    margin-bottom: 20px;
-    margin: 0 -20px 20px -60px;
-    text-align: right;
-    min-height: 44px;
+  padding: 10px 9px 10px 9px;
+  text-align: right;
+  height: 35px;
 }
 
 .content-top-nav button {
-  border: none;
+  /*border: none;*/
+  margin-top: -14px;
+  padding-top: 6px;
 }
 
 .content-top-nav button:hover {
@@ -185,6 +257,7 @@ h1 {
 
 ul, li {
   list-style-type: none;
+  border-left: 2px solid white;
 }
 
 .container-list {
@@ -194,20 +267,9 @@ ul, li {
 }
 
 .container-save {
-  float: right;
-  margin-top: -38px;
-}
-
-/*.container-box {
-  display: inline-block;
-  border: 1px solid black;
-  padding: 2em;
-  width: 300px;
-  height: 300px;
-}*/
-
-#servers {
-    margin-top: 35px;
+  position: relative;
+  top: 2px;
+  /*right: 265px;*/
 }
 
 .divider {
@@ -236,4 +298,9 @@ ul, li {
 
 #databases {
   margin-top: 40px;
+}
+
+
+.padding-left-none {
+  padding-left: 0!important;
 }
