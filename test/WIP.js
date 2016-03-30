@@ -1,4 +1,35 @@
 
+//
+// // also stops a Droplet on digitalocean
+// const stopMachine = machineName => dockerMachine(`stop ${ machineName }`);
+//
+// // also removes a Droplet on DigitalOcean
+// const removeMachine = machineName => dockerMachine(`rm -y ${ machineName }`);
+
+/**
+ * manageProject() will perform an action on the project containers
+ * functions that we will pass into the callback include:
+ * start, stop, restart, and remove (see above)
+ * based on initially passing in the project object and the callback
+ *
+ * @param {Object} projObj
+ * @param {Function} containerFn
+ * @return {} will perform an action on the project containers
+ */
+export const manageProject = co(function *(projObj, containerFn) {
+  for (var key in projObj.containers) {
+    containerFn(projObj.machine, key);
+  }
+});
+
+/**
+ * checkDockerInstall() returns true or a promise to install Docker
+ * based on checking the default machine and passing in it's environment variables
+ *
+ * @return {} returns true or a promise to install Docker
+ */
+const installDockerMachine = () => exec('curl -L https://github.com/docker/machine/releases/download/v0.6.0/docker-machine-`uname -s`-`uname -m` > /usr/local/bin/docker-machine && chmod +x /usr/local/bin/docker-machine')
+
 /**
  * addBasePath() returns a new object with the basePath included
  * based on passing a json string and parsing it

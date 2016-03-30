@@ -4,6 +4,9 @@ import ProjectLinks from './ProjectLinks';
 import * as projConfig from './server/projConfig.js';
 import * as appConfig from './server/appConfig.js';
 import defaultConfig from './server/defaultConfig.js';
+import * as container from './server/container.js';
+import * as manageProj from './server/manageProj.js';
+import fileWatch from './server/fileWatch.js';
 
 class App extends React.Component {
   constructor(props, context) {
@@ -13,8 +16,14 @@ class App extends React.Component {
     this.addContainer = this.addContainer.bind(this);
     this.addAppConfig = this.addAppConfig.bind(this);
     this.delContainer = this.delContainer.bind(this);
+    this.addFileWatcher = this.addFileWatcher.bind(this);
+    this.stopProject = this.stopProject.bind(this);
+    this.startProject = this.startProject.bind(this);
+    this.restartProject = this.restartProject.bind(this);
+    this.removeProject = this.removeProject.bind(this);
     this.state = {
       projects: {},
+      activeProject: '',
     };
   }
 
@@ -33,6 +42,57 @@ class App extends React.Component {
     this.setState({ projects });
   }
 
+  addContainer(uuid, statusObj) {
+    const projects = this.state.projects;
+
+    if (statusObj.status === 'pending') {
+      let data = '';
+      if (projects[uuid].containers[statusObj.containerId]) {
+        data = projects[uuid].containers[statusObj.containerId].data + statusObj.data.toString();
+      }
+      projects[uuid].containers[statusObj.containerId] = {
+        containerId: statusObj.containerId,
+        status: 'pending',
+        data,
+        image: statusObj.image,
+      };
+    }
+
+    if (statusObj.status === 'error') {
+      projects[uuid].containers[statusObj.containerId] = {
+        containerId: statusObj.containerId,
+        status: 'error',
+        err: statusObj.err.toString(),
+        image: statusObj.image,
+      };
+    }
+
+    if (statusObj.status === 'complete') {
+      delete projects[uuid].containers[statusObj.tmpContainerId];
+      projects[uuid].containers[statusObj.containerId] = statusObj;
+    }
+
+    projConfig.writeProj(projects[uuid]);
+    this.setState({ projects });
+  }
+
+  // need to delete container from docker - handle pending/error containers
+  delContainer(uuid, containerObj) {
+    const projects = this.state.projects;
+    container.removeContainer(projects[uuid], containerObj.containerId)
+      .then(() => {
+        delete projects[uuid].containers[containerObj.containerId];
+        projConfig.writeProj(projects[uuid]);
+        this.setState({ projects });
+      });
+  }
+
+  addFileWatcher(uuid) {
+    const projects = this.state.projects;
+    fileWatch(projects[uuid]);
+    this.setState({ projects });
+  }
+
   addAppConfig(config) {
     this.setState({ config });
   }
@@ -48,50 +108,53 @@ class App extends React.Component {
       .catch();
   }
 
-  addContainer(uuid, status) {
+  stopProject(uuid) {
     const projects = this.state.projects;
-
-    if (status.status === 'pending') {
-      let data = '';
-      if (projects[uuid].containers[status.containerId]) {
-        data = projects[uuid].containers[status.containerId].data + status.data.toString();
-      }
-      projects[uuid].containers[status.containerId] = {
-        containerId: status.containerId,
-        status: 'pending',
-        data,
-        image: status.image,
-      };
-    }
-
-    if (status.status === 'error') {
-      projects[uuid].containers[status.containerId] = {
-        containerId: status.containerId,
-        status: 'error',
-        err: status.err.toString(),
-        image: status.image,
-      };
-    }
-
-    if (status.status === 'complete') {
-      delete projects[uuid].containers[status.tmpContainerId];
-      projects[uuid].containers[status.containerId] = status;
-    }
-
-    projConfig.writeProj(projects[uuid]);
-    this.setState({ projects });
+    manageProj.stopProject(projects[uuid])
+      .then(proj => {
+        if (proj.uuid === this.state.activeProject) {
+          this.setState({ activeProject: '' });
+        }
+      })
+      .catch();
   }
 
-  // need to delete container from docker - handle pending/error containers
-  delContainer(uuid, container) {
+  startProject(uuid) {
     const projects = this.state.projects;
-    delete projects[uuid].containers[container.containerId];
-    projConfig.writeProj(projects[uuid]);
-    this.setState({ projects });
+    const activeProject = projects[this.state.activeProject];
+    manageProj.startProject(projects[uuid], activeProject)
+      .then(proj => {
+        projects[uuid] = proj;
+        this.setState({ projects });
+        this.setState({ activeProject: proj.uuid });
+      })
+      .catch();
   }
 
-  togglePopover() {
-    $('[data-toggle="popover"]').popover();
+  restartProject(uuid) {
+    const projects = this.state.projects;
+    const activeProject = projects[this.state.activeProject];
+    manageProj.restartProject(projects[uuid], activeProject)
+      .then(proj => {
+        this.setState({ activeProject: proj.uuid });
+      })
+      .catch();
+  }
+
+  removeProject(uuid) {
+    const projects = this.state.projects;
+    const activeProject = projects[this.state.activeProject];
+    manageProj.removeProject(projects[uuid])
+      .then(() => {
+        if (activeProject === uuid) {
+          this.setState({ activeProject: '' });
+        }
+        appConfig.removeProjFromConfig(projects[uuid], defaultConfig);
+        this.context.router.replace('/');
+        delete projects[uuid];
+        this.setState({ projects });
+      })
+      .catch();
   }
 
   render() {
@@ -109,7 +172,12 @@ class App extends React.Component {
             addContainer: this.addContainer,
             delContainer: this.delContainer,
             context: this.context,
-            togglePopover: this.togglePopover,
+            addFileWatcher: this.addFileWatcher,
+            activeProject: this.state.activeProject,
+            stopProject: this.stopProject,
+            startProject: this.startProject,
+            restartProject: this.restartProject,
+            removeProject: this.removeProject,
           }
         )}
       </div>

@@ -3,6 +3,7 @@ import * as machine from './machine.js';
 import Promise, { coroutine as co } from 'bluebird';
 import { exec as childExec, spawn } from 'child_process';
 import defaultConfig from './defaultConfig';
+import * as availableImages from './availableImages';
 import R from 'ramda';
 import uuidNode from 'node-uuid';
 
@@ -69,6 +70,7 @@ const dockerCommands = {
       return `/containers/${containerId}?v=1&force=1`;
     },
   },
+  // creates a list of images
   images: {
     cmd: 'json',
     method: 'GET',
@@ -77,6 +79,7 @@ const dockerCommands = {
       return `/images/${this.cmd}?all`;
     },
   },
+  // creates a network for the containers
   networkCreate: {
     cmd: 'create',
     method: 'POST',
@@ -84,6 +87,7 @@ const dockerCommands = {
       return `/networks/${this.cmd}`;
     },
   },
+  // inspects a network
   networkInspect: {
     cmd: '',
     method: 'GET',
@@ -91,14 +95,22 @@ const dockerCommands = {
       return `/networks/${uuid}`;
     },
   },
+  // delete a network
+  networkDelete: {
+    cmd: '',
+    method: 'DELETE',
+    uri(uuid) {
+      return `/networks/${uuid}`;
+    },
+  },
 };
 
 /**
- * commandMaker() returns an anonymous function that takes 2 parameters
+ * commandMaker() returns a function that takes 2 parameters
  * based on the passed in command object, which represents a task to perform in the command line
  *
  * @param {Object} cmd
- * @return {Function} returning anonymous function that takes 2 parameters
+ * @return {Function} returns a function that takes 2 parameters
  */
 function commandMaker(cmd) {
   return co(function *g(machineName, containerInfo) {
@@ -128,6 +140,7 @@ export const restart = commandMaker(dockerCommands.restart);
 export const remove = commandMaker(dockerCommands.remove);
 export const images = commandMaker(dockerCommands.images);
 export const networkCreate = commandMaker(dockerCommands.networkCreate);
+export const networkDelete = commandMaker(dockerCommands.networkDelete);
 export const networkInspect = commandMaker(dockerCommands.networkInspect);
 
 /**
@@ -144,14 +157,27 @@ export const pull = co(function *g(machineName, image) {
   return yield exec(`docker pull ${image}`, { env });
 });
 
-export const pullSpawn = co(function *g(machineName, image, uuid, containerId, callback) {
+/**
+ * pullSpawn() returns a promise to execute a docker command, 'pull' which will pull
+ * an image from the registry/ host, during the data collection it sets the status to
+ * pending and then yields a promise to resolve or reject the spawn command
+ * based on the passed in machine name, image, uuid, container id, and callback
+ *
+ * @param {String} machineName
+ * @param {String} image
+ * @param {String} uuid
+ * @param {String} containerId
+ * @param {Function} callback
+ * @return {} returns a promise to pull the image or reject if there is an error
+ */
+export const pullSpawn = co(function *g(machineName, image, uuid, server, containerId, callback) {
   const env = yield machine.env(machineName);
   process.env = R.merge(process.env, env);
 
   const pullReq = spawn('docker', ['pull', image]);
 
   pullReq.stdout.on('data', data =>
-    callback(uuid, { containerId, image, status: 'pending', data }));
+    callback(uuid, { containerId, image, server, status: 'pending', data }));
 
   yield new Promise((resolve, reject) => {
     pullReq.stderr.on('data', reject);
@@ -189,48 +215,73 @@ export const logs = co(function *g(machineName, containerId) {
 });
 
 /**
- * setContainerParams() returns an object with the image and path to uuid
- * based on the passed in image and project object
+ * setServerParams() returns an object with the image, project path, network mode, and working dir
+ * based on the passed in image and project uuid
  *
  * @param {String} image
- * @param {Object} projObj
- * @return {Object} returns an object with the image and path to uuid
+ * @param {String} uuid
+ * @return {Object} returns an object with the image, project path, network mode, and working dir
  */
-export const setContainerParams = (image, uuid) => ({
+export const setServerParams = (image, uuid) => ({
   image,
   HostConfig: {
     Binds: [`/home/docker/dockdev/${uuid}:/app`],
     NetworkMode: uuid,
   },
+  WorkingDir: '/app',
 });
 
+/**
+ * setDbParams() returns an object with the networkMode
+ * based on the passed in image and project uuid
+ *
+ * @param {String} image
+ * @param {String} uuid
+ * @return {Object} returns an object with the networkMode
+ */
+export const setDbParams = (image, uuid) => ({
+  image,
+  HostConfig: {
+    NetworkMode: uuid,
+  },
+});
+
+/**
+ * setNetworkParams() returns an object with the project uuid
+ * based on the passed in project uuid
+ *
+ * @param {String} uuid
+ * @return {Object} returns an object with the uuid
+ */
 export const setNetworkParams = (uuid) => ({
   name: uuid,
 });
 
 /**
- * addContainer() will create a container through the docker API
- * then it will add infromation about the container to the projObj
- * then it returns a string with the containerId
- * based on the passed in project object and image
+ * add() returns a new container object. It will first attempt to use a local image
+ * but if not found it will pull an image from the docker API
+ * then it will create a container and return an object with container info
+ * based on the passed in uuid, image, and callbacky
  *
- * @param {Object} projObj
+ * @param {String} uuid
  * @param {String} image
- * @return {String} containerId
+ * @param {Function} callback
+ * @return {Object} newContainer
  */
 export const add = co(function *g(uuid, image, callback) {
-  const containerConfig = setContainerParams(image, uuid);
+  const server = availableImages.servers.indexOf(image) > -1;
+  const containerConfig = server ? setServerParams(image, uuid) : setDbParams(image, uuid);
 
   let containerId = uuidNode.v4();
 
-  callback(uuid, { containerId, image, status: 'pending', data: '' });
+  callback(uuid, { containerId, image, server, status: 'pending', data: '' });
 
   // check to make sure image is on the local computer
   if (!(yield images(defaultConfig.machine, image)).length) {
     try {
-      yield pullSpawn(defaultConfig.machine, image, uuid, containerId, callback);
+      yield pullSpawn(defaultConfig.machine, image, uuid, server, containerId, callback);
     } catch (err) {
-      return callback(uuid, { containerId, image, status: 'error', err });
+      return callback(uuid, { containerId, image, server, status: 'error', err });
     }
   }
 
@@ -246,7 +297,7 @@ export const add = co(function *g(uuid, image, callback) {
     containerId,
     name,
     dest,
-    sync: true,
+    server,
     status: 'complete',
   };
 
@@ -264,31 +315,11 @@ export const add = co(function *g(uuid, image, callback) {
  * @return {Boolean} true
  */
 export const removeContainer = co(function *g(projObj, containerId) {
-  yield remove(projObj.machine, containerId);
-  delete projObj.containers[containerId];
+  if (projObj.containers[containerId].status === 'complete') {
+    yield remove(projObj.machine, containerId);
+  }
   return true;
 });
-
-/**
- * manageProject() will perform an action on the project containers
- * functions that we will pass into the callback include:
- * start, stop, restart, and remove (see above)
- * based on initially passing in the project object and the callback
- *
- * @param {Object} projObj
- * @param {Function} containerFn
- * @return {} will perform an action on the project containers
- */
-export const manageProject = co(function *(projObj, containerFn) {
-  for (var key in projObj.containers) {
-    containerFn(projObj.machine, key);
-  }
-});
-
-// remove('default', 'f3e796d19685')
-//   .then(console.log)
-//   .catch(console.log);
-
 
 // Example POST request to create a container
 // POST /containers/create HTTP/1.1

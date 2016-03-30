@@ -8,6 +8,7 @@ import { join } from 'path';
 *   @param {String} config.configFile is the file name for dockdev app config storage
 *   @param {String} config.defaultPath is the path where the app config is stored by default
 *   @param {String} config.DOToken is the placeholder for the user provided Access Token
+*   @param {String} config.machine is the docker machine that we are create for the user
 *   @param {Function} config.configPath is the full path to the app config file
 *
 * Projects Config
