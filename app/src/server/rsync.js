@@ -1,10 +1,11 @@
-import { exec as childExec } from 'child_process';
-import Promise, { coroutine as co } from 'bluebird';
+// import { exec as childExec } from 'child_process';
+import { coroutine as co } from 'bluebird';
 import R from 'ramda';
 import * as machine from './machine.js';
+import { exec } from './utils';
 
 // promisify callback function
-const execProm = Promise.promisify(childExec);
+// const execProm = Promise.promisify(childExec);
 
 /**
  * rsync() returns a promise that resolves to the stdout
@@ -13,7 +14,7 @@ const execProm = Promise.promisify(childExec);
  * @param {String} args
  * @return {} returns a promise that resolves to the stdout
  */
-const rsync = (args) => execProm(`rsync ${args}`);
+const rsync = (args) => exec(`rsync ${args}`);
 
 /**
  * selectWithin() returns a result object
@@ -56,7 +57,7 @@ const selectSSHandIP = R.compose(
  * @return {String}
  */
 const createRsyncArgs = (source, dest, machineInfo) =>
-  `-a -e "ssh -i ${machineInfo.SSHKeyPath} -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" --delete ${source} docker@${machineInfo.IPAddress}:${dest}`;
+  `--archive --whole-file --omit-dir-times --inplace -l --rsh="ssh -i ${machineInfo.SSHKeyPath} -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" --delete ${source} docker@${machineInfo.IPAddress}:${dest}`;
 
 /**
  * getSyncContainer() returns the containerId for the container where sync is turned on
@@ -68,7 +69,7 @@ const createRsyncArgs = (source, dest, machineInfo) =>
 function getSyncContainer(projObj) {
   let result;
   for (const container in projObj.containers) {
-    if (projObj.containers[container].sync) {
+    if (projObj.containers[container].server) {
       result = projObj.containers[container].containerId;
       break;
     }
@@ -86,38 +87,20 @@ function getSyncContainer(projObj) {
  * @return {} returns a promise to run the rsync terminal command
  */
 export function generateRsync(projObj) {
-  const getArgs = co(function *() {
+  const getArgs = co(function *g() {
     const machineInfo = selectSSHandIP(yield machine.inspect(projObj.machine));
     const targetContainerId = getSyncContainer(projObj);
     const dest = projObj.containers[targetContainerId].dest;
-
-    try {
-      yield machine.ssh(projObj.machine, `mkdir ${dest}`);
-    } catch (e) {
-      // console.log(e);
-    }
 
     return createRsyncArgs(`${projObj.basePath}/`, dest, machineInfo);
   });
 
   const args = getArgs();
 
-  return co(function *() {
+  return co(function *g() {
     return yield rsync(yield args);
   });
 }
-
-
-// const source = '/Users/samhagan/dev/codesmith/DockDev/test/userFolder/project5';
-// const dest = '/opt/test';
-// const sandbox = {
-//   SSHKeyPath: '/Users/samhagan/.docker/machine/machines/sandbox/id_rsa',
-//   IPAddress: '192.168.99.102'
-// }
-
-// rsync(createRsyncArgs(source, dest, sandbox))
-//   .then(console.log)
-//   .catch(console.log);
 
 // - File watch
 //   - need ability to turnoff projFile watching

@@ -2,40 +2,40 @@ import React from 'react';
 import R from 'ramda';
 import Container from './Container';
 
-const ProjectDetail = ({ projects, params }) => {
-  // console.log(projects);
-  // for (var keys in projects) {
-  //     console.log('KEYS:',projects[keys].uuid);
-  //     console.log('KEYS:',projects[keys].projectName);
-  //
-  // }
-  // console.log("params: ", params);
-  // console.log("name:", projects.projectName);
-
-  function alertIT(){
-    $("[data-toggle=popover]").popover({"placement": "bottom"});
-    // alert('click');
-  }
+const ProjectDetail = ({
+    projects,
+    params,
+    delContainer,
+    addFileWatcher,
+    activeProject,
+    startProject,
+    stopProject,
+    restartProject,
+    removeProject,
+  }) => {
 
   const proj = projects[params.uuid];
   const containers = R.toPairs(proj.containers)
-    .map(container => <Container key={container[0]} details={container}>
-                      </Container>
+    .map(cont =>
+      <Container
+        key={cont[0]}
+        details={cont[1]}
+        uuid={params.uuid}
+        delContainer={delContainer}
+      />
+    );
 
-           );
+  const start = () => startProject(params.uuid);
+  const stop = () => stopProject(params.uuid);
+  const restart = () => restartProject(params.uuid);
+  const remove = () => removeProject(params.uuid);
+  const watcher = () => addFileWatcher(params.uuid);
+
   return (
     <div className="col-xs-12">
       <h3 className="text-capitalize">
         {proj.projectName} Details
       </h3>
-      {/*<button>Start</button>
-      <button>Stop</button>
-      <button>Restart</button>
-      <button>Delete</button>*/}
-      {/*<p>
-        All the awesome information about your project,
-        container, are right here.  Take a look around.
-      </p>*/}
       <div className="row">
         <div className="col-xs-12" id="servers">
           <h4>Servers</h4>
@@ -54,10 +54,14 @@ const ProjectDetail = ({ projects, params }) => {
 
 ProjectDetail.propTypes = {
   projects: React.PropTypes.object,
-  params: React.PropTypes.object
+  params: React.PropTypes.object,
+  delContainer: React.PropTypes.func,
+  addFileWatcher: React.PropTypes.func,
+  activeProject: React.PropTypes.string,
+  startProject: React.PropTypes.func,
+  stopProject: React.PropTypes.func,
+  restartProject: React.PropTypes.func,
+  removeProject: React.PropTypes.func,
 };
 
 export default ProjectDetail;
-
-
-{/*<button type="button" className="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?" onClick={alertIT}>Click to toggle popover</button>*/}
