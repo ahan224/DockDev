@@ -4,7 +4,9 @@ import R from 'ramda';
 import uuid from 'node-uuid';
 import * as utils from './utils';
 import * as appConfig from './appConfig';
+import { setNetworkParams, networkCreate } from './container';
 import defaultConfig from './defaultConfig';
+import * as machine from './machine';
 
 /**
  * createProj() returns an object with project-level information, including a uuid
@@ -29,9 +31,9 @@ export const createProj = (basePath, projectName) => ({
  * @param {Object} projObj
  * @return {} creates a folder
  */
-export const createDockDev = (projObj) =>
-  utils.mkdir(join(projObj.basePath, defaultConfig.projFolder));
-
+export const createDockDev = (projObj) => {
+  return utils.mkdir(join(projObj.basePath, defaultConfig.projFolder));
+};
 /**
  * cleanProjToWrite() returns a formatted object with information to be stored in the project file
  * based on composing R.pick (which parameters to write) and indent formatting (jsonStringifyPretty)
@@ -58,11 +60,12 @@ export const writeProj = (projObj) =>
 /**
  * initProject() creates the project object, then yields a promise to create the project folder
  * then yields a promise to write the project file, then it adds the project object to memory
- * and finally, it returns the project object
- * based on initially passing in the basePath and projectName
+ * and it creates the network for the project before finally returning the project object
+ * based on initially passing in the basePath, projectName, and overwrite
  *
  * @param {String} basePath
  * @param {String} projectName
+ * @param {Boolean} overwrite
  * @return {Object} projObj
  */
 export const initProject = co(function *g(basePath, projectName, overwrite) {
@@ -83,6 +86,9 @@ export const initProject = co(function *g(basePath, projectName, overwrite) {
   projObj.basePath = basePath;
 
   yield appConfig.addProjToConfig(basePath, defaultConfig);
+
+  yield networkCreate(defaultConfig.machine, setNetworkParams(projObj.uuid));
+  yield machine.ssh(projObj.machine, `mkdir /home/docker/dockdev/${projObj.uuid}`);
 
   return projObj;
 });

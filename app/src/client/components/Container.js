@@ -1,28 +1,29 @@
 import React from 'react';
 
-const Container = (props) => {
+const Container = ({ details, delContainer, uuid }) => {
+  const clickDelContainer = () => delContainer(uuid, details);
   return (
     <div className="col-xs-12 col-md-6 col-lg-4">
       <div className="card text-xs-left">
         <div className="card-block">
-          <h4 className="card-title">{ props.details[1].image }</h4>
-          <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
+          <h3 className="card-title">
+          <button onClick={clickDelContainer}>Delete</button>
+            { details.image }
+            { details.status }
+            <span className="version">v1.1.1.0</span>
+          </h3>
+          <p className="card-text">
+            With supporting text below as a natural lead-in to additional content.
+          </p>
+          <a href="#" className=" pull-right">Details...</a>
         </div>
-      </div>
-    </div>
   );
 };
 
+Container.propTypes = {
+  details: React.PropTypes.object,
+  delContainer: React.PropTypes.func,
+  uuid: React.PropTypes.string,
+};
+
 export default Container;
-
-
-
-
-{/*<div className="card card-block">
-  <h5 className="card-header">
-    { props.details[1].image }
-    <span className="version">v1.1.1.0</span>
-  </h5>
-  <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-  <a href="#" className=" pull-right">Details...</a>
-</div>*/}

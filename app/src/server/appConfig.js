@@ -4,22 +4,30 @@ import * as utils from './utils';
 import * as machine from './machine.js';
 import fs from 'fs';
 import { exec as childExec } from 'child_process';
+import rimraf from 'rimraf';
+import { networkDelete } from './container';
+import defaultConfig from './defaultConfig';
 
 // promisify callback function
 const exec = Promise.promisify(childExec);
+const rimrafProm = Promise.promisify(rimraf);
 
+/**
+ * checkDockerMachineInstalled() returns true if docker machine is installed or false if not
+ * based on checking the version of the docker machine
+ *
+ * @return {Boolean} returns true or false
+ */
 const checkDockerMachineInstalled = co(function *g() {
   const result = yield machine.version();
   return result.substr(0, 6) === 'docker';
 });
 
-const installDockerMachine = () => exec('curl -L https://github.com/docker/machine/releases/download/v0.6.0/docker-machine-`uname -s`-`uname -m` > /usr/local/bin/docker-machine && chmod +x /usr/local/bin/docker-machine')
-
 /**
- * checkDockerInstall() returns true or a promise to install Docker
- * based on checking the default machine and passing in it's environment variables
+ * checkDockerInstall() returns true if docker is installed or false if not
+ * based on running docker in the command line and checking the resulting output
  *
- * @return {} returns true or a promise to install Docker
+ * @return {Boolean} returns true or false
  */
 const checkDockerInstall = co(function *g() {
   const result = yield exec('docker');
@@ -79,9 +87,11 @@ const createConfigFolder = (defaultConfig) =>
   utils.mkdir(join(defaultConfig.defaultPath, defaultConfig.configFolder));
 
 /**
- * loadConfigFile() returns the config file from ~/.dockdevconfig or creates/writes it
+ * loadConfigFile() returns the config object from ~/.dockdevconfig or creates/writes it
+ * based on passing in the default config object
  *
- * @param
+ * @param {Object} defaultConfig
+ * @return {Object} config
  */
 export const loadConfigFile = co(function *g(defaultConfig) {
   let config = yield readConfig(defaultConfig.configPath());
@@ -102,11 +112,11 @@ export const loadConfigFile = co(function *g(defaultConfig) {
 });
 
 /**
- * loadPathsFile() returns a promise that a path will reslove whether or not it is good
+ * loadPathsFile() returns a promise that a path will resolve whether or not it is good
  * based on the passed in path
  *
  * @param {String} basePath
- * @return {??} promise to resolve the path
+ * @return {} promise to resolve 'ERROR' or the projet object
  */
 const loadPathsFile = (path, defaultConfig) =>
   new Promise((resolve) => {
@@ -119,14 +129,13 @@ const loadPathsFile = (path, defaultConfig) =>
   });
 
 /**
- * loadPaths() returns a promise that all the paths will resolve and will search for bad
- * paths if any of the good paths fails to load
- * based on the passed in config object with all the paths and an emitter and channel to pass data
+ * loadPaths() will load all the paths for every project and if a project fails to load
+ * it will run a callback on those failed paths
  *
  * @param {Object} configObj
- * @param {Emitter} emitter
- * @param {Channel} channel
- * @return {} promise all paths will resolve
+ * @param {Object} defaultConfig
+ * @param {Function} callback
+ * @return {}
  */
 export const loadPaths = (configObj, defaultConfig, callback) => {
   const goodPaths = [];
@@ -139,7 +148,14 @@ export const loadPaths = (configObj, defaultConfig, callback) => {
   });
 };
 
-// adds projects paths to the main config file
+/**
+ * addProjToConfig() will add a project's path to the main config file
+ * based on the passed in project base path and the default config object
+ *
+ * @param {String} basePath
+ * @param {Object} defaultConfig
+ * @return {}
+ */
 export const addProjToConfig = co(function *g(basePath, defaultConfig) {
   const configPath = defaultConfig.configPath();
   const readConfigFile = yield readConfig(configPath);
@@ -147,7 +163,36 @@ export const addProjToConfig = co(function *g(basePath, defaultConfig) {
   yield utils.writeFile(configPath, utils.jsonStringifyPretty(readConfigFile));
 });
 
-// load app --> returns config object
+/**
+ * removeProjFromConfig() will delete a project's path to the main config file
+ * based on the passed in project base path and the default config object
+ *
+ * @param {String} basePath
+ * @param {Object} defaultConfig
+ * @return {}
+ */
+export const removeProjFromConfig = co(function *g(projObj, defaultConfig) {
+  const configPath = defaultConfig.configPath();
+  const readConfigFile = yield readConfig(configPath);
+  readConfigFile.projects = readConfigFile.projects.filter(path => path !== projObj.basePath);
+  yield utils.writeFile(configPath, utils.jsonStringifyPretty(readConfigFile));
+  yield rimrafProm(join(projObj.basePath, defaultConfig.projFolder));
+  return true;
+});
+
+/**
+ * initApp() will run through several processes at app initiation. First,
+ * it will check if docker machine is installed, then docker, then check
+ * if there is a dockdev machine created yet, then it will redirect to the
+ * home page and load all the projects
+ * based on the passed in default config object, router, add config and project functions
+ *
+ * @param {Object} defaultConfig
+ * @param {Function} router
+ * @param {Function} addConfig
+ * @param {Function} addProject
+ * @return {Boolean} true
+ */
 export const initApp = co(function *g(defaultConfig, router, addConfig, addProject) {
   try {
     yield checkDockerMachineInstalled();
@@ -166,7 +211,13 @@ export const initApp = co(function *g(defaultConfig, router, addConfig, addProje
   const checkDockDevMachine = yield machine.list();
   if (checkDockDevMachine.indexOf('dockdev') === -1) {
     router.replace('/init/3');
-    yield machine.createMachine('dockdev');
+    yield machine.createMachine(defaultConfig.machine);
+  }
+
+  try {
+    yield machine.ssh(defaultConfig.machine, 'mkdir -m 777 /home/docker/dockdev/');
+  } catch (e) {
+    console.log(e)
   }
 
   router.replace('/');

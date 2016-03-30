@@ -7,6 +7,7 @@ const BrowserWindow = electron.BrowserWindow;
 
 let mainWindow = null;
 
+// electron is listening for when the app is 'ready' to load and will create a new browser window
 app.on('ready', () => {
 
   mainWindow = new BrowserWindow({ width: 950, height: 650, titleBarStyle: 'hidden-inset' });
@@ -17,14 +18,3 @@ app.on('ready', () => {
     mainWindow = null;
   });
 });
-
-
-// ipcMain.on('asynchronous-message', function(event, arg) {
-//   console.log(arg);  // prints "ping"
-//   event.sender.send('asynchronous-reply', 'pong');
-// });
-//
-// ipcMain.on('synchronous-message', function(event, arg) {
-//   console.log(arg);  // prints "ping"
-//   event.returnValue = 'pong';
-// });

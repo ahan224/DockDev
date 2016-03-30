@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-// import * as utils from '../app/build/server/utils.js';
 import { join } from 'path';
 import rimraf from 'rimraf';
 import { readFileSync, mkdirSync, readdirSync, writeFileSync } from 'fs';
@@ -8,7 +7,33 @@ import * as rsync from '../app/build/server/rsync.js';
 import { addFileWatcher } from '../app/build/server/fileWatch.js';
 import { removeContainer, addContainer } from '../app/build/server/container.js';
 import * as projConfig from '../app/build/server/projConfig.js';
-import * as defaultConfig from '../app/build/server/defaultConfig.js';
+import defaultConfig from '../app/build/server/defaultConfig.js';
+
+//
+// describe('should write an app level config file', () => {
+//   let result;
+//   const basePath = join(__dirname, 'configFolder');
+//
+// // need to delete the configFolder and File before, then run the
+//   before(() => {
+//     // remove configFolder if it exists
+//     rimraf.sync(basePath);
+//
+//     // will create in basePath and also searches for projectFolders in the test directory
+//     mkdirSync(basePath);
+//   });
+//
+//   // this should probably be moved to the existing project tests (project2)
+//   it('writeConfig should write a file', () => {
+//     appConfig.writeConfig(__dirname, basePath);
+//     result = readFileSync(defaultConfig.configPath(basePath));
+//     return result
+//       .then(data => {
+//         expect(data.userSelectedDirectory).to.equal(process.env.HOME);
+//         expect(data.projects).to.be.empty;
+//       });
+//   });
+// });
 
 describe('initiate new DockDev project via individual functions', () => {
   const projectName = 'project1';
@@ -163,7 +188,7 @@ describe('add and modify containers within a project', () => {
     result = projConfig.initProject(basePath, projectName);
   });
 
-  it('should add a container to the project', () => {
+  it('should add a container to the project', (done) => {
     return result
       .then(data => addContainer(data, image))
       .then(id => {
@@ -172,6 +197,7 @@ describe('add and modify containers within a project', () => {
         result.then(data => {
           expect(data.containers[containerId].image).to.equal(image);
           expect(data.containers[containerId].containerId).to.equal(containerId);
+          done();
         });
       });
   });
