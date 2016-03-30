@@ -1,9 +1,8 @@
 import React from 'react';
-import { Router, Route, Link } from 'react-router'
+import { Router, Route, Link } from 'react-router';
 
 const ProjectNav = ({ projects, addContainer, children, params, context }) => (
-  <div id="content">
-    <div className="content-top-nav">
+    <div className="proj-nav">
       <ul className="nav nav-inline">
         <li className="nav-item">
           <Link className="nav-link" to={`/projects/${params.uuid}`}>General</Link>
@@ -14,12 +13,8 @@ const ProjectNav = ({ projects, addContainer, children, params, context }) => (
         <li className="nav-item">
           <Link className="nav-link" to={`/projects/${params.uuid}/deploy`}>Deploy</Link>
         </li>
-        <li className="nav-item">
-          <Link className="nav-link" to={`/projects/${params.uuid}/settings`}>Settings</Link>
-        </li>
       </ul>
 
-    </div>
     {React.cloneElement(children, { projects, addContainer, context })}
   </div>
 );

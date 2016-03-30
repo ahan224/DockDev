@@ -1,32 +1,4 @@
 import React from 'react';
-// <<<<<<< HEAD
-// import * as container from './build/server/container.js';
-// import { Link } from 'react-router';
-//
-// import createBrowserHistory from 'history/lib/createBrowserHistory'
-//
-// const AddContainer = ({ params, addContainer }) => {
-//   let image = '';
-//   const handler = event => {image = event.target.value;};
-//
-//   const submit = () => {
-//     console.log(
-//     container.add(params.uuid, image)
-//       .then(result => addContainer(params.uuid, result)));
-//   };
-//
-//   return (
-//     <div className="row">
-//       <div className="col-xs-8">
-//         <input type="text" className="form-control form-control-md" onChange={handler} placeholder="Container Name"/>
-//       </div>
-//       <div>
-//         <button onClick={submit} className="btn btn-primary-outline" name="submit">Add</button>
-//       </div>
-//     </div>
-//   );
-// };
-// =======
 import * as container from './server/container.js';
 import * as images from './server/availableImages.js';
 import DockerImage from './DockerImage';
@@ -76,8 +48,6 @@ class AddContainer extends React.Component {
     };
   }
 
-
-
   submit() {
     let last;
     if (this.state.selServer) {
@@ -98,7 +68,12 @@ class AddContainer extends React.Component {
   render() {
     const serverDisplay = this.state.servers.map((val, idx) => {
       const style = {};
-      // if (val.name === this.state.selServer) style.color = 'red';
+      if (val.name === this.state.selServer)  {
+        style.color = 'white',
+        style.backgroundColor = '#286090',
+        style.borderRadius = '6px',
+        style.borderColor = '#286090'
+      };
       return (
         <DockerImage key={idx} style={style} className="col-xs-6"
           name={val.name} handler={this.clickServer(val.name)}
@@ -111,8 +86,9 @@ class AddContainer extends React.Component {
       const style = {};
       if (this.state.selDbs.indexOf(val.name) > -1) {
         style.color = 'white',
-        style.backgroundColor = 'blue',
-        style.borderRadius = '6px'
+        style.backgroundColor = '#286090',
+        style.borderRadius = '6px',
+        style.borderColor = '#286090'
       };
       return (
         <DockerImage key={idx} style={style}
@@ -122,18 +98,23 @@ class AddContainer extends React.Component {
     });
 
     return (
-      <div className="row">
-        <div className="col-xs-12" id="servers">
-          <h4>Servers</h4>
-          <button className="btn btn-sm btn-primary-outline container-save" onClick={this.submit}>Save</button>
-          <div className="divider"></div>
-          {serverDisplay}
-        </div>
-        <div className="col-xs-12" id="databases">
-          <h4>Databases</h4>
-          <div className="divider"></div>
-          {dbDisplay}
-        </div>
+      <div className="project-wrapper">
+          <div className="col-xs-4 proj-detail-title" id="servers" style={{'padding':'0px',}}>
+            <h5 className="text-capitalize">
+              Add Container
+            </h5>
+          </div>
+          <div className="col-xs-12" >
+            <h5>Servers</h5>
+            <button className="btn btn-sm btn-primary-outline container-save" onClick={this.submit}>Save</button>
+            <div className="divider"></div>
+            {serverDisplay}
+          </div>
+          <div className="col-xs-12" id="databases">
+            <h5>Databases</h5>
+            <div className="divider"></div>
+            {dbDisplay}
+          </div>
       </div>
     );
   }
