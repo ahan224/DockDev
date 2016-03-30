@@ -5,8 +5,8 @@ import * as machine from './machine.js';
 import fs from 'fs';
 import { exec as childExec } from 'child_process';
 import rimraf from 'rimraf';
-import { networkDelete } from './container';
-import defaultConfig from './defaultConfig';
+// import { networkDelete } from './container';
+// import defaultConfig from './defaultConfig';
 
 // promisify callback function
 const exec = Promise.promisify(childExec);
@@ -46,7 +46,7 @@ const installDocker = () => exec('curl -fsSL https://get.docker.com/ | sh');
 const initConfig = (defaultConfig) => ({
   path: defaultConfig.configPath(),
   projects: [],
-  userDir: process.env.HOME
+  userDir: process.env.HOME,
 });
 
 /**
