@@ -7,6 +7,7 @@ const BrowserWindow = electron.BrowserWindow;
 
 let mainWindow = null;
 
+// electron is listening for when the app is 'ready' to load and will create a new browser window
 app.on('ready', () => {
 
   mainWindow = new BrowserWindow({ width: 950, height: 650, titleBarStyle: 'hidden-inset' });

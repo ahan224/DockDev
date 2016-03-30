@@ -42,7 +42,7 @@ export const createMachine = (machineName) =>
  * @param {String} machineName
  * @return {Object} result
  */
-export const env = co(function *(machineName) {
+export const env = co(function *g(machineName) {
   let result = yield exec(`env ${machineName}`);
   result = R.fromPairs(result.split('\n').slice(0, 4).map(val => val.substr(7).split('=')));
   for (const prop in result) {
@@ -81,14 +81,20 @@ export const machineConfig = co(function *(machineName) {
   return configObj;
 });
 
-
+/**
+ * version() returns the docker machine version
+ *
+ * @return {} returns the docker machine version
+ */
 export const version = () => exec('version');
 
+/**
+ * version() returns a list of docker machines
+ *
+ * @return {} returns a list docker machines
+ */
 export const list = () => exec('ls');
 
-//
-// // also stops a Droplet on digitalocean
-// const stopMachine = machineName => dockerMachine(`stop ${ machineName }`);
-//
-// // also removes a Droplet on DigitalOcean
-// const removeMachine = machineName => dockerMachine(`rm -y ${ machineName }`);
+
+export const removeMachineFolder = (projObj) =>
+  ssh(projObj.machine, `rm -rf /home/docker/dockdev/${projObj.uuid}`);
