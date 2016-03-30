@@ -4,7 +4,7 @@ import ProjectLinks from './ProjectLinks';
 import * as projConfig from './server/projConfig.js';
 import * as appConfig from './server/appConfig.js';
 import defaultConfig from './server/defaultConfig.js';
-// import * as container from './server/container.js';
+import * as container from './server/container.js';
 import * as manageProj from './server/manageProj.js';
 import fileWatch from './server/fileWatch.js';
 
@@ -79,9 +79,12 @@ class App extends React.Component {
   // need to delete container from docker - handle pending/error containers
   delContainer(uuid, containerObj) {
     const projects = this.state.projects;
-    delete projects[uuid].containers[containerObj.containerId];
-    projConfig.writeProj(projects[uuid]);
-    this.setState({ projects });
+    container.removeContainer(projects[uuid], containerObj.containerId)
+      .then(() => {
+        delete projects[uuid].containers[containerObj.containerId];
+        projConfig.writeProj(projects[uuid]);
+        this.setState({ projects });
+      });
   }
 
   addFileWatcher(uuid) {
