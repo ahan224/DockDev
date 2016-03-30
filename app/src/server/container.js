@@ -215,17 +215,33 @@ export const logs = co(function *g(machineName, containerId) {
 });
 
 /**
- * setContainerParams() returns an object with the image, project path, and network mode
+ * setServerParams() returns an object with the image, project path, network mode, and working dir
  * based on the passed in image and project uuid
  *
  * @param {String} image
  * @param {String} uuid
- * @return {Object} returns an object with the image, project path, and network mode
+ * @return {Object} returns an object with the image, project path, network mode, and working dir
  */
-export const setContainerParams = (image, uuid) => ({
+export const setServerParams = (image, uuid) => ({
   image,
   HostConfig: {
     Binds: [`/home/docker/dockdev/${uuid}:/app`],
+    NetworkMode: uuid,
+  },
+  WorkingDir: '/app',
+});
+
+/**
+ * setDbParams() returns an object with the networkMode
+ * based on the passed in image and project uuid
+ *
+ * @param {String} image
+ * @param {String} uuid
+ * @return {Object} returns an object with the networkMode
+ */
+export const setDbParams = (image, uuid) => ({
+  image,
+  HostConfig: {
     NetworkMode: uuid,
   },
 });
@@ -253,8 +269,8 @@ export const setNetworkParams = (uuid) => ({
  * @return {Object} newContainer
  */
 export const add = co(function *g(uuid, image, callback) {
-  const containerConfig = setContainerParams(image, uuid);
   const server = availableImages.servers.indexOf(image) > -1;
+  const containerConfig = server ? setServerParams(image, uuid) : setDbParams(image, uuid);
 
   let containerId = uuidNode.v4();
 
@@ -299,8 +315,9 @@ export const add = co(function *g(uuid, image, callback) {
  * @return {Boolean} true
  */
 export const removeContainer = co(function *g(projObj, containerId) {
-  yield remove(projObj.machine, containerId);
-  delete projObj.containers[containerId];
+  if (projObj.containers[containerId].status === 'complete') {
+    yield remove(projObj.machine, containerId);
+  }
   return true;
 });
 
