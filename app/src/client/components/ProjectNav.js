@@ -55,9 +55,12 @@ ProjectNav.propTypes = {
   addContainer: React.PropTypes.func,
   context: React.PropTypes.object,
   delContainer: React.PropTypes.func,
-  manageProjects: React.PropTypes.func,
   addFileWatcher: React.PropTypes.func,
   activeProject: React.PropTypes.string,
+  startProject: React.PropTypes.func,
+  stopProject: React.PropTypes.func,
+  restartProject: React.PropTypes.func,
+  removeProject: React.PropTypes.func,
 };
 
 
