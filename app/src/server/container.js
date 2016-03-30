@@ -225,10 +225,15 @@ export const logs = co(function *g(machineName, containerId) {
 export const setServerParams = (image, uuid) => ({
   image,
   HostConfig: {
-    Binds: [`/home/docker/dockdev/${uuid}:/app`],
+    Binds: ['/home/docker:/app'],
     NetworkMode: uuid,
+    PortBindings: { '3000/tcp': [{ HostPort: '3000' }] },
   },
   WorkingDir: '/app',
+  Cmd: ['npm', 'start'],
+  ExposedPorts: {
+    '3000/tcp': {},
+  },
 });
 
 /**

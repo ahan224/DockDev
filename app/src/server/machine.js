@@ -26,6 +26,30 @@ const exec = (args) => execProm(`docker-machine ${args}`);
 export const inspect = (machineName) => exec(`inspect ${machineName}`);
 
 /**
+ * status() returns a string indicating if the machine is running
+ *
+ * @param {String} machineName
+ * @return {} returns a promise that resolves to the stdout
+ */
+export const status = (machineName) => exec(`status ${machineName}`);
+
+/**
+ * regenCerts() regenerates the certificates for the machine with force (no stdout output)
+ *
+ * @param {String} machineName
+ * @return {} returns a promise that resolves to the stdout
+ */
+export const regenCerts = (machineName) => exec(`regenerate-certs -f ${machineName}`);
+
+/**
+ * start() starts a docker-machine
+ *
+ * @param {String} machineName
+ * @return {} returns a promise that resolves to the stdout
+ */
+export const start = (machineName) => exec(`start ${machineName}`);
+
+/**
  * createMachine() returns a new docker-machine without a shared folder
  * based on the passed in arguments string
  *
@@ -98,3 +122,14 @@ export const list = () => exec('ls');
 
 export const removeMachineFolder = (projObj) =>
   ssh(projObj.machine, `rm -rf /home/docker/dockdev/${projObj.uuid}`);
+
+
+export const checkMachineRunning = co(function *g(defaultConfig) {
+  const running = yield status(defaultConfig.machine);
+  if (running.trim() !== 'Running') {
+    yield start(defaultConfig.machine);
+    // yield regenCerts(defaultConfig.machine);
+    return false;
+  }
+  return true;
+});
