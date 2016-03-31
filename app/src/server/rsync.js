@@ -8,6 +8,23 @@ import { exec } from './utils';
 // const execProm = Promise.promisify(childExec);
 
 /**
+* cleanFilePath() accepts a string file path and returns a string file path with any
+* folder names with spaces qouted.
+*
+* @param {String} basePath
+* @return {String} basePath
+*/
+function cleanFilePath(basePath) {
+  const splitPath = basePath.split('/');
+  const cleanPath = splitPath.map(val => {
+    if (val.indexOf(' ') > -1) return `"${val}"`;
+    return val;
+  }).join('/');
+
+  return cleanPath;
+}
+
+/**
  * rsync() returns a promise that resolves to the stdout
  * based on the passed in string of arguments
  *
@@ -57,7 +74,7 @@ const selectSSHandIP = R.compose(
  * @return {String}
  */
 const createRsyncArgs = (source, dest, machineInfo) =>
-  `--archive --whole-file --omit-dir-times --inplace -l --rsh="ssh -i ${machineInfo.SSHKeyPath} -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" --delete ${source} docker@${machineInfo.IPAddress}:${dest}`;
+  `-aWOl --inplace --rsh="ssh -i ${machineInfo.SSHKeyPath} -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" --delete ${source} docker@${machineInfo.IPAddress}:${dest}`;
 
 /**
  * getSyncContainer() returns the containerId for the container where sync is turned on
@@ -91,8 +108,9 @@ export function generateRsync(projObj) {
     const machineInfo = selectSSHandIP(yield machine.inspect(projObj.machine));
     const targetContainerId = getSyncContainer(projObj);
     const dest = projObj.containers[targetContainerId].dest;
+    const cleanPath = cleanFilePath(projObj.basePath);
 
-    return createRsyncArgs(`${projObj.basePath}/`, dest, machineInfo);
+    return createRsyncArgs(`${cleanPath}/`, dest, machineInfo);
   });
 
   const args = getArgs();
