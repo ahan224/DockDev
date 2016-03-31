@@ -34,10 +34,8 @@ const checkDockerInstall = co(function *g() {
   return result.split('\n').length > 1;
 });
 
-const installDocker = () => exec('curl -fsSL https://get.docker.com/ | sh');
-
 /**
- * initCongig() returns an object outlining the main config file information
+ * initConfig() returns an object outlining the main config file information
  * based on the passed in DockDev default config object
  *
  * @param {Object} defaultConfig
@@ -212,12 +210,6 @@ export const initApp = co(function *g(defaultConfig, router, addConfig, addProje
   if (checkDockDevMachine.indexOf('dockdev') === -1) {
     router.replace('/init/3');
     yield machine.createMachine(defaultConfig.machine);
-  }
-
-  try {
-    yield machine.ssh(defaultConfig.machine, 'mkdir -m 777 /home/docker/dockdev/');
-  } catch (e) {
-    console.log(e)
   }
 
   router.replace('/');
