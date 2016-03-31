@@ -13,7 +13,6 @@ const ProjectDetail = ({
     restartProject,
     removeProject,
   }) => {
-
   const proj = projects[params.uuid];
   const containers = R.toPairs(proj.containers)
     .map(cont =>
@@ -33,7 +32,7 @@ const ProjectDetail = ({
 
   return (
       <div className="project-wrapper">
-        <div className="col-xs-4 proj-detail-title" style={{'padding':'0px',}}>
+        <div className="col-xs-4 proj-detail-title" style={{ padding: '0px' }}>
           <h5 className="text-capitalize">
             {proj.projectName}
           </h5>

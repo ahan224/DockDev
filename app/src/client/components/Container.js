@@ -11,7 +11,9 @@ const Container = ({ details, delContainer, uuid }) => {
             { details.image }
             { details.status }
           </h5>
-          <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
+          <p className="card-text">
+            With supporting text below as a natural lead-in to additional content.
+          </p>
         </div>
       </div>
     </div>

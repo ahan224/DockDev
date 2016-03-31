@@ -60,12 +60,12 @@ class AddContainer extends React.Component {
   render() {
     const serverDisplay = this.state.servers.map((val, idx) => {
       const style = {};
-      if (val.name === this.state.selServer)  {
-        style.color = 'white',
-        style.backgroundColor = '#286090',
-        style.borderRadius = '6px',
-        style.borderColor = '#286090'
-      };
+      if (val.name === this.state.selServer) {
+        style.color = 'white';
+        style.backgroundColor = '#286090';
+        style.borderRadius = '6px';
+        style.borderColor = '#286090';
+      }
       return (
         <DockerImage key={idx} style={style} className="col-xs-6"
           name={val.name} handler={this.clickServer(val.name)}
@@ -73,15 +73,15 @@ class AddContainer extends React.Component {
       );
     });
 
-    //adds blue text onclick to container selection
+    // adds blue text onclick to container selection
     const dbDisplay = this.state.dbs.map((val, idx) => {
       const style = {};
       if (this.state.selDbs.indexOf(val.name) > -1) {
-        style.color = 'white',
-        style.backgroundColor = '#286090',
-        style.borderRadius = '6px',
-        style.borderColor = '#286090'
-      };
+        style.color = 'white';
+        style.backgroundColor = '#286090';
+        style.borderRadius = '6px';
+        style.borderColor = '#286090';
+      }
       return (
         <DockerImage key={idx} style={style}
           name={val.name} handler={this.clickDb(val.name)}
@@ -91,14 +91,16 @@ class AddContainer extends React.Component {
 
     return (
       <div className="project-wrapper">
-          <div className="col-xs-4 proj-detail-title" id="servers" style={{'padding':'0px',}}>
+          <div className="col-xs-4 proj-detail-title" id="servers" style={{ padding: '0px' }}>
             <h5 className="text-capitalize">
               Add Container
             </h5>
           </div>
           <div className="col-xs-12" >
             <h5>Servers</h5>
-            <button className="btn btn-sm btn-primary-outline container-save" onClick={this.submit}>Save</button>
+            <button className="btn btn-sm btn-primary-outline container-save" onClick={this.submit}>
+              Save
+            </button>
             <div className="divider"></div>
             {serverDisplay}
           </div>
