@@ -1,7 +1,7 @@
 import * as container from './container.js';
 import fileWatch from './fileWatch.js';
 import { coroutine as co } from 'bluebird';
-import { removeMachineFolder } from './machine.js';
+import { removeMachineFolder, createMachineFolder } from './machine.js';
 
 const checkStatus = co(function *g(projObj, containerId) {
   return (yield container.inspect(projObj.machine, containerId)).State.Running;
@@ -34,7 +34,8 @@ export const stopProject = co(function *g(projObj) {
 
 export const startProject = co(function *g(projObj, activeProject) {
   const server = getServer(projObj);
-
+  yield removeMachineFolder(projObj);
+  yield createMachineFolder(projObj);
   if (activeProject) yield stopProject(activeProject);
   yield applyCommand(container.start, projObj);
 

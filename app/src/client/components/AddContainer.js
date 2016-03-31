@@ -28,6 +28,7 @@ class AddContainer extends React.Component {
   }
 
   clickServer(selServer) {
+    console.log(selServer);
     return () => {
       this.setState({ selServer });
     };
@@ -59,17 +60,28 @@ class AddContainer extends React.Component {
   render() {
     const serverDisplay = this.state.servers.map((val, idx) => {
       const style = {};
-      if (val.name === this.state.selServer) style.color = 'red';
+      if (val.name === this.state.selServer) {
+        style.color = 'white';
+        style.backgroundColor = '#286090';
+        style.borderRadius = '6px';
+        style.borderColor = '#286090';
+      }
       return (
-        <DockerImage key={idx} style={style}
+        <DockerImage key={idx} style={style} className="col-xs-6"
           name={val.name} handler={this.clickServer(val.name)}
         />
       );
     });
 
+    // adds blue text onclick to container selection
     const dbDisplay = this.state.dbs.map((val, idx) => {
       const style = {};
-      if (this.state.selDbs.indexOf(val.name) > -1) style.color = 'blue';
+      if (this.state.selDbs.indexOf(val.name) > -1) {
+        style.color = 'white';
+        style.backgroundColor = '#286090';
+        style.borderRadius = '6px';
+        style.borderColor = '#286090';
+      }
       return (
         <DockerImage key={idx} style={style}
           name={val.name} handler={this.clickDb(val.name)}
@@ -78,23 +90,25 @@ class AddContainer extends React.Component {
     });
 
     return (
-      <div className="row">
-        <div className="col-xs-12" id="servers">
-          <h4>Servers</h4>
-          <button
-            className="btn btn-sm btn-primary-outline container-save"
-            onClick={this.submit}
-          >
-            Save
-          </button>
-          <div className="divider"></div>
-          {serverDisplay}
-        </div>
-        <div className="col-xs-12" id="servers">
-          <h4>Databases</h4>
-          <div className="divider"></div>
-          {dbDisplay}
-        </div>
+      <div className="project-wrapper">
+          <div className="col-xs-4 proj-detail-title" id="servers" style={{ padding: '0px' }}>
+            <h5 className="text-capitalize">
+              Add Container
+            </h5>
+          </div>
+          <div className="col-xs-12" >
+            <h5>Servers</h5>
+            <button className="btn btn-sm btn-primary-outline container-save" onClick={this.submit}>
+              Save
+            </button>
+            <div className="divider"></div>
+            {serverDisplay}
+          </div>
+          <div className="col-xs-12" id="databases">
+            <h5>Databases</h5>
+            <div className="divider"></div>
+            {dbDisplay}
+          </div>
       </div>
     );
   }
@@ -106,42 +120,4 @@ AddContainer.propTypes = {
   context: React.PropTypes.object,
 };
 
-
-// const AddContainer = ({ params, addContainer }) => {
-//   let error;
-//   const errors = [
-//     <div key="1">Error</div>,
-//     '',
-//   ];
-//
-//   const server = ['node', 'notNode'];
-//   let serverSelect = server[0];
-//   const serverChange = event => {
-//     console.log(event.target.value);
-//     serverSelect = event.target.value;
-//   };
-//
-//   const submit = () => {
-//     if (serverSelect === 'notNode') {
-//       error = errors[0];
-//       console.log(error);
-//     } else {
-//       container.add(params.uuid, serverSelect)
-//       .then(result => addContainer(params.uuid, result));
-//     }
-//   };
-//
-//   const serverElements = server.map((val, idx) => <option key={idx} value={val}>{val}</option>);
-//
-//   return (
-//     <div>
-//       <select onChange={serverChange}>
-//         {serverElements}
-//       </select>
-//       AddContainer
-//       <button onClick={submit}>Submit</button>
-//       {error}
-//     </div>
-//   );
-// };
 export default AddContainer;
