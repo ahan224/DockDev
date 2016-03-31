@@ -103,9 +103,9 @@ function getSyncContainer(projObj) {
  * @param {Object} projObj
  * @return {} returns a promise to run the rsync terminal command
  */
-export function generateRsync(projObj) {
+export function generateRsync(projObj, destMachine) {
   const getArgs = co(function *g() {
-    const machineInfo = selectSSHandIP(yield machine.inspect(projObj.machine));
+    const machineInfo = selectSSHandIP(yield machine.inspect(projObj[destMachine]));
     const targetContainerId = getSyncContainer(projObj);
     const dest = projObj.containers[targetContainerId].dest;
     const cleanPath = cleanFilePath(projObj.basePath);
