@@ -23,7 +23,7 @@ const AddProject = ({ addNewProject }) => {
               type="text"
               placeholder="Name"
               onChange={projNameHandler}
-              />
+            />
           </div>
             <div className="col-xs-12 form-input-spacing">
               <label className="file width-12">

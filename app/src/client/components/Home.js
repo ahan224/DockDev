@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default ({ context }) => {
+export default () => {
   return (
       <div id="content"></div>
   );
