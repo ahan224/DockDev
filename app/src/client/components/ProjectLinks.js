@@ -21,7 +21,7 @@ const ProjectLinks = ({ projects }) => {
 };
 
 ProjectLinks.propTypes = {
-  projects: React.PropTypes.object
+  projects: React.PropTypes.object,
 };
 
 export default ProjectLinks;
