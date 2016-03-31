@@ -8,6 +8,7 @@ import addFolderIcon from './AddFolderIcon';
 import * as container from './server/container.js';
 import * as manageProj from './server/manageProj.js';
 import fileWatch from './server/fileWatch.js';
+import * as machine from './server/machine.js';
 
 class App extends React.Component {
   constructor(props, context) {
@@ -34,7 +35,9 @@ class App extends React.Component {
       this.context.router,
       this.addAppConfig,
       this.addExistingProjects
-    );
+    ).then(() => {
+      setInterval(() => machine.checkMachineRunning(defaultConfig), 5000);
+    });
   }
 
   addExistingProjects(proj) {

@@ -58,6 +58,7 @@ gulp.task('react', () => {
     './server/appConfig.js',
     './server/defaultConfig.js',
     './server/container.js',
+    './server/machine.js',
     './server/availableImages.js',
     './server/fileWatch.js',
     './server/manageProj.js',

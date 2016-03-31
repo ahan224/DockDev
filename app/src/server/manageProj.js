@@ -54,7 +54,6 @@ export const removeProject = co(function *g(projObj) {
   yield stopProject(projObj);
   yield applyCommand(container.remove, projObj);
   yield container.networkDelete(projObj.machine, projObj.uuid);
-  yield removeMachineFolder(projObj);
 
   return projObj;
 });
