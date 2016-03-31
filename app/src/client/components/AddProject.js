@@ -15,14 +15,8 @@ const AddProject = ({ addNewProject }) => {
   const submit = () => addNewProject(projectPath, projectName);
 
   return (
-    <div id="content">
-      <div className="content-top-nav"></div>
         <div className="centered-content center-block">
-          <h2>Add Project</h2>
-          {/*<p id="addText">
-            DockDev will create a container for you
-            after you assign a name and select a folder/create a directory.
-          </p>*/}
+          <h3>Add Project</h3>
           <div className="col-xs-12 form-input-spacing">
             <input
               className="form-control form-control-lg border-bottom-input"
@@ -46,8 +40,6 @@ const AddProject = ({ addNewProject }) => {
               </button>
             </div>
         </div>
-
-    </div>
   );
 };
 

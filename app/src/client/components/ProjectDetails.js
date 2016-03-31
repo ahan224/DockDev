@@ -32,23 +32,27 @@ const ProjectDetail = ({
   const watcher = () => addFileWatcher(params.uuid);
 
   return (
-    <div className="col-xs-12">
-      <h3 className="text-capitalize">
-        {proj.projectName} Details
-      </h3>
-      <div className="row">
-        <div className="col-xs-12" id="servers">
-          <h4>Servers</h4>
-          <div className="divider"></div>
+      <div className="project-wrapper">
+        <div className="col-xs-4 proj-detail-title" style={{'padding':'0px',}}>
+          <h5 className="text-capitalize">
+            {proj.projectName}
+          </h5>
         </div>
-        {containers}
+          <div className="row">
+            <div className="col-xs-12" id="servers">
+              <h5>Servers</h5>
+              <div className="divider"></div>
+            </div>
+            {containers}
+          </div>
+          <div className="row" >
+            <div className="col-xs-12" id="databases">
+              <h5>Databases</h5>
+              <div className="divider"></div>
+              {containers}
+            </div>
+          </div>
       </div>
-      <div className="row" id="databases">
-        <h4>Databases</h4>
-        <div className="divider"></div>
-        {containers}
-      </div>
-    </div>
   );
 };
 

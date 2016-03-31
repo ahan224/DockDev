@@ -6,17 +6,15 @@ const Container = ({ details, delContainer, uuid }) => {
     <div className="col-xs-12 col-md-6 col-lg-4">
       <div className="card text-xs-left">
         <div className="card-block">
-          <h3 className="card-title">
+          <h5 className="card-title">
           <button onClick={clickDelContainer}>Delete</button>
             { details.image }
             { details.status }
-            <span className="version">v1.1.1.0</span>
-          </h3>
-          <p className="card-text">
-            With supporting text below as a natural lead-in to additional content.
-          </p>
-          <a href="#" className=" pull-right">Details...</a>
+          </h5>
+          <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
         </div>
+      </div>
+    </div>
   );
 };
 
