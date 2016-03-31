@@ -1,5 +1,9 @@
 import React from 'react';
 
-const ProjectSettings = () => (<div>Settings</div>);
+class ProjectSettings extends React.Component {
+  render(){
+    return (<div>settings for project</div>);
+  }
+}
 
 export default ProjectSettings;
