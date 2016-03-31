@@ -3,7 +3,7 @@ import React from 'react';
 const addFolderIcon = () =>(
 
 	     <div>
-  				<svg><rect x="10" y="10" width="30" height="30"></rect></svg>
+  				<img src="../src/client/images/x_folder-add.png"></img>
 			</div>
     );
 
