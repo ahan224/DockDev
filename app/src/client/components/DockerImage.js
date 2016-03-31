@@ -5,8 +5,10 @@ const DockerImage = ({ name, handler, style }) => (
        <div className="col-xs-12 col-md-6 col-lg-4">
          <div className="card text-xs-left">
            <div className="card-block" onClick={handler} style={style}>
-             <h5 className="card-title">{ name }</h5>
-             <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
+             <h5 className="card-title">{name}</h5>
+             <p className="card-text">
+              With supporting text below as a natural lead-in to additional content.
+            </p>
            </div>
          </div>
        </div>
