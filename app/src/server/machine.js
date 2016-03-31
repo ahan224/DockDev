@@ -121,7 +121,10 @@ export const list = () => exec('ls');
 
 
 export const removeMachineFolder = (projObj) =>
-  ssh(projObj.machine, `rm -rf /home/docker/dockdev/${projObj.uuid}`);
+  ssh(projObj.machine, `rm -rf /home/docker/${projObj.uuid}`);
+
+export const createMachineFolder = (projObj) =>
+  ssh(projObj.machine, `mkdir /home/docker/${projObj.uuid}`);
 
 
 export const checkMachineRunning = co(function *g(defaultConfig) {
