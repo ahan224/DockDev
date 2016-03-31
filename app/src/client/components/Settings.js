@@ -16,7 +16,7 @@ const Settings = ({ addNewProject }) => (
         <input
           className="form-control form-control-lg border-bottom-input padding-left-none"
           type="text"
-          />
+        />
       </div>
     </div>
   </div>

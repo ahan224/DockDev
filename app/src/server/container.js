@@ -144,20 +144,6 @@ export const networkDelete = commandMaker(dockerCommands.networkDelete);
 export const networkInspect = commandMaker(dockerCommands.networkInspect);
 
 /**
- * pull() returns a promise to execute a docker command, 'pull' which will pull
- * an image from the registry/ host
- * based on the passed in machine name and image
- *
- * @param {String} machineName
- * @param {String} image
- * @return {} returns a promise to pull the image
- */
-export const pull = co(function *g(machineName, image) {
-  const env = yield machine.env(machineName);
-  return yield exec(`docker pull ${image}`, { env });
-});
-
-/**
  * pullSpawn() returns a promise to execute a docker command, 'pull' which will pull
  * an image from the registry/ host, during the data collection it sets the status to
  * pending and then yields a promise to resolve or reject the spawn command
@@ -225,7 +211,7 @@ export const logs = co(function *g(machineName, containerId) {
 export const setServerParams = (image, uuid) => ({
   image,
   HostConfig: {
-    Binds: ['/home/docker:/app'],
+    Binds: ['/home/docker/tmp:/app'],
     NetworkMode: uuid,
     PortBindings: { '3000/tcp': [{ HostPort: '3000' }] },
   },

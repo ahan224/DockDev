@@ -11,6 +11,11 @@ import fileWatch from './server/fileWatch.js';
 import Icons from './icons';
 import * as machine from './server/machine.js';
 
+const svgStyle = {
+  width: '16px',
+  height: '16px',
+};
+
 class App extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -162,7 +167,7 @@ class App extends React.Component {
       .catch();
   }
 
-  exampleClick(e){
+  exampleClick(e) {
     console.log(e.target);
   }
 
@@ -175,11 +180,11 @@ class App extends React.Component {
               <label onClick={this.exampleClick}>
                 Projects
               </label>
-              <span className="add-proj-icon">
-                  <NavLink to="/addProject" className="add-proj-icon">
-                    <img src="../src/client/images/x_folder-add.png"></img>
-                  </NavLink>
-              </span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/addProject" className="add-proj-icon">
+              <img src="./client/images/x_folder-add.png"></img>
             </NavLink>
           </li>
           <ProjectLinks projects={this.state.projects} />
@@ -208,18 +213,18 @@ class App extends React.Component {
             <div id="content">
               {React.cloneElement(this.props.children,
                 {
-                    projects: this.state.projects,
-                    addNewProject: this.addNewProject,
-                    addContainer: this.addContainer,
-                    delContainer: this.delContainer,
-                    context: this.context,
-                    exampleClick: this.exampleClick,
-                    addFileWatcher: this.addFileWatcher,
-                    activeProject: this.state.activeProject,
-                    stopProject: this.stopProject,
-                    startProject: this.startProject,
-                    restartProject: this.restartProject,
-                    removeProject: this.removeProject,
+                  projects: this.state.projects,
+                  addNewProject: this.addNewProject,
+                  addContainer: this.addContainer,
+                  delContainer: this.delContainer,
+                  context: this.context,
+                  exampleClick: this.exampleClick,
+                  addFileWatcher: this.addFileWatcher,
+                  activeProject: this.state.activeProject,
+                  stopProject: this.stopProject,
+                  startProject: this.startProject,
+                  restartProject: this.restartProject,
+                  removeProject: this.removeProject,
                 }
               )}
             </div>
@@ -229,11 +234,6 @@ class App extends React.Component {
   }
 }
 
-let svgStyle = {
-  width: '16px',
-  height: '16px'
-};
-
 App.propTypes = {
   children: React.PropTypes.object,
 };
@@ -241,6 +241,5 @@ App.propTypes = {
 App.contextTypes = {
   router: React.PropTypes.object.isRequired,
 };
-
 
 export default App;
