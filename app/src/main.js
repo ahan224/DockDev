@@ -18,14 +18,3 @@ app.on('ready', () => {
     mainWindow = null;
   });
 });
-
-
-// ipcMain.on('asynchronous-message', function(event, arg) {
-//   console.log(arg);  // prints "ping"
-//   event.sender.send('asynchronous-reply', 'pong');
-// });
-//
-// ipcMain.on('synchronous-message', function(event, arg) {
-//   console.log(arg);  // prints "ping"
-//   event.returnValue = 'pong';
-// });

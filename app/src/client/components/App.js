@@ -4,9 +4,11 @@ import ProjectLinks from './ProjectLinks';
 import * as projConfig from './server/projConfig.js';
 import * as appConfig from './server/appConfig.js';
 import defaultConfig from './server/defaultConfig.js';
+import addFolderIcon from './AddFolderIcon';
 import * as container from './server/container.js';
 import * as manageProj from './server/manageProj.js';
 import fileWatch from './server/fileWatch.js';
+import Icons from './icons';
 import * as machine from './server/machine.js';
 
 class App extends React.Component {
@@ -160,33 +162,77 @@ class App extends React.Component {
       .catch();
   }
 
+  exampleClick(e){
+    console.log(e.target);
+  }
+
   render() {
     return (
       <div>
         <ul role="nav" id="menu" className="nav">
-          <li className="nav-item"><NavLink to="/" onlyActiveOnIndex>Home</NavLink></li>
-          <li className="nav-item"><NavLink to="/addProject">Add Project</NavLink></li>
+          <li className="nav-item proj-anchor">
+            <NavLink to="/" onlyActiveOnIndex>
+              <label onClick={this.exampleClick}>
+                Projects
+              </label>
+              <span className="add-proj-icon">
+                  <NavLink to="/addProject" className="add-proj-icon">
+                    <img src="../src/client/images/x_folder-add.png"></img>
+                  </NavLink>
+              </span>
+            </NavLink>
+          </li>
           <ProjectLinks projects={this.state.projects} />
         </ul>
-        {React.cloneElement(this.props.children,
-          {
-            projects: this.state.projects,
-            addNewProject: this.addNewProject,
-            addContainer: this.addContainer,
-            delContainer: this.delContainer,
-            context: this.context,
-            addFileWatcher: this.addFileWatcher,
-            activeProject: this.state.activeProject,
-            stopProject: this.stopProject,
-            startProject: this.startProject,
-            restartProject: this.restartProject,
-            removeProject: this.removeProject,
-          }
-        )}
-      </div>
+          <div id="right-column">
+            <div className="content-top-nav">
+             <div className="btn-group btn-group-sm" role="group" aria-label="...">
+               <button type="button" className="btn btn-secondary">
+               </button>
+                 <button type="button" className="btn btn-secondary">
+                  <div style={svgStyle}>
+                    <svg style={svgStyle}>
+                      <circle cx={8} cy={6} r={6} fill="red" value="Status">
+                        Status
+                      </circle>
+                    </svg>
+                  </div>
+                 </button>
+                 <button type="button" className="btn btn-secondary">
+                   <div>
+                     <NavLink to="/settings">Settings</NavLink>
+                   </div>
+                 </button>
+             </div>
+            </div>
+            <div id="content">
+              {React.cloneElement(this.props.children,
+                {
+                    projects: this.state.projects,
+                    addNewProject: this.addNewProject,
+                    addContainer: this.addContainer,
+                    delContainer: this.delContainer,
+                    context: this.context,
+                    exampleClick: this.exampleClick,
+                    addFileWatcher: this.addFileWatcher,
+                    activeProject: this.state.activeProject,
+                    stopProject: this.stopProject,
+                    startProject: this.startProject,
+                    restartProject: this.restartProject,
+                    removeProject: this.removeProject,
+                }
+              )}
+            </div>
+          </div>
+        </div>
     );
   }
 }
+
+let svgStyle = {
+  width: '16px',
+  height: '16px'
+};
 
 App.propTypes = {
   children: React.PropTypes.object,
