@@ -50,8 +50,8 @@ const dockerCommands = {
   create: {
     cmd: 'create',
     method: 'POST',
-    uri() {
-      return `/containers/${this.cmd}`;
+    uri(obj) {
+      return `/containers/${this.cmd}?name=${obj.name}`;
     },
   },
   // restarts a container
@@ -210,10 +210,14 @@ export const logs = co(function *g(machineName, containerId) {
  */
 export const setServerParams = (image, uuid) => ({
   image,
+  name: 'server1',
   HostConfig: {
     Binds: ['/home/docker/tmp:/app'],
     NetworkMode: uuid,
     PortBindings: { '3000/tcp': [{ HostPort: '3000' }] },
+    Dns: [],
+    DnsOptions: [],
+    DnsSearch: [],
   },
   WorkingDir: '/app',
   Cmd: ['npm', 'start'],
@@ -232,8 +236,12 @@ export const setServerParams = (image, uuid) => ({
  */
 export const setDbParams = (image, uuid) => ({
   image,
+  name: 'mongo1',
   HostConfig: {
     NetworkMode: uuid,
+    Dns: [],
+    DnsOptions: [],
+    DnsSearch: [],
   },
 });
 
