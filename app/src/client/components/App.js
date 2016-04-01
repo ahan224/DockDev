@@ -4,9 +4,19 @@ import ProjectLinks from './ProjectLinks';
 import * as projConfig from './server/projConfig.js';
 import * as appConfig from './server/appConfig.js';
 import defaultConfig from './server/defaultConfig.js';
+import addFolderIcon from './AddFolderIcon';
 import * as container from './server/container.js';
 import * as manageProj from './server/manageProj.js';
 import fileWatch from './server/fileWatch.js';
+import Icons from './icons';
+import * as machine from './server/machine.js';
+import * as deploy from './server/deploy.js';
+import errorHandler from './server/errorHandler.js';
+
+const svgStyle = {
+  width: '16px',
+  height: '16px',
+};
 
 class App extends React.Component {
   constructor(props, context) {
@@ -21,9 +31,13 @@ class App extends React.Component {
     this.startProject = this.startProject.bind(this);
     this.restartProject = this.restartProject.bind(this);
     this.removeProject = this.removeProject.bind(this);
+    this.deployProject = this.deployProject.bind(this);
+    this.updateToken = this.updateToken.bind(this);
+    this.errorCallback = this.errorCallback.bind(this);
     this.state = {
       projects: {},
       activeProject: '',
+      DOToken: '',
     };
   }
 
@@ -33,7 +47,9 @@ class App extends React.Component {
       this.context.router,
       this.addAppConfig,
       this.addExistingProjects
-    );
+    ).then(() => {
+      // setInterval(() => machine.checkMachineRunning(defaultConfig), 5000);
+    });
   }
 
   addExistingProjects(proj) {
@@ -84,7 +100,8 @@ class App extends React.Component {
         delete projects[uuid].containers[containerObj.containerId];
         projConfig.writeProj(projects[uuid]);
         this.setState({ projects });
-      });
+      })
+      .catch(err => errorHandler('delContainer', err, [uuid, containerObj]));
   }
 
   addFileWatcher(uuid) {
@@ -110,41 +127,40 @@ class App extends React.Component {
 
   stopProject(uuid) {
     const projects = this.state.projects;
-    manageProj.stopProject(projects[uuid])
+    manageProj.stopProject(projects[uuid], this.errorCallback)
       .then(proj => {
         if (proj.uuid === this.state.activeProject) {
           this.setState({ activeProject: '' });
         }
       })
-      .catch();
+      .catch(err => errorHandler('stopProject', err, [uuid], this.errorCallback));
   }
 
   startProject(uuid) {
     const projects = this.state.projects;
     const activeProject = projects[this.state.activeProject];
-    manageProj.startProject(projects[uuid], activeProject)
+    manageProj.startProject(projects[uuid], activeProject, this.errorCallback)
       .then(proj => {
         projects[uuid] = proj;
-        this.setState({ projects });
         this.setState({ activeProject: proj.uuid });
       })
-      .catch();
+      .catch(err => errorHandler('startProject', err, [uuid], this.errorCallback));
   }
 
   restartProject(uuid) {
     const projects = this.state.projects;
     const activeProject = projects[this.state.activeProject];
-    manageProj.restartProject(projects[uuid], activeProject)
+    manageProj.restartProject(projects[uuid], activeProject, this.errorCallback)
       .then(proj => {
         this.setState({ activeProject: proj.uuid });
       })
-      .catch();
+      .catch(err => errorHandler('restartProject', err, [uuid], this.errorCallback));
   }
 
   removeProject(uuid) {
     const projects = this.state.projects;
     const activeProject = projects[this.state.activeProject];
-    manageProj.removeProject(projects[uuid])
+    manageProj.removeProject(projects[uuid], this.errorCallback)
       .then(() => {
         if (activeProject === uuid) {
           this.setState({ activeProject: '' });
@@ -154,33 +170,90 @@ class App extends React.Component {
         delete projects[uuid];
         this.setState({ projects });
       })
-      .catch();
+      .catch(err => errorHandler('removeProject', err, [uuid], this.errorCallback));
+  }
+
+  deployProject(uuid) {
+    const DOToken = this.state.DOToken;
+    const projects = this.state.projects;
+    deploy.deployToOcean(projects[uuid], DOToken);
+  }
+
+  updateToken(e) {
+    this.setState({ DOToken: e.target.value });
+  }
+
+  exampleClick(e) {
+    console.log(e.target);
+  }
+
+  errorCallback(errorObj) {
+    console.log(errorObj);
   }
 
   render() {
     return (
       <div>
         <ul role="nav" id="menu" className="nav">
-          <li className="nav-item"><NavLink to="/" onlyActiveOnIndex>Home</NavLink></li>
-          <li className="nav-item"><NavLink to="/addProject">Add Project</NavLink></li>
+          <li className="nav-item proj-anchor">
+            <NavLink to="/" onlyActiveOnIndex>
+              <label onClick={this.exampleClick}>
+                Projects
+              </label>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/addProject" className="add-proj-icon">
+              <img src="./client/images/x_folder-add.png"></img>
+            </NavLink>
+          </li>
           <ProjectLinks projects={this.state.projects} />
         </ul>
-        {React.cloneElement(this.props.children,
-          {
-            projects: this.state.projects,
-            addNewProject: this.addNewProject,
-            addContainer: this.addContainer,
-            delContainer: this.delContainer,
-            context: this.context,
-            addFileWatcher: this.addFileWatcher,
-            activeProject: this.state.activeProject,
-            stopProject: this.stopProject,
-            startProject: this.startProject,
-            restartProject: this.restartProject,
-            removeProject: this.removeProject,
-          }
-        )}
-      </div>
+          <div id="right-column">
+            <div className="content-top-nav">
+             <div className="btn-group btn-group-sm" role="group" aria-label="...">
+               <button type="button" className="btn btn-secondary">
+               </button>
+                 <button type="button" className="btn btn-secondary">
+                  <div style={svgStyle}>
+                    <svg style={svgStyle}>
+                      <circle cx={8} cy={6} r={6} fill="red" value="Status">
+                        Status
+                      </circle>
+                    </svg>
+                  </div>
+                 </button>
+                 <button type="button" className="btn btn-secondary">
+                   <div>
+                     <NavLink to="/settings">Settings</NavLink>
+                   </div>
+                 </button>
+             </div>
+            </div>
+            <div id="content">
+              {React.cloneElement(this.props.children,
+                {
+                  projects: this.state.projects,
+                  addNewProject: this.addNewProject,
+                  addContainer: this.addContainer,
+                  delContainer: this.delContainer,
+                  context: this.context,
+                  exampleClick: this.exampleClick,
+                  addFileWatcher: this.addFileWatcher,
+                  activeProject: this.state.activeProject,
+                  stopProject: this.stopProject,
+                  startProject: this.startProject,
+                  restartProject: this.restartProject,
+                  removeProject: this.removeProject,
+                  deployProject: this.deployProject,
+                  updateToken: this.updateToken,
+                  DOToken: this.state.DOToken,
+                  errorCallback: this.errorCallback,
+                }
+              )}
+            </div>
+          </div>
+        </div>
     );
   }
 }
@@ -192,6 +265,5 @@ App.propTypes = {
 App.contextTypes = {
   router: React.PropTypes.object.isRequired,
 };
-
 
 export default App;

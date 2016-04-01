@@ -21,17 +21,21 @@ const config = {
   // app config
   configFolder: '.dockdevConfig',
   configFile: 'dockdevConfig.json',
+  errorLogFile: 'error.json',
   defaultPath: process.env.HOME,
   DOToken: '',
   machine: 'dockdev',
   configPath(path = this.defaultPath) {
     return join(path, this.configFolder, this.configFile);
   },
+  errorLogPath(path = this.defaultPath) {
+    return join(path, this.configFolder, this.errorLogFile);
+  },
 
   // projects config
   projFolder: '.dockdev',
   projFile: 'dockdev.json',
-  projWriteParams: ['uuid', 'projectName', 'containers', 'machine'],
+  projWriteParams: ['uuid', 'projectName', 'containers', 'machine', 'remoteMachine'],
   projPath() {
     return join(this.projFolder, this.projFile);
   },

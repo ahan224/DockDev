@@ -14,9 +14,10 @@ const ProjectNav = ({
     stopProject,
     restartProject,
     removeProject,
+    deployProject,
   }) => (
-  <div id="content">
-    <div className="content-top-nav">
+  <div >
+    <div className="proj-nav">
       <ul className="nav nav-inline">
         <li className="nav-item">
           <Link className="nav-link" to={`/projects/${params.uuid}`}>General</Link>
@@ -27,11 +28,7 @@ const ProjectNav = ({
         <li className="nav-item">
           <Link className="nav-link" to={`/projects/${params.uuid}/deploy`}>Deploy</Link>
         </li>
-        <li className="nav-item">
-          <Link className="nav-link" to={`/projects/${params.uuid}/settings`}>Settings</Link>
-        </li>
       </ul>
-
     </div>
     {React.cloneElement(children, {
       projects,
@@ -44,6 +41,7 @@ const ProjectNav = ({
       stopProject,
       restartProject,
       removeProject,
+      deployProject,
     })}
   </div>
 );
@@ -61,6 +59,7 @@ ProjectNav.propTypes = {
   stopProject: React.PropTypes.func,
   restartProject: React.PropTypes.func,
   removeProject: React.PropTypes.func,
+  deployProject: React.PropTypes.func,
 };
 
 

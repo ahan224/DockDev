@@ -2,17 +2,16 @@ import React from 'react';
 
 const DockerImage = ({ name, handler, style }) => (
 
-  <div className="col-xs-6" onClick={handler} style={style}>
-    <div className="card card-block">
-      <h3 className="card-title">
-            {name}
-        <span className="version">.</span>
-        <p className="collapse">Collapse</p>
-      </h3>
-      <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-      <a href="#" className=" pull-right">Details...</a>
-    </div>
-  </div>
+       <div className="col-xs-12 col-md-6 col-lg-4">
+         <div className="card text-xs-left">
+           <div className="card-block" onClick={handler} style={style}>
+             <h5 className="card-title">{name}</h5>
+             <p className="card-text">
+              With supporting text below as a natural lead-in to additional content.
+            </p>
+           </div>
+         </div>
+       </div>
 );
 
 DockerImage.propTypes = {
@@ -22,9 +21,3 @@ DockerImage.propTypes = {
 };
 
 export default DockerImage;
-
-
-{/*<div onClick={handler} style={style}>
-  {name}
-
-</div>*/}
