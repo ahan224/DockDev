@@ -101,7 +101,7 @@ h1 {
 
 #projectMenu {
   margin-left: -10px;
-  border: 1px dashed grey;
+  /*border: 1px dashed grey;*/
   padding-left: 25px;
   margin-top: -15px;
 }
@@ -120,7 +120,7 @@ h1 {
 
 ul.nav li {
     padding: 6px;
-    border: 1px dashed;
+    /*border: 1px dashed;*/
 }
 
 .project-wrapper {
@@ -131,12 +131,93 @@ ul.nav li {
     top: 12px;
 }
 
+.container-player-btns {
+    top: -45px;
+    right: 73px;
+    /* width: 100%; */
+    float: right;
+    text-align: right;
+}
+
+.container-player-btns label {
+    border: 1px dashed;
+    padding: 2px 5px!important;
+}
+
+.container-player-btns label.btn.btn-primary:focus {
+    background: none;
+    color: grey;
+    border: none;
+}
+
+.container-player-btns label.btn.btn-primary:hover {
+    background: none;
+    color: grey;
+    border: none;
+}
+
+.content-top-nav label.btn.btn-primary:hover {
+    background: none;
+    color: grey;
+    border: none;
+}
+
+.content-top-nav label.btn.btn-primary:focus {
+    background: none;
+    color: grey;
+    border: none;
+}
+
+
+.content-top-nav label.btn.btn-primary.active {
+    background: none;
+    color: grey;
+    border: none;
+}
+
+#servers, #databases {
+  min-height: 280px;
+}
+
+.top-nav-btn-group{
+      /*border: 1px dashed;*/
+    margin-top: -3px;
+    height: 38px;
+}
+
+.top-nav-btn-group .btn {
+  padding: 2px 16px 0 16px!important;
+}
+
+.top-nav-btn-group .btn img {
+  width: 20px;
+}
+
+.top-nav-btn-group label {
+    background: none;
+    color: grey;
+    border: none;
+}
+
+.container-player-btns label{
+   background: none;
+    color: grey;
+    border: none;
+}
+
+.container-player-btns label.btn.btn-primary.active{
+   background: none!important;
+    color: grey;
+    border: none;
+}
+
+
 .project-wrapper h5 {
   font-size: 20px;
 }
 
 .proj-nav .nav li a {
-  color: white;
+  color: grey;
 }
 
 .proj-detail-title {
@@ -144,7 +225,7 @@ ul.nav li {
   position: absolute;
   top: -38px;
   /*border: 1px dashed red;*/
-  color: white;
+  color: grey;
 }
 
 .proj-nav .nav {
@@ -152,9 +233,10 @@ ul.nav li {
     /*border: 1px dashed;*/
     /* right: 26px; */
     text-align: right;
-    background: #6363E5;
+    /*background: #6363E5;*/
     padding: 10px;
     margin: -10px;
+    height: 50px;
 }
 
 .add-proj-icon {
@@ -164,8 +246,10 @@ ul.nav li {
 
 .add-proj-icon img {
   width: 100%;
-  border: 1px dashed;
-  margin-top: -9px;
+  /*border: 1px dashed;*/
+  margin-top: -23px;
+    width: 18px;
+    margin-left: -8px;
 }
 
 #menu > div {
@@ -196,6 +280,10 @@ ul.nav li {
   margin: 0 auto;
   overflow: auto;
   padding:10px;
+}
+
+.proj-nav ul li {
+    margin-top: -4px;
 }
 
 .centered-content {
@@ -308,9 +396,10 @@ ul, li {
 }
 
 .container-save {
-  position: relative;
-  top: 2px;
   /*right: 265px;*/
+  position: absolute;
+    right: 0;
+    top: -9px;
 }
 
 .divider {

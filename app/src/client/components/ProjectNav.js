@@ -19,15 +19,18 @@ const ProjectNav = ({
   <div >
     <div className="proj-nav">
       <ul className="nav nav-inline">
+          <li className="nav-item">
+            <Link className="nav-link" to={`/projects/${params.uuid}`}>
+              H
+            </Link>
+          </li>
         <li className="nav-item">
-          <Link className="nav-link" to={`/projects/${params.uuid}`}>General</Link>
+          <Link className="nav-link" to={`/projects/${params.uuid}/container`}> +
+          </Link>
         </li>
-        <li className="nav-item">
-          <Link className="nav-link" to={`/projects/${params.uuid}/container`}>Add Container</Link>
-        </li>
-        <li className="nav-item">
-          <Link className="nav-link" to={`/projects/${params.uuid}/deploy`}>Deploy</Link>
-        </li>
+          {/*<li className="nav-item">
+            <Link className="nav-link" to={`/projects/${params.uuid}/deploy`}>Deploy</Link>
+          </li>*/}
       </ul>
     </div>
     {React.cloneElement(children, {

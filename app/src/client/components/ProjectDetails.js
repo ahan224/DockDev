@@ -12,6 +12,7 @@ const ProjectDetail = ({
     removeProject,
   }) => {
   const proj = projects[params.uuid];
+  console.log(proj.containers);
   const server = R.toPairs(proj.containers)
     .filter(cont => cont[1].server)
     .map(cont =>
@@ -43,13 +44,23 @@ const ProjectDetail = ({
     <div className="project-wrapper">
       <div className="col-xs-4 proj-detail-title" style={{ padding: '0px' }}>
         <h5 className="text-capitalize">
-          {proj.projectName}
+            {proj.projectName}
         </h5>
       </div>
-        <button onClick={start}>Start</button>
-        <button onClick={stop}>Stop</button>
-        <button onClick={restart}>Restart</button>
-        <button onClick={remove}>Remove</button>
+      <div className="btn-group container-player-btns" data-toggle="buttons">
+        <label className="btn btn-primary active">
+          <input type="radio" name="options" id="option1" autoComplete="off" checked onClick={start} />
+                   <img src="./client/images/png/arrow@2x.png"></img>
+        </label>
+        <label className="btn btn-primary">
+          <input type="radio" name="options" id="option2" autoComplete="off" onClick={stop} />
+                   <img src="./client/images/png/shapes@2x.png"></img>
+        </label>
+        <label className="btn btn-primary">
+          <input type="radio" name="options" id="option3" autoComplete="off" onClick={restart} />
+                   <img src="./client/images/png/arrows@2x.png"></img>
+        </label>
+      </div>
         <div className="row">
           <div className="col-xs-12" id="servers">
             <h5>Servers</h5>
