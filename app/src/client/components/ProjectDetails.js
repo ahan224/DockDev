@@ -12,7 +12,19 @@ const ProjectDetail = ({
     removeProject,
   }) => {
   const proj = projects[params.uuid];
-  const containers = R.toPairs(proj.containers)
+  const server = R.toPairs(proj.containers)
+    .filter(cont => cont[1].server)
+    .map(cont =>
+      <Container
+        key={cont[0]}
+        details={cont[1]}
+        uuid={params.uuid}
+        delContainer={delContainer}
+      />
+    );
+
+  const dbs = R.toPairs(proj.containers)
+    .filter(cont => !cont[1].server)
     .map(cont =>
       <Container
         key={cont[0]}
@@ -43,13 +55,13 @@ const ProjectDetail = ({
             <h5>Servers</h5>
             <div className="divider"></div>
           </div>
-          {containers}
+          {server}
         </div>
         <div className="row" >
           <div className="col-xs-12" id="databases">
             <h5>Databases</h5>
             <div className="divider"></div>
-            {containers}
+            {dbs}
           </div>
         </div>
     </div>
