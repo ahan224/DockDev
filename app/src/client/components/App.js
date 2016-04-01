@@ -242,6 +242,7 @@ class App extends React.Component {
                   removeProject: this.removeProject,
                   deployProject: this.deployProject,
                   updateToken: this.updateToken,
+                  DOToken: this.state.DOToken,
                 }
               )}
             </div>
