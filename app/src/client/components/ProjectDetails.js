@@ -12,7 +12,6 @@ const ProjectDetail = ({
     removeProject,
   }) => {
   const proj = projects[params.uuid];
-  console.log(proj.containers);
   const server = R.toPairs(proj.containers)
     .filter(cont => cont[1].server)
     .map(cont =>
@@ -58,6 +57,10 @@ const ProjectDetail = ({
         </label>
         <label className="btn btn-primary">
           <input type="radio" name="options" id="option3" autoComplete="off" onClick={restart} />
+                   <img src="./client/images/png/arrows@2x.png"></img>
+        </label>
+        <label className="btn btn-primary">
+          <input type="radio" name="options" id="option3" autoComplete="off" onClick={remove} />
                    <img src="./client/images/png/arrows@2x.png"></img>
         </label>
       </div>
