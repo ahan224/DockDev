@@ -55,8 +55,7 @@ h1 {
   top: 0;
   bottom: 0;
   width: 200px;
-  background: rgb(241,241,241);
-  color: white;
+  background: rgb(113, 160,215);  color: white;
   margin-bottom: 0;
   padding-left: 10px;
   /*border-right: 1px solid #DADADA;*/
@@ -64,8 +63,7 @@ h1 {
 
 .search-wrapper {
   height: 50px;
-  background: #DFDFDF;
-  padding-top: 12px;
+  background: #6894C8;  padding-top: 12px;
   padding-right: 25px;
   margin-left: -10px;
 }
@@ -104,6 +102,11 @@ h1 {
   /*border: 1px dashed grey;*/
   padding-left: 25px;
   margin-top: -15px;
+  color: white!important;
+}
+
+#projectMenu a {
+  color: white;
 }
 
 .proj-content {
@@ -273,6 +276,11 @@ ul.nav li {
   font-size: 15px;
   /*background: black;*/
   margin-top: 6px;
+  color: white!important;
+}
+
+#menu label:active {
+  color: white;
 }
 
 #content {
