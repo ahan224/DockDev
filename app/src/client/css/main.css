@@ -109,6 +109,12 @@ h1 {
   color: white;
 }
 
+.btn-primary-outline:hover {
+    color: #fff;
+    background-color: #71A0D7!important;
+    border-color: #71A0D7!important;
+}
+
 .proj-content {
   position: relative;
   /* border: 1px dashed; */
