@@ -185,7 +185,7 @@ ul.nav li {
 }
 
 #servers, #databases {
-  min-height: 280px;
+  min-height: 50px;
 }
 
 .top-nav-btn-group{
