@@ -17,7 +17,7 @@ function handleErrors() {
  this.emit('end');
 }
 
-gulp.task('default', ['server', 'react', 'test', 'main', 'css', 'html', 'bower', 'watch']);
+gulp.task('default', ['server', 'react', 'test', 'main', 'client-other', 'html', 'bower', 'watch']);
 
 gulp.task('server', () => {
   return gulp.src('./app/src/server/*')
@@ -58,9 +58,12 @@ gulp.task('react', () => {
     './server/appConfig.js',
     './server/defaultConfig.js',
     './server/container.js',
+    './server/machine.js',
     './server/availableImages.js',
     './server/fileWatch.js',
     './server/manageProj.js',
+    './server/deploy.js',
+    './server/errorHandler.js',
   ]);
 
   return bundler
@@ -78,9 +81,14 @@ gulp.task('test', () => {
   .pipe(gulp.dest('./test/'));
 });
 
-gulp.task('css', () => {
-  return gulp.src('./app/src/client/css/*')
-    .pipe(gulp.dest('./app/build/client/css'))
+gulp.task('client-other', () => {
+  return gulp.src(['./app/src/client/*/**', '!./app/src/client/index.js', '!./app/src/client/components/*.js'])
+    .pipe(gulp.dest('./app/build/client/'))
+})
+
+gulp.task('images', () => {
+  return gulp.src('./app/src/client/images/*')
+    .pipe(gulp.dest('./app/build/client/images'))
 })
 
 gulp.task('html', () => {
@@ -98,7 +106,7 @@ gulp.task('watch', function() {
   gulp.watch('./test/tests.js', ['test']);
   gulp.watch('./app/src/main.js', ['main']);
   gulp.watch(['./app/src/client/index.js', 'app/src/client/components/*.js'], ['react']);
-  gulp.watch('./app/src/client/css/*', ['css']);
+  gulp.watch('./app/src/client/*/**', ['client-other']);
   gulp.watch('./app/index.html', ['html']);
   gulp.watch('./bower_components/*/**', ['bower']);
 });

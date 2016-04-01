@@ -259,7 +259,7 @@ describe('should sync files to docker machine', () => {
         writeFileSync(join(result.basePath, 'test10.txt'));
 
         setTimeout(done, 1900);
-        expect(true).to.be.true;
+        // need to add test here
         return;
       });
   });

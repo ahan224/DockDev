@@ -22,6 +22,7 @@ export const createProj = (basePath, projectName) => ({
   basePath,
   containers: {},
   machine: defaultConfig.machine,
+  remoteMachine: '',
 });
 
 /**
@@ -88,7 +89,6 @@ export const initProject = co(function *g(basePath, projectName, overwrite) {
   yield appConfig.addProjToConfig(basePath, defaultConfig);
 
   yield networkCreate(defaultConfig.machine, setNetworkParams(projObj.uuid));
-  yield machine.ssh(projObj.machine, `mkdir /home/docker/dockdev/${projObj.uuid}`);
 
   return projObj;
 });

@@ -1,10 +1,7 @@
 import React from 'react';
 
-export default ({ context }) => {
+export default () => {
   return (
-    <div id="content">
-      <div id="content-top-nav"></div>
-      DockDev
-    </div>
+      <div id="content"></div>
   );
 };

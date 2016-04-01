@@ -1,11 +1,12 @@
-import fs from 'fs';
-import { exec as childExec } from 'child_process';
-import Promise, { coroutine as co } from 'bluebird';
+// import fs from 'fs';
+// import { exec as childExec } from 'child_process';
+import { coroutine as co } from 'bluebird';
 import R from 'ramda';
+import { readFile, exec as execProm } from './utils';
 
 // promisify certain callback functions
-const readFile = Promise.promisify(fs.readFile);
-const execProm = Promise.promisify(childExec);
+// const readFile = Promise.promisify(fs.readFile);
+// const execProm = Promise.promisify(childExec);
 
 /**
  * exec() returns a docker-machine terminal command promise that resolves to the stdout
@@ -24,6 +25,30 @@ const exec = (args) => execProm(`docker-machine ${args}`);
  * @return {} returns a promise that resolves to the stdout
  */
 export const inspect = (machineName) => exec(`inspect ${machineName}`);
+
+/**
+ * status() returns a string indicating if the machine is running
+ *
+ * @param {String} machineName
+ * @return {} returns a promise that resolves to the stdout
+ */
+export const status = (machineName) => exec(`status ${machineName}`);
+
+/**
+ * regenCerts() regenerates the certificates for the machine with force (no stdout output)
+ *
+ * @param {String} machineName
+ * @return {} returns a promise that resolves to the stdout
+ */
+export const regenCerts = (machineName) => exec(`regenerate-certs -f ${machineName}`);
+
+/**
+ * start() starts a docker-machine
+ *
+ * @param {String} machineName
+ * @return {} returns a promise that resolves to the stdout
+ */
+export const start = (machineName) => exec(`start ${machineName}`);
 
 /**
  * createMachine() returns a new docker-machine without a shared folder
@@ -97,4 +122,18 @@ export const list = () => exec('ls');
 
 
 export const removeMachineFolder = (projObj) =>
-  ssh(projObj.machine, `rm -rf /home/docker/dockdev/${projObj.uuid}`);
+  ssh(projObj.machine, 'rm -rf /home/docker/tmp');
+
+export const createMachineFolder = (projObj) =>
+  ssh(projObj.machine, 'mkdir /home/docker/tmp');
+
+
+export const checkMachineRunning = co(function *g(defaultConfig) {
+  const running = yield status(defaultConfig.machine);
+  if (running.trim() !== 'Running') {
+    yield start(defaultConfig.machine);
+    // yield regenCerts(defaultConfig.machine);
+    return false;
+  }
+  return true;
+});

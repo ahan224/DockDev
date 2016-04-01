@@ -37,3 +37,16 @@ export const find = (array) => {
  * @return {String}
  */
 export const jsonStringifyPretty = (obj) => JSON.stringify(obj, null, 2);
+
+
+// function promisify(fun) {
+//   return function(...args) {
+//     return new Promise((resolve, reject) => {
+//       args.push((err, result) => {
+//         if (err) reject({ message: err.toString().substr(7), code: err.code });
+//         else resolve(result);
+//       });
+//       fun.apply(null, args);
+//     });
+//   };
+// }
