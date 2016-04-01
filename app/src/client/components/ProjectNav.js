@@ -14,6 +14,7 @@ const ProjectNav = ({
     stopProject,
     restartProject,
     removeProject,
+    deployProject,
   }) => (
   <div >
     <div className="proj-nav">
@@ -40,6 +41,7 @@ const ProjectNav = ({
       stopProject,
       restartProject,
       removeProject,
+      deployProject,
     })}
   </div>
 );
@@ -57,6 +59,7 @@ ProjectNav.propTypes = {
   stopProject: React.PropTypes.func,
   restartProject: React.PropTypes.func,
   removeProject: React.PropTypes.func,
+  deployProject: React.PropTypes.func,
 };
 
 
