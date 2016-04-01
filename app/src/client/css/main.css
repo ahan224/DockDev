@@ -48,7 +48,6 @@ h1 {
 #header h5 {
   text-align: right;
   padding: 8px 0 0;
-
 }
 
 #menu {
@@ -56,31 +55,55 @@ h1 {
   top: 0;
   bottom: 0;
   width: 200px;
-  background: #FFF;
+  background: rgb(241,241,241);
   color: white;
-  padding-top: 35px;
   margin-bottom: 0;
   padding-left: 10px;
-  border-right: 1px solid #DADADA;
+  /*border-right: 1px solid #DADADA;*/
 }
 
-#menu a {
-  color:#504E4E;
+.search-wrapper {
+  height: 50px;
+  background: #DFDFDF;
+  padding-top: 12px;
+  padding-right: 25px;
+  margin-left: -10px;
+}
+
+.main-search-input {
+  width: 148px;
+  background: none;
+  border: none;
+}
+
+.add-proj-icon {
+    padding: 0;
+    margin: 0;
+    top: -7px;
+    /*position: absolute;*/
 }
 
 .proj-anchor {
-  border: 1px dashed white;
-  height: 44px;
+  height: 50px;
   padding: 8px 0px 0px 2px;
+  /*border: 1px dashed grey;*/
 }
 
-#menu li:first-child {
-  padding-top: 5px;
+.add-proj-wrapper {
+    position: relative;
+    top: -33px;
+    /*border: 1px dashed black;*/
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    right: -140px;
 }
 
 #projectMenu {
-  padding-top: 0!important;
-  padding-bottom: 6px!important;
+  margin-left: -10px;
+  border: 1px dashed grey;
+  padding-left: 25px;
+  margin-top: -15px;
 }
 
 .proj-content {
@@ -93,6 +116,11 @@ h1 {
   background: #757CDE;
   color: white;
   padding: 10px;
+}
+
+ul.nav li {
+    padding: 6px;
+    border: 1px dashed;
 }
 
 .project-wrapper {
@@ -130,19 +158,18 @@ h1 {
 }
 
 .add-proj-icon {
-  position: absolute;
-    right: 16px;
     width: 28px;
     height: 28px;
 }
 
 .add-proj-icon img {
   width: 100%;
-  padding: 0 4px;
+  border: 1px dashed;
+  margin-top: -9px;
 }
 
 #menu > div {
-  width: 100%;
+  /*width: 100%;*/
   color: #DADADA;
   /*padding: 15px;*/
   /*border-bottom: 1px solid #DADADA;*/
@@ -159,7 +186,9 @@ h1 {
 #menu label {
   margin: 0;
   font-weight: bold;
-  font-size: 18px;
+  font-size: 15px;
+  /*background: black;*/
+  margin-top: 6px;
 }
 
 #content {
@@ -241,7 +270,7 @@ h1 {
   border-bottom: 1px solid #F1F1F3;
   padding: 10px 9px 10px 9px;
   text-align: right;
-  height: 35px;
+  height: 50px;
 }
 
 .content-top-nav button {

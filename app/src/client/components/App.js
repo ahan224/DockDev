@@ -195,6 +195,12 @@ class App extends React.Component {
     return (
       <div>
         <ul role="nav" id="menu" className="nav">
+          <li className="search-wrapper">
+            {/*<input className="main-search-input"></input>*/}
+              {/*<span className="input-group-addon">
+                <img src="./client/images/png/search.png"></img>
+              </span>*/}
+          </li>
           <li className="nav-item proj-anchor">
             <NavLink to="/" onlyActiveOnIndex>
               <label onClick={this.exampleClick}>
@@ -202,9 +208,9 @@ class App extends React.Component {
               </label>
             </NavLink>
           </li>
-          <li>
+          <li className="add-proj-wrapper">
             <NavLink to="/addProject" className="add-proj-icon">
-              <img src="./client/images/x_folder-add.png"></img>
+              <img src="./client/images/png/signs.png"></img>
             </NavLink>
           </li>
           <ProjectLinks projects={this.state.projects} />
