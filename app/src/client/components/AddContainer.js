@@ -28,7 +28,6 @@ class AddContainer extends React.Component {
   }
 
   clickServer(selServer) {
-    console.log(selServer);
     return () => {
       this.setState({ selServer });
     };
