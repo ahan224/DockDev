@@ -10,6 +10,7 @@ import * as manageProj from './server/manageProj.js';
 import fileWatch from './server/fileWatch.js';
 import Icons from './icons';
 import * as machine from './server/machine.js';
+import * as deploy from './server/deploy.js';
 import errorHandler from './server/errorHandler.js';
 
 const svgStyle = {
@@ -30,10 +31,13 @@ class App extends React.Component {
     this.startProject = this.startProject.bind(this);
     this.restartProject = this.restartProject.bind(this);
     this.removeProject = this.removeProject.bind(this);
+    this.deployProject = this.deployProject.bind(this);
+    this.updateToken = this.updateToken.bind(this);
     this.errorCallback = this.errorCallback.bind(this);
     this.state = {
       projects: {},
       activeProject: '',
+      DOToken: '',
     };
   }
 
@@ -169,6 +173,20 @@ class App extends React.Component {
       .catch(err => errorHandler('removeProject', err, [uuid], this.errorCallback));
   }
 
+  deployProject(uuid) {
+    const DOToken = this.state.DOToken;
+    const projects = this.state.projects;
+    deploy.deployToOcean(projects[uuid], DOToken);
+  }
+
+  updateToken(e) {
+    this.setState({ DOToken: e.target.value });
+  }
+
+  exampleClick(e) {
+    console.log(e.target);
+  }
+
   errorCallback(errorObj) {
     console.log(errorObj);
   }
@@ -227,6 +245,9 @@ class App extends React.Component {
                   startProject: this.startProject,
                   restartProject: this.restartProject,
                   removeProject: this.removeProject,
+                  deployProject: this.deployProject,
+                  updateToken: this.updateToken,
+                  DOToken: this.state.DOToken,
                   errorCallback: this.errorCallback,
                 }
               )}
