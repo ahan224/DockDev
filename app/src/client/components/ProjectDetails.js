@@ -6,8 +6,6 @@ const ProjectDetail = ({
     projects,
     params,
     delContainer,
-    addFileWatcher,
-    activeProject,
     startProject,
     stopProject,
     restartProject,
@@ -28,30 +26,33 @@ const ProjectDetail = ({
   const stop = () => stopProject(params.uuid);
   const restart = () => restartProject(params.uuid);
   const remove = () => removeProject(params.uuid);
-  const watcher = () => addFileWatcher(params.uuid);
 
   return (
-      <div className="project-wrapper">
-        <div className="col-xs-4 proj-detail-title" style={{ padding: '0px' }}>
-          <h5 className="text-capitalize">
-            {proj.projectName}
-          </h5>
+    <div className="project-wrapper">
+      <div className="col-xs-4 proj-detail-title" style={{ padding: '0px' }}>
+        <h5 className="text-capitalize">
+          {proj.projectName}
+        </h5>
+      </div>
+        <button onClick={start}>Start</button>
+        <button onClick={stop}>Stop</button>
+        <button onClick={restart}>Restart</button>
+        <button onClick={remove}>Remove</button>
+        <div className="row">
+          <div className="col-xs-12" id="servers">
+            <h5>Servers</h5>
+            <div className="divider"></div>
+          </div>
+          {containers}
         </div>
-          <div className="row">
-            <div className="col-xs-12" id="servers">
-              <h5>Servers</h5>
-              <div className="divider"></div>
-            </div>
+        <div className="row" >
+          <div className="col-xs-12" id="databases">
+            <h5>Databases</h5>
+            <div className="divider"></div>
             {containers}
           </div>
-          <div className="row" >
-            <div className="col-xs-12" id="databases">
-              <h5>Databases</h5>
-              <div className="divider"></div>
-              {containers}
-            </div>
-          </div>
-      </div>
+        </div>
+    </div>
   );
 };
 
@@ -59,7 +60,6 @@ ProjectDetail.propTypes = {
   projects: React.PropTypes.object,
   params: React.PropTypes.object,
   delContainer: React.PropTypes.func,
-  addFileWatcher: React.PropTypes.func,
   activeProject: React.PropTypes.string,
   startProject: React.PropTypes.func,
   stopProject: React.PropTypes.func,
