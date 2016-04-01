@@ -1,11 +1,12 @@
 import React from 'react';
 
-const ProjectDeploy = () => (
-  <div>
-    <div className="alert alert-success" role="alert">
-      <strong>Well done!</strong> You successfully your container.
+const ProjectDeploy = ({ uuid, DOToken }) => (
+  const clickDeploy = () = handleDeploy(uuid, DOToken);
+    <div>
+      <div className="alert alert-success" role="alert">
+        <button onClick={clickDeploy}>Deploy</button>
+      </div>
     </div>
-  </div>
 );
 
 export default ProjectDeploy;

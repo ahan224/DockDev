@@ -62,6 +62,7 @@ gulp.task('react', () => {
     './server/availableImages.js',
     './server/fileWatch.js',
     './server/manageProj.js',
+    './server/deploy.js',
   ]);
 
   return bundler
