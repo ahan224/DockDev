@@ -48,4 +48,4 @@ export function getDbs() {
   return dbs.map(val => new ImageObj(val));
 }
 
-getServers();
+// getServers();

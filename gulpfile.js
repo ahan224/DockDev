@@ -63,6 +63,7 @@ gulp.task('react', () => {
     './server/fileWatch.js',
     './server/manageProj.js',
     './server/deploy.js',
+    './server/errorHandler.js',
   ]);
 
   return bundler

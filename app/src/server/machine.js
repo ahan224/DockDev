@@ -1,11 +1,12 @@
-import fs from 'fs';
-import { exec as childExec } from 'child_process';
-import Promise, { coroutine as co } from 'bluebird';
+// import fs from 'fs';
+// import { exec as childExec } from 'child_process';
+import { coroutine as co } from 'bluebird';
 import R from 'ramda';
+import { readFile, exec as execProm } from './utils';
 
 // promisify certain callback functions
-const readFile = Promise.promisify(fs.readFile);
-const execProm = Promise.promisify(childExec);
+// const readFile = Promise.promisify(fs.readFile);
+// const execProm = Promise.promisify(childExec);
 
 /**
  * exec() returns a docker-machine terminal command promise that resolves to the stdout
@@ -121,10 +122,10 @@ export const list = () => exec('ls');
 
 
 export const removeMachineFolder = (projObj) =>
-  ssh(projObj.machine, `rm -rf /home/docker/${projObj.uuid}`);
+  ssh(projObj.machine, 'rm -rf /home/docker/tmp');
 
 export const createMachineFolder = (projObj) =>
-  ssh(projObj.machine, `mkdir /home/docker/${projObj.uuid}`);
+  ssh(projObj.machine, 'mkdir /home/docker/tmp');
 
 
 export const checkMachineRunning = co(function *g(defaultConfig) {

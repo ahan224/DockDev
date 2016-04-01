@@ -11,6 +11,7 @@ import fileWatch from './server/fileWatch.js';
 import Icons from './icons';
 import * as machine from './server/machine.js';
 import * as deploy from './server/deploy.js';
+import errorHandler from './server/errorHandler.js';
 
 const svgStyle = {
   width: '16px',
@@ -32,6 +33,7 @@ class App extends React.Component {
     this.removeProject = this.removeProject.bind(this);
     this.deployProject = this.deployProject.bind(this);
     this.updateToken = this.updateToken.bind(this);
+    this.errorCallback = this.errorCallback.bind(this);
     this.state = {
       projects: {},
       activeProject: '',
@@ -46,7 +48,7 @@ class App extends React.Component {
       this.addAppConfig,
       this.addExistingProjects
     ).then(() => {
-      setInterval(() => machine.checkMachineRunning(defaultConfig), 5000);
+      // setInterval(() => machine.checkMachineRunning(defaultConfig), 5000);
     });
   }
 
@@ -98,7 +100,8 @@ class App extends React.Component {
         delete projects[uuid].containers[containerObj.containerId];
         projConfig.writeProj(projects[uuid]);
         this.setState({ projects });
-      });
+      })
+      .catch(err => errorHandler('delContainer', err, [uuid, containerObj]));
   }
 
   addFileWatcher(uuid) {
@@ -124,41 +127,40 @@ class App extends React.Component {
 
   stopProject(uuid) {
     const projects = this.state.projects;
-    manageProj.stopProject(projects[uuid])
+    manageProj.stopProject(projects[uuid], this.errorCallback)
       .then(proj => {
         if (proj.uuid === this.state.activeProject) {
           this.setState({ activeProject: '' });
         }
       })
-      .catch();
+      .catch(err => errorHandler('stopProject', err, [uuid], this.errorCallback));
   }
 
   startProject(uuid) {
     const projects = this.state.projects;
     const activeProject = projects[this.state.activeProject];
-    manageProj.startProject(projects[uuid], activeProject)
+    manageProj.startProject(projects[uuid], activeProject, this.errorCallback)
       .then(proj => {
         projects[uuid] = proj;
-        this.setState({ projects });
         this.setState({ activeProject: proj.uuid });
       })
-      .catch();
+      .catch(err => errorHandler('startProject', err, [uuid], this.errorCallback));
   }
 
   restartProject(uuid) {
     const projects = this.state.projects;
     const activeProject = projects[this.state.activeProject];
-    manageProj.restartProject(projects[uuid], activeProject)
+    manageProj.restartProject(projects[uuid], activeProject, this.errorCallback)
       .then(proj => {
         this.setState({ activeProject: proj.uuid });
       })
-      .catch();
+      .catch(err => errorHandler('restartProject', err, [uuid], this.errorCallback));
   }
 
   removeProject(uuid) {
     const projects = this.state.projects;
     const activeProject = projects[this.state.activeProject];
-    manageProj.removeProject(projects[uuid])
+    manageProj.removeProject(projects[uuid], this.errorCallback)
       .then(() => {
         if (activeProject === uuid) {
           this.setState({ activeProject: '' });
@@ -168,22 +170,25 @@ class App extends React.Component {
         delete projects[uuid];
         this.setState({ projects });
       })
-      .catch();
+      .catch(err => errorHandler('removeProject', err, [uuid], this.errorCallback));
   }
 
   deployProject(uuid) {
     const DOToken = this.state.DOToken;
     const projects = this.state.projects;
     deploy.deployToOcean(projects[uuid], DOToken);
-
   }
 
   updateToken(e) {
-    this.setState({DOToken: e.target.value});
+    this.setState({ DOToken: e.target.value });
   }
 
   exampleClick(e) {
     console.log(e.target);
+  }
+
+  errorCallback(errorObj) {
+    console.log(errorObj);
   }
 
   render() {
@@ -243,6 +248,7 @@ class App extends React.Component {
                   deployProject: this.deployProject,
                   updateToken: this.updateToken,
                   DOToken: this.state.DOToken,
+                  errorCallback: this.errorCallback,
                 }
               )}
             </div>
