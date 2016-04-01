@@ -98,19 +98,19 @@ const buildDockerFile = co(function *g() {
  * based on the passed in project object, remote machine name, and access token
  *
  * @param {Object} projObj
- * @param {String} dropletMachName
  * @param {String} accessToken
  * @return {Boolean} true
  */
-const deployToOcean = co(function *g(projObj, dropletMachName, accessToken) {
+export const deployToOcean = co(function *g(projObj, accessToken) {
+  const remoteMachName = projObj.projectName.replace(' ', '_');
   const Token = storeOceanToken(accessToken);
-  yield dropletOnOcean(Token, dropletMachName);
+  yield dropletOnOcean(Token, remoteMachName);
   const dbNamesArray = getDbNames(projObj);
-  yield pullImagesOcean(dropletMachName, dbNamesArray);
+  yield pullImagesOcean(remoteMachName, dbNamesArray);
   yield buildDockerFile();
   const remoteSync = generateRsync(projObj, 'remoteMachine');
   yield remoteSync;
-  yield ssh(dropletMachName, 'docker build ./tmp');
+  yield ssh(remoteMachName, 'docker build ./tmp');
   return true;
 });
 
