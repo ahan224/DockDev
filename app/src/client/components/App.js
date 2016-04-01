@@ -210,7 +210,7 @@ class App extends React.Component {
           </li>
           <li className="add-proj-wrapper">
             <NavLink to="/addProject" className="add-proj-icon">
-              <img src="./client/images/png/signs@2x.png"></img>
+              <img src="./client/images/png/addIcon@2x.png"></img>
             </NavLink>
           </li>
           <ProjectLinks projects={this.state.projects} />
