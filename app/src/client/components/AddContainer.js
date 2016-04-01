@@ -90,7 +90,7 @@ class AddContainer extends React.Component {
 
     return (
       <div className="project-wrapper">
-          <div className="col-xs-4 proj-detail-title" id="servers" style={{ padding: '0px' }}>
+          <div className="col-xs-4 proj-detail-title" style={{ padding: '0px' }}>
             <h5 className="text-capitalize">
               Add Container
             </h5>
