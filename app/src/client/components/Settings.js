@@ -1,7 +1,7 @@
 import React from 'react';
 import { remote } from 'electron';
 
-const Settings = ({ addNewProject }) => (
+const Settings = ({ DOToken, updateToken }) => (
   <div>
     <div className="col-sm-8">
       <h5>Root Path</h5>
@@ -15,6 +15,8 @@ const Settings = ({ addNewProject }) => (
         <h5>Digital Ocean Token</h5>
         <input
           className="form-control form-control-lg border-bottom-input padding-left-none"
+          value={DOToken}
+          onChange={updateToken}
           type="text"
         />
       </div>
@@ -22,6 +24,11 @@ const Settings = ({ addNewProject }) => (
   </div>
 
 );
+
+Settings.propTypes = {
+  updateToken: React.PropTypes.func,
+  DOToken: React.PropTypes.string,
+};
 
 // onClick={popFileSelector}
 // onChange={projNameHandler}
