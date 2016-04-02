@@ -1,53 +1,60 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-const ProjectNav = ({
-    projects,
-    addContainer,
-    delContainer,
-    children,
-    params,
-    context,
-    addFileWatcher,
-    activeProject,
-    startProject,
-    stopProject,
-    restartProject,
-    removeProject,
-    deployProject,
-  }) => (
-  <div >
-    <div className="proj-nav">
-      <ul className="nav nav-inline">
+const ProjectNav = (props) => {
+  const uuid = props.params.uuid;
+  const proj = props.projects[uuid];
+
+  const start = () => props.startProject(uuid);
+  const stop = () => props.stopProject(uuid);
+  const restart = () => props.restartProject(uuid);
+  const remove = () => props.removeProject(uuid);
+
+  return (
+    <div >
+      <div className="proj-nav">
+        <div className="col-xs-4 proj-detail-title" style={{ padding: '0px' }}>
+          <h5 className="text-capitalize">
+            {proj.projectName}
+          </h5>
+        </div>
+        <div className="btn-group container-player-btns" data-toggle="buttons">
+          <label className="btn btn-primary active">
+            <input type="radio" name="options" id="option1" autoComplete="off" />
+              <img src="./client/images/png/arrow@2x.png" onClick={start}></img>
+          </label>
+          <label className="btn btn-primary">
+            <input type="radio" name="options" id="option2" autoComplete="off" />
+              <img src="./client/images/png/shapes@2x.png" onClick={stop}></img>
+          </label>
+          <label className="btn btn-primary">
+            <input type="radio" name="options" id="option3" autoComplete="off" />
+              <img src="./client/images/png/arrows@2x.png" onClick={restart}></img>
+          </label>
+          <label className="btn btn-primary">
+            <input type="radio" name="options" id="option3" autoComplete="off" />
+              <img src="./client/images/png/arrows@2x.png" onClick={remove}></img>
+          </label>
+        </div>
+        <ul className="nav nav-inline">
+            <li className="nav-item">
+              <Link className="nav-link" to={`/projects/${uuid}`}>
+                H
+              </Link>
+            </li>
           <li className="nav-item">
-            <Link className="nav-link" to={`/projects/${params.uuid}`}>
-              H
+            <Link className="nav-link" to={`/projects/${uuid}/container`}> +
             </Link>
           </li>
-        <li className="nav-item">
-          <Link className="nav-link" to={`/projects/${params.uuid}/container`}> +
-          </Link>
-        </li>
-          {/*<li className="nav-item">
-            <Link className="nav-link" to={`/projects/${params.uuid}/deploy`}>Deploy</Link>
-          </li>*/}
-      </ul>
+            <li className="nav-item">
+              <Link className="nav-link" to={`/projects/${uuid}/deploy`}>Deploy</Link>
+            </li>
+        </ul>
+      </div>
+      {React.cloneElement(props.children, props)}
     </div>
-    {React.cloneElement(children, {
-      projects,
-      addContainer,
-      context,
-      delContainer,
-      addFileWatcher,
-      activeProject,
-      startProject,
-      stopProject,
-      restartProject,
-      removeProject,
-      deployProject,
-    })}
-  </div>
-);
+  );
+};
 
 ProjectNav.propTypes = {
   children: React.PropTypes.object,
@@ -56,7 +63,6 @@ ProjectNav.propTypes = {
   addContainer: React.PropTypes.func,
   context: React.PropTypes.object,
   delContainer: React.PropTypes.func,
-  addFileWatcher: React.PropTypes.func,
   activeProject: React.PropTypes.string,
   startProject: React.PropTypes.func,
   stopProject: React.PropTypes.func,
@@ -65,5 +71,30 @@ ProjectNav.propTypes = {
   deployProject: React.PropTypes.func,
 };
 
+
+// projects,
+// addContainer,
+// delContainer,
+// children,
+// params,
+// context,
+// activeProject,
+// startProject,
+// stopProject,
+// restartProject,
+// removeProject,
+// deployProject,
+
+// projects,
+// addContainer,
+// context,
+// delContainer,
+// addFileWatcher,
+// activeProject,
+// startProject,
+// stopProject,
+// restartProject,
+// removeProject,
+// deployProject,
 
 export default ProjectNav;
