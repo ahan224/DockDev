@@ -77,9 +77,9 @@ class AddContainer extends React.Component {
       const style = {};
       if (this.state.selDbs.indexOf(val.name) > -1) {
         style.color = 'white';
-        style.backgroundColor = '#286090';
-        style.borderRadius = '6px';
-        style.borderColor = '#286090';
+        style.backgroundColor = '#71A0D7';
+        style.borderRadius = '2px';
+        style.borderColor = '#6894C8';
       }
       return (
         <DockerImage key={idx} style={style}
@@ -90,7 +90,7 @@ class AddContainer extends React.Component {
 
     return (
       <div className="project-wrapper">
-          <div className="col-xs-4 proj-detail-title" id="servers" style={{ padding: '0px' }}>
+          <div className="col-xs-4 proj-detail-title" style={{ padding: '0px' }}>
             <h5 className="text-capitalize">
               Add Container
             </h5>
