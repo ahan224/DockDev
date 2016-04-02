@@ -195,6 +195,12 @@ class App extends React.Component {
     return (
       <div>
         <ul role="nav" id="menu" className="nav">
+          <li className="search-wrapper">
+            {/*<input className="main-search-input"></input>*/}
+              {/*<span className="input-group-addon">
+                <img src="./client/images/png/search.png"></img>
+              </span>*/}
+          </li>
           <li className="nav-item proj-anchor">
             <NavLink to="/" onlyActiveOnIndex>
               <label onClick={this.exampleClick}>
@@ -202,32 +208,31 @@ class App extends React.Component {
               </label>
             </NavLink>
           </li>
-          <li>
+          <li className="add-proj-wrapper">
             <NavLink to="/addProject" className="add-proj-icon">
-              <img src="./client/images/x_folder-add.png"></img>
+              <img src="./client/images/png/addIcon@2x.png"></img>
             </NavLink>
           </li>
           <ProjectLinks projects={this.state.projects} />
         </ul>
           <div id="right-column">
             <div className="content-top-nav">
-             <div className="btn-group btn-group-sm" role="group" aria-label="...">
-               <button type="button" className="btn btn-secondary">
-               </button>
-                 <button type="button" className="btn btn-secondary">
-                  <div style={svgStyle}>
-                    <svg style={svgStyle}>
-                      <circle cx={8} cy={6} r={6} fill="red" value="Status">
-                        Status
-                      </circle>
-                    </svg>
-                  </div>
-                 </button>
-                 <button type="button" className="btn btn-secondary">
-                   <div>
-                     <NavLink to="/settings">Settings</NavLink>
-                   </div>
-                 </button>
+             <div className="btn-group top-nav-btn-group" data-toggle="buttons">
+               <label className="btn btn-primary active">
+                 <input type="radio" name="options" id="option1" autoComplete="off"  />
+                   <img src="./client/images/png/music@2x.png"></img>
+
+               </label>
+               <label className="btn btn-primary">
+                 <input type="radio" name="options" id="option2" autoComplete="off"  />
+                   <img src="./client/images/png/power@2x.png"></img>
+
+               </label>
+               <label className="btn btn-primary">
+                 <input type="radio" name="options" id="option3" autoComplete="off"  />
+                   <img src="./client/images/png/tool@2x.png"></img>
+
+               </label>
              </div>
             </div>
             <div id="content">
