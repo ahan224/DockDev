@@ -29,11 +29,6 @@ h1 {
   }
 }
 
-#app {
-  overflow: hidden;
-    overflow-y: scroll;
-}
-
 #header{
   border-bottom: 1px solid #19191B;
     position: fixed;
@@ -140,13 +135,13 @@ ul.nav li {
     top: 12px;
 }
 
-.container-player-btns {
+/*.container-player-btns {
     top: -45px;
     right: 73px;
     /* width: 100%; */
     float: right;
     text-align: right;
-}
+}*/
 
 .container-player-btns label {
     border: 1px dashed;
@@ -291,8 +286,6 @@ ul.nav li {
 
 #content {
   width: 100%;
-  margin: 0 auto;
-  overflow: auto;
   padding:10px;
 }
 
