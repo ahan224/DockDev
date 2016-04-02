@@ -29,11 +29,6 @@ h1 {
   }
 }
 
-#app {
-  overflow: hidden;
-    overflow-y: scroll;
-}
-
 #header{
   border-bottom: 1px solid #19191B;
     position: fixed;
@@ -48,7 +43,6 @@ h1 {
 #header h5 {
   text-align: right;
   padding: 8px 0 0;
-
 }
 
 #menu {
@@ -56,31 +50,64 @@ h1 {
   top: 0;
   bottom: 0;
   width: 200px;
-  background: #FFF;
-  color: white;
-  padding-top: 35px;
+  background: rgb(113, 160,215);  color: white;
   margin-bottom: 0;
   padding-left: 10px;
-  border-right: 1px solid #DADADA;
+  /*border-right: 1px solid #DADADA;*/
 }
 
-#menu a {
-  color:#504E4E;
+.search-wrapper {
+  height: 50px;
+  background: #6894C8;  padding-top: 12px;
+  padding-right: 25px;
+  margin-left: -10px;
+}
+
+.main-search-input {
+  width: 148px;
+  background: none;
+  border: none;
+}
+
+.add-proj-icon {
+    padding: 0;
+    margin: 0;
+    top: -7px;
+    /*position: absolute;*/
 }
 
 .proj-anchor {
-  border: 1px dashed white;
-  height: 44px;
+  height: 50px;
   padding: 8px 0px 0px 2px;
+  /*border: 1px dashed grey;*/
 }
 
-#menu li:first-child {
-  padding-top: 5px;
+.add-proj-wrapper {
+    position: relative;
+    top: -33px;
+    /*border: 1px dashed black;*/
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    right: -140px;
 }
 
 #projectMenu {
-  padding-top: 0!important;
-  padding-bottom: 6px!important;
+  margin-left: -10px;
+  /*border: 1px dashed grey;*/
+  padding-left: 25px;
+  margin-top: -15px;
+  color: white!important;
+}
+
+#projectMenu a {
+  color: white;
+}
+
+.btn-primary-outline:hover {
+    color: #fff;
+    background-color: #71A0D7!important;
+    border-color: #71A0D7!important;
 }
 
 .proj-content {
@@ -95,6 +122,11 @@ h1 {
   padding: 10px;
 }
 
+ul.nav li {
+    padding: 6px;
+    /*border: 1px dashed;*/
+}
+
 .project-wrapper {
   position: relative;
     /* top: -25px; */
@@ -103,12 +135,93 @@ h1 {
     top: 12px;
 }
 
+/*.container-player-btns {
+    top: -45px;
+    right: 73px;
+    /* width: 100%; */
+    float: right;
+    text-align: right;
+}*/
+
+.container-player-btns label {
+    border: 1px dashed;
+    padding: 2px 5px!important;
+}
+
+.container-player-btns label.btn.btn-primary:focus {
+    background: none;
+    color: grey;
+    border: none;
+}
+
+.container-player-btns label.btn.btn-primary:hover {
+    background: none;
+    color: grey;
+    border: none;
+}
+
+.content-top-nav label.btn.btn-primary:hover {
+    background: none;
+    color: grey;
+    border: none;
+}
+
+.content-top-nav label.btn.btn-primary:focus {
+    background: none;
+    color: grey;
+    border: none;
+}
+
+
+.content-top-nav label.btn.btn-primary.active {
+    background: none;
+    color: grey;
+    border: none;
+}
+
+#servers, #databases {
+  min-height: 50px;
+}
+
+.top-nav-btn-group{
+      /*border: 1px dashed;*/
+    margin-top: -3px;
+    height: 38px;
+}
+
+.top-nav-btn-group .btn {
+  padding: 2px 16px 0 16px!important;
+}
+
+.top-nav-btn-group .btn img {
+  width: 20px;
+}
+
+.top-nav-btn-group label {
+    background: none;
+    color: grey;
+    border: none;
+}
+
+.container-player-btns label{
+   background: none;
+    color: grey;
+    border: none;
+}
+
+.container-player-btns label.btn.btn-primary.active{
+   background: none!important;
+    color: grey;
+    border: none;
+}
+
+
 .project-wrapper h5 {
   font-size: 20px;
 }
 
 .proj-nav .nav li a {
-  color: white;
+  color: grey;
 }
 
 .proj-detail-title {
@@ -116,7 +229,7 @@ h1 {
   position: absolute;
   top: -38px;
   /*border: 1px dashed red;*/
-  color: white;
+  color: grey;
 }
 
 .proj-nav .nav {
@@ -124,25 +237,27 @@ h1 {
     /*border: 1px dashed;*/
     /* right: 26px; */
     text-align: right;
-    background: #6363E5;
+    /*background: #6363E5;*/
     padding: 10px;
     margin: -10px;
+    height: 50px;
 }
 
 .add-proj-icon {
-  position: absolute;
-    right: 16px;
     width: 28px;
     height: 28px;
 }
 
 .add-proj-icon img {
   width: 100%;
-  padding: 0 4px;
+  /*border: 1px dashed;*/
+  margin-top: -23px;
+    width: 18px;
+    margin-left: -8px;
 }
 
 #menu > div {
-  width: 100%;
+  /*width: 100%;*/
   color: #DADADA;
   /*padding: 15px;*/
   /*border-bottom: 1px solid #DADADA;*/
@@ -159,14 +274,23 @@ h1 {
 #menu label {
   margin: 0;
   font-weight: bold;
-  font-size: 18px;
+  font-size: 15px;
+  /*background: black;*/
+  margin-top: 6px;
+  color: white!important;
+}
+
+#menu label:active {
+  color: white;
 }
 
 #content {
   width: 100%;
-  margin: 0 auto;
-  overflow: auto;
   padding:10px;
+}
+
+.proj-nav ul li {
+    margin-top: -4px;
 }
 
 .centered-content {
@@ -241,7 +365,7 @@ h1 {
   border-bottom: 1px solid #F1F1F3;
   padding: 10px 9px 10px 9px;
   text-align: right;
-  height: 35px;
+  height: 50px;
 }
 
 .content-top-nav button {
@@ -279,9 +403,10 @@ ul, li {
 }
 
 .container-save {
-  position: relative;
-  top: 2px;
   /*right: 265px;*/
+  position: absolute;
+    right: 0;
+    top: -9px;
 }
 
 .divider {
