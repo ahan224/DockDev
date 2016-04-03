@@ -1,5 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router';
+import ProjButtons from './appChildComp/ProjButtons';
+import ProjNavLinks from './appChildComp/ProjNavLinks';
 
 const ProjectNav = (props) => {
   const uuid = props.params.uuid;
@@ -18,38 +19,10 @@ const ProjectNav = (props) => {
             {proj.projectName}
           </h5>
         </div>
-        <div className="btn-group container-player-btns" data-toggle="buttons">
-          <label className="btn btn-primary active">
-            <input type="radio" name="options" id="option1" autoComplete="off" />
-              <img src="./client/images/png/arrow@2x.png" onClick={start}></img>
-          </label>
-          <label className="btn btn-primary">
-            <input type="radio" name="options" id="option2" autoComplete="off" />
-              <img src="./client/images/png/shapes@2x.png" onClick={stop}></img>
-          </label>
-          <label className="btn btn-primary">
-            <input type="radio" name="options" id="option3" autoComplete="off" />
-              <img src="./client/images/png/arrows@2x.png" onClick={restart}></img>
-          </label>
-          <label className="btn btn-primary">
-            <input type="radio" name="options" id="option3" autoComplete="off" />
-              <img src="./client/images/png/shapes@2x.png" onClick={remove}></img>
-          </label>
-        </div>
-        <ul className="nav nav-inline">
-            <li className="nav-item">
-              <Link className="nav-link" to={`/projects/${uuid}`}>
-                H
-              </Link>
-            </li>
-          <li className="nav-item">
-            <Link className="nav-link" to={`/projects/${uuid}/container`}> +
-            </Link>
-          </li>
-            <li className="nav-item">
-              <Link className="nav-link" to={`/projects/${uuid}/deploy`}>Deploy</Link>
-            </li>
-        </ul>
+
+        <ProjButtons start={start} stop={stop} restart={restart} remove={remove} />
+        <ProjNavLinks uuid={uuid} />
+
       </div>
       {React.cloneElement(props.children, props)}
     </div>
