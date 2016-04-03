@@ -107,7 +107,8 @@ export function generateRsync(projObj, destMachine) {
   const getArgs = co(function *g() {
     const machineInfo = selectSSHandIP(yield machine.inspect(projObj[destMachine]));
     const targetContainerId = getSyncContainer(projObj);
-    const dest = projObj.containers[targetContainerId].dest;
+    const dest = (destMachine === 'remoteMachine') ?
+      '/var/lib/docker/tmp' : projObj.containers[targetContainerId].dest;
     const cleanPath = cleanFilePath(projObj.basePath);
 
     return createRsyncArgs(`${cleanPath}/`, dest, machineInfo);

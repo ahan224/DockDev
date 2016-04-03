@@ -110,8 +110,9 @@ export const deployToOcean = co(function *g(projObj, accessToken) {
   yield buildDockerFile();
   const remoteSync = generateRsync(projObj, 'remoteMachine');
   yield remoteSync;
-  yield ssh(remoteMachName, 'docker build ./tmp');
+  yield ssh(remoteMachName, 'docker build .');
   return true;
 });
 
+// /var/lib/docker/tmp
 // const DO = 'eedf80c21a790ed8328a1f64447a2b239ba98c8137051a362b8bee89530968a7'
