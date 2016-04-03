@@ -1,6 +1,5 @@
 import React from 'react';
-import NavLink from './appComp/NavLink';
-import ProjectLinks from './appComp/ProjectLinks';
+import LeftNav from './appComp/LeftNav';
 import * as projConfig from './server/projConfig.js';
 import * as appConfig from './server/appConfig.js';
 import defaultConfig from './server/defaultConfig.js';
@@ -8,7 +7,7 @@ import addFolderIcon from './appComp/AddFolderIcon';
 import * as container from './server/container.js';
 import * as manageProj from './server/manageProj.js';
 import fileWatch from './server/fileWatch.js';
-import Icons from './appComp/icons';
+import Icons from './appComp/Icons';
 import * as machine from './server/machine.js';
 import * as deploy from './server/deploy.js';
 import errorHandler from './server/errorHandler.js';
@@ -194,42 +193,22 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <ul role="nav" id="menu" className="nav">
-          <li className="search-wrapper">
-            {/*<input className="main-search-input"></input>*/}
-              {/*<span className="input-group-addon">
-                <img src="./client/images/png/search.png"></img>
-              </span>*/}
-          </li>
-          <li className="nav-item proj-anchor">
-            <NavLink to="/" onlyActiveOnIndex>
-              <label onClick={this.exampleClick}>
-                Projects
-              </label>
-            </NavLink>
-          </li>
-          <li className="add-proj-wrapper">
-            <NavLink to="/addProject" className="add-proj-icon">
-              <img src="./client/images/png/addIcon@2x.png"></img>
-            </NavLink>
-          </li>
-          <ProjectLinks projects={this.state.projects} />
-        </ul>
+        <LeftNav projects={this.state.projects} exampleClick={this.exampleClick}/>
           <div id="right-column">
             <div className="content-top-nav">
              <div className="btn-group top-nav-btn-group" data-toggle="buttons">
                <label className="btn btn-primary active">
-                 <input type="radio" name="options" id="option1" autoComplete="off"  />
+                 <input type="radio" name="options" id="option1" autoComplete="off" />
                    <img src="./client/images/png/music@2x.png"></img>
 
                </label>
                <label className="btn btn-primary">
-                 <input type="radio" name="options" id="option2" autoComplete="off"  />
+                 <input type="radio" name="options" id="option2" autoComplete="off" />
                    <img src="./client/images/png/power@2x.png"></img>
 
                </label>
                <label className="btn btn-primary">
-                 <input type="radio" name="options" id="option3" autoComplete="off"  />
+                 <input type="radio" name="options" id="option3" autoComplete="off" />
                    <img src="./client/images/png/tool@2x.png"></img>
 
                </label>
