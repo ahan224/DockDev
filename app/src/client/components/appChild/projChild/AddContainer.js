@@ -1,7 +1,7 @@
 import React from 'react';
 import * as container from './server/container.js';
 import * as images from './server/availableImages.js';
-import DockerImage from './projComp/DockerImage';
+import DockerImage from './projChildComp/DockerImage';
 
 class AddContainer extends React.Component {
   constructor() {
