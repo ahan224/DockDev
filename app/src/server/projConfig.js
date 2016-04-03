@@ -69,19 +69,14 @@ export const writeProj = (projObj) =>
  * @param {Boolean} overwrite
  * @return {Object} projObj
  */
-export const initProject = co(function *g(basePath, projectName, overwrite) {
+export const initProject = co(function *g(basePath, projectName) {
   const projObj = createProj(basePath, projectName);
 
-  // allows to overwrite an existing project config
-  if (overwrite) {
     try {
       yield createDockDev(projObj);
     } catch (e) {
       console.log(e);
     }
-  } else {
-    yield createDockDev(projObj);
-  }
 
   yield writeProj(projObj);
   projObj.basePath = basePath;
