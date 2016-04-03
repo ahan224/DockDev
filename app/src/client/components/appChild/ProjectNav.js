@@ -33,7 +33,7 @@ const ProjectNav = (props) => {
           </label>
           <label className="btn btn-primary">
             <input type="radio" name="options" id="option3" autoComplete="off" />
-              <img src="./client/images/png/arrows@2x.png" onClick={remove}></img>
+              <img src="./client/images/png/shapes@2x.png" onClick={remove}></img>
           </label>
         </div>
         <ul className="nav nav-inline">
