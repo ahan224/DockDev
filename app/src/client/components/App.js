@@ -1,14 +1,14 @@
 import React from 'react';
-import NavLink from './NavLink';
-import ProjectLinks from './ProjectLinks';
+import NavLink from './appComp/NavLink';
+import ProjectLinks from './appComp/ProjectLinks';
 import * as projConfig from './server/projConfig.js';
 import * as appConfig from './server/appConfig.js';
 import defaultConfig from './server/defaultConfig.js';
-import addFolderIcon from './AddFolderIcon';
+import addFolderIcon from './appComp/AddFolderIcon';
 import * as container from './server/container.js';
 import * as manageProj from './server/manageProj.js';
 import fileWatch from './server/fileWatch.js';
-import Icons from './icons';
+import Icons from './appComp/icons';
 import * as machine from './server/machine.js';
 import * as deploy from './server/deploy.js';
 import errorHandler from './server/errorHandler.js';
@@ -115,7 +115,7 @@ class App extends React.Component {
   }
 
   addNewProject(path, name) {
-    projConfig.initProject(path, name, true)
+    projConfig.initProject(path, name)
       .then(proj => {
         const projects = this.state.projects;
         projects[proj.uuid] = proj;
