@@ -1,5 +1,6 @@
 import React from 'react';
 import LeftNav from './appComp/LeftNav';
+import TopNav from './appComp/TopNav';
 import * as projConfig from './server/projConfig.js';
 import * as appConfig from './server/appConfig.js';
 import defaultConfig from './server/defaultConfig.js';
@@ -194,26 +195,9 @@ class App extends React.Component {
     return (
       <div>
         <LeftNav projects={this.state.projects} exampleClick={this.exampleClick} />
+        <TopNav activeProject={this.state.activeProject} />
+
           <div id="right-column">
-            <div className="content-top-nav">
-             <div className="btn-group top-nav-btn-group" data-toggle="buttons">
-               <label className="btn btn-primary active">
-                 <input type="radio" name="options" id="option1" autoComplete="off" />
-                   <img src="./client/images/png/music@2x.png"></img>
-
-               </label>
-               <label className="btn btn-primary">
-                 <input type="radio" name="options" id="option2" autoComplete="off" />
-                   <img src="./client/images/png/power@2x.png"></img>
-
-               </label>
-               <label className="btn btn-primary">
-                 <input type="radio" name="options" id="option3" autoComplete="off" />
-                   <img src="./client/images/png/tool@2x.png"></img>
-
-               </label>
-             </div>
-            </div>
             <div id="content">
               {React.cloneElement(this.props.children,
                 {
