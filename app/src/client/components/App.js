@@ -193,7 +193,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <LeftNav projects={this.state.projects} exampleClick={this.exampleClick}/>
+        <LeftNav projects={this.state.projects} exampleClick={this.exampleClick} />
           <div id="right-column">
             <div className="content-top-nav">
              <div className="btn-group top-nav-btn-group" data-toggle="buttons">

@@ -31,4 +31,4 @@ LeftNav.propTypes = {
   exampleClick: React.PropTypes.func,
 };
 
-export default LeftProjNav;
+export default LeftNav;
