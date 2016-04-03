@@ -92,7 +92,6 @@ export const ssh = (machineName, args) => exec(`ssh ${machineName} ${args}`);
  * based on the passed in machine name
  *
  * @param {String} machineName
- * @param {String} containerInfo
  * @return {Object} configObj
  */
 export const machineConfig = co(function *(machineName) {
@@ -101,7 +100,7 @@ export const machineConfig = co(function *(machineName) {
     uri: `https://${result.Driver.IPAddress}:2376`,
     cert: (yield readFile(`${result.HostOptions.AuthOptions.ClientCertPath}`)).toString(),
     key: (yield readFile(`${result.HostOptions.AuthOptions.ClientKeyPath}`)).toString(),
-    ca: (yield readFile(`${result.HostOptions.AuthOptions.CaCertPath}`)).toString()
+    ca: (yield readFile(`${result.HostOptions.AuthOptions.CaCertPath}`)).toString(),
   };
   return configObj;
 });
