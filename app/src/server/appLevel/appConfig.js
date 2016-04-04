@@ -4,6 +4,9 @@ import * as utils from '../utils/utils';
 import * as machine from '../dockerAPI/machine';
 import fs from 'fs';
 import rimraf from 'rimraf';
+import {
+  FAILED_READ_CONFIG,
+} from './errorMsgs';
 
 const rimrafProm = Promise.promisify(rimraf);
 
@@ -50,13 +53,10 @@ const initConfig = (defaultConfig) => ({
  * @param {String} configPath
  * @return {Object} configObj
  */
-const readConfig = co(function *g(configPath) {
-  try {
-    return JSON.parse(yield utils.readFile(configPath));
-  } catch (e) {
-    return undefined;
-  }
-});
+const readConfig = (configPath) =>
+  utils.readFile(configPath)
+    .then(JSON.parse)
+    .catch(() => {throw FAILED_READ_CONFIG;});
 
 /**
  * writeConfig() return a promise to write the initial config file
@@ -205,7 +205,7 @@ export const initApp = co(function *g(defaultConfig, router, addConfig, addProje
   const checkDockDevMachine = yield machine.list();
   if (checkDockDevMachine.indexOf('dockdev') === -1) {
     router.replace('/init/3');
-    yield machine.createMachine(defaultConfig.machine);
+    yield machine.createVirtualBox(defaultConfig.machine);
   }
 
   router.replace('/');

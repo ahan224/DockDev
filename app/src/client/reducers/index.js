@@ -12,12 +12,15 @@ function config(state = { isFetching: false }, action) {
     case RECEIVE_CONFIG:
       return Object.assign({}, state, {
         isFetching: false,
-        projects: action.config.projects,
+        projects: action.projects,
+        tokens: action.tokens,
       });
     default:
       return state;
   }
 }
+
+// function projects()
 
 const rootReducer = combineReducers({
   config,
