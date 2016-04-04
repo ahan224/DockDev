@@ -1,12 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router';
-import R from 'ramda';
 
 const ProjectLinks = ({ projects }) => {
-  const projArray = R.toPairs(projects);
-  const projLinks = projArray.map(proj => (
-      <li key={proj[1].uuid} className="nav-item">
-        <Link className="nav-link" to={`/projects/${proj[1].uuid}`}>{proj[1].projectName}</Link>
+  projects = projects || [];
+  const projLinks = projects.map((proj, idx) => (
+      <li key={idx} className="nav-item">
+        <Link className="nav-link" to={`/projects/${proj}`}>{proj}</Link>
       </li>
     )
   );

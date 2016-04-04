@@ -1,5 +1,5 @@
 import * as container from '../dockerAPI/docker';
-import fileWatch from './fileWatch';
+import fileWatch from '../projLevel/fileWatch';
 import { coroutine as co } from 'bluebird';
 import { removeMachineFolder, createMachineFolder } from '../dockerAPI/machine';
 import errorHandler from '../appLevel/errorHandler';
