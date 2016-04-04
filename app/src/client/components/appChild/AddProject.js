@@ -25,20 +25,20 @@ const AddProject = ({ addNewProject }) => {
               onChange={projNameHandler}
             />
           </div>
-            <div className="col-xs-12 form-input-spacing">
-              <label className="file width-12">
-                <input type="file" id="file" />
-                <span className="file-custom border-bottom-input" onClick={popFileSelector}></span>
-              </label>
+          <div className="col-xs-12 form-input-spacing">
+            <label className="file width-12">
+              <input type="file" id="file" />
+              <span className="file-custom border-bottom-input" onClick={popFileSelector}></span>
+            </label>
           </div>
-            <div className="col-xs-6">
-              Cancel
-            </div>
-            <div className="col-xs-6">
-              <button className="btn btn-primary-outline btn-block" onClick={submit}>
-                Add
-              </button>
-            </div>
+          <div className="col-xs-6">
+            Cancel
+          </div>
+          <div className="col-xs-6">
+            <button className="btn btn-primary-outline btn-block" onClick={submit}>
+              Add
+            </button>
+          </div>
         </div>
   );
 };
