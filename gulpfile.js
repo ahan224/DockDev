@@ -17,10 +17,10 @@ function handleErrors() {
  this.emit('end');
 }
 
-gulp.task('default', ['api', 'react', 'main', 'client-other', 'html', 'bower', 'watch']);
+gulp.task('default', ['server', 'react', 'main', 'client-other', 'html', 'bower', 'watch']);
 
-gulp.task('api', () => {
-  return gulp.src('./app/src/api/*')
+gulp.task('server', () => {
+  return gulp.src('./app/src/server/**/**')
     .pipe(babel( {plugins: [
         'transform-es2015-modules-commonjs',
         'transform-es2015-shorthand-properties',
@@ -28,7 +28,7 @@ gulp.task('api', () => {
       ]}
     ))
     .on('error', handleErrors)
-    .pipe(gulp.dest('./app/build/api'));
+    .pipe(gulp.dest('./app/build/server'));
 });
 
 gulp.task('main', () => {
@@ -54,16 +54,7 @@ gulp.task('react', () => {
     'ramda',
     'react-router',
     'electron',
-    './api/projConfig.js',
-    './api/appConfig.js',
-    './api/defaultConfig.js',
-    './api/docker.js',
-    './api/machine.js',
-    './api/availableImages.js',
-    './api/fileWatch.js',
-    './api/manageProj.js',
-    './api/deploy.js',
-    './api/errorHandler.js',
+    './server/main',
   ]);
 
   return bundler
@@ -94,7 +85,7 @@ gulp.task('bower', () => {
 })
 
 gulp.task('watch', function() {
-  gulp.watch(['./app/src/api/*',], ['api']);
+  gulp.watch(['./app/src/server/**/**',], ['api']);
   gulp.watch('./app/src/main.js', ['main']);
   gulp.watch(['./app/src/client/index.js', 'app/src/client/components/*.js'], ['react']);
   gulp.watch('./app/src/client/*/**', ['client-other']);
