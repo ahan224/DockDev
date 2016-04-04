@@ -3,13 +3,8 @@ import Promise, { coroutine as co } from 'bluebird';
 import * as utils from './utils';
 import * as machine from './machine.js';
 import fs from 'fs';
-import { exec as childExec } from 'child_process';
 import rimraf from 'rimraf';
-// import { networkDelete } from './container';
-// import defaultConfig from './defaultConfig';
 
-// promisify callback function
-const exec = Promise.promisify(childExec);
 const rimrafProm = Promise.promisify(rimraf);
 
 /**
@@ -30,7 +25,7 @@ const checkDockerMachineInstalled = co(function *g() {
  * @return {Boolean} returns true or false
  */
 const checkDockerInstall = co(function *g() {
-  const result = yield exec('docker');
+  const result = yield utils.exec('docker');
   return result.split('\n').length > 1;
 });
 
@@ -45,6 +40,7 @@ const initConfig = (defaultConfig) => ({
   path: defaultConfig.configPath(),
   projects: [],
   userDir: process.env.HOME,
+  DOtoken: '',
 });
 
 /**

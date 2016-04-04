@@ -17,10 +17,10 @@ function handleErrors() {
  this.emit('end');
 }
 
-gulp.task('default', ['server', 'react', 'test', 'main', 'client-other', 'html', 'bower', 'watch']);
+gulp.task('default', ['api', 'react', 'main', 'client-other', 'html', 'bower', 'watch']);
 
-gulp.task('server', () => {
-  return gulp.src('./app/src/server/*')
+gulp.task('api', () => {
+  return gulp.src('./app/src/api/*')
     .pipe(babel( {plugins: [
         'transform-es2015-modules-commonjs',
         'transform-es2015-shorthand-properties',
@@ -28,7 +28,7 @@ gulp.task('server', () => {
       ]}
     ))
     .on('error', handleErrors)
-    .pipe(gulp.dest('./app/build/server'));
+    .pipe(gulp.dest('./app/build/api'));
 });
 
 gulp.task('main', () => {
@@ -54,16 +54,16 @@ gulp.task('react', () => {
     'ramda',
     'react-router',
     'electron',
-    './server/projConfig.js',
-    './server/appConfig.js',
-    './server/defaultConfig.js',
-    './server/container.js',
-    './server/machine.js',
-    './server/availableImages.js',
-    './server/fileWatch.js',
-    './server/manageProj.js',
-    './server/deploy.js',
-    './server/errorHandler.js',
+    './api/projConfig.js',
+    './api/appConfig.js',
+    './api/defaultConfig.js',
+    './api/docker.js',
+    './api/machine.js',
+    './api/availableImages.js',
+    './api/fileWatch.js',
+    './api/manageProj.js',
+    './api/deploy.js',
+    './api/errorHandler.js',
   ]);
 
   return bundler
@@ -71,14 +71,6 @@ gulp.task('react', () => {
     .on('error', handleErrors)
     .pipe(source('bundle.js'))
     .pipe(gulp.dest('./app/build/client'))
-});
-
-gulp.task('test', () => {
-  return gulp.src('test/tests.js')
-  .pipe(babel({plugins: ['transform-es2015-modules-commonjs', 'transform-es2015-shorthand-properties']}))
-  .pipe(rename('tests-compiled.js'))
-  .on('error', handleErrors)
-  .pipe(gulp.dest('./test/'));
 });
 
 gulp.task('client-other', () => {
@@ -102,8 +94,7 @@ gulp.task('bower', () => {
 })
 
 gulp.task('watch', function() {
-  gulp.watch(['./app/src/server/*',], ['server']);
-  gulp.watch('./test/tests.js', ['test']);
+  gulp.watch(['./app/src/api/*',], ['api']);
   gulp.watch('./app/src/main.js', ['main']);
   gulp.watch(['./app/src/client/index.js', 'app/src/client/components/*.js'], ['react']);
   gulp.watch('./app/src/client/*/**', ['client-other']);
