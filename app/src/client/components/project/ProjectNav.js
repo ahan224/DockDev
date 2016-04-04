@@ -1,6 +1,6 @@
 import React from 'react';
-import ProjButtons from './appChildComp/ProjButtons';
-import ProjNavLinks from './appChildComp/ProjNavLinks';
+import ProjButtons from './assets/ProjButtons';
+import ProjNavLinks from './assets/ProjNavLinks';
 
 const ProjectNav = (props) => {
   const uuid = props.params.uuid;

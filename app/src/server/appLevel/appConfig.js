@@ -4,9 +4,6 @@ import * as utils from '../utils/utils';
 import * as machine from '../dockerAPI/machine';
 import fs from 'fs';
 import rimraf from 'rimraf';
-import {
-  FAILED_READ_CONFIG,
-} from './errorMsgs';
 
 const rimrafProm = Promise.promisify(rimraf);
 
@@ -53,10 +50,7 @@ const initConfig = (defaultConfig) => ({
  * @param {String} configPath
  * @return {Object} configObj
  */
-const readConfig = (configPath) =>
-  utils.readFile(configPath)
-    .then(JSON.parse)
-    .catch(() => {throw FAILED_READ_CONFIG;});
+const readConfig = (configPath) => utils.readFile(configPath);
 
 /**
  * writeConfig() return a promise to write the initial config file
