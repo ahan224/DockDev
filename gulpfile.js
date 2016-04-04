@@ -85,7 +85,7 @@ gulp.task('bower', () => {
 })
 
 gulp.task('watch', function() {
-  gulp.watch(['./app/src/server/**/**',], ['api']);
+  gulp.watch(['./app/src/server/**/**',], ['server']);
   gulp.watch('./app/src/main.js', ['main']);
   gulp.watch(['./app/src/client/index.js', 'app/src/client/components/*.js'], ['react']);
   gulp.watch('./app/src/client/*/**', ['client-other']);

@@ -51,8 +51,8 @@ const commands = {
   containerCreate: {
     cmd: 'create',
     method: 'POST',
-    uri({ containerName }) {
-      return `/containers/${this.cmd}?name=${containerName}`;
+    uri(obj) {
+      return `/containers/${this.cmd}?name=${obj.containerName}`;
     },
   },
   // restarts a container
