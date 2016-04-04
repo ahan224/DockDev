@@ -1,6 +1,7 @@
 import { coroutine as co } from 'bluebird';
 import R from 'ramda';
 import { readFile, exec as execProm } from '../utils/utils';
+import { FAILED_TO_ACCESS_MACHINE } from '../appLevel/errorMsgs';
 
 /**
  * exec() returns a docker-machine terminal command promise that resolves to the stdout
@@ -18,7 +19,9 @@ const exec = (args) => execProm(`docker-machine ${args}`);
  * @param {String} machineName
  * @return {} returns a promise that resolves to the stdout
  */
-export const inspect = (machineName) => exec(`inspect ${machineName}`);
+export const inspect = (machineName) =>
+  exec(`inspect ${machineName}`)
+    .catch(() => {throw FAILED_TO_ACCESS_MACHINE;});
 
 /**
  * status() returns a string indicating the status of the specified machineName

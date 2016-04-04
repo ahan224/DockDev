@@ -38,6 +38,8 @@ export const find = (array) => {
  */
 export const jsonStringifyPretty = (obj) => JSON.stringify(obj, null, 2);
 
+export const spaceToUnder = (str) => str.split(' ').join('_');
+export const underToSpace = (str) => str.split('_').join(' ');
 
 // function promisify(fun) {
 //   return function(...args) {

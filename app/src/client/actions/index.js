@@ -1,10 +1,12 @@
-import { defaultConfig, appConfig } from './server/main';
+import uuid from 'node-uuid';
+import { defaultConfig, appConfig, projConfig } from './server/main';
 
 export const REQUEST_CONFIG = 'REQUEST_CONFIG';
 export const RECEIVE_CONFIG = 'RECEIVE_CONFIG';
 export const REQUEST_PROJECT = 'REQUEST_PROJECT';
 export const RECEIVE_PROJECT = 'RECEIVE_PROJECT';
 export const ADDED_PROJECT = 'ADD_PROJECT';
+export const ADDING_PROJECT = 'ADDING_PROJECT';
 
 function requestConfig() {
   return {
@@ -21,17 +23,28 @@ function receiveConfig(config) {
   };
 }
 
-function requestProject(path) {
-  return {
-    type: REQUEST_PROJECT,
-    path,
-  };
-}
+// function requestProject(path) {
+//   return {
+//     type: REQUEST_PROJECT,
+//     path,
+//   };
+// }
+//
+// function receiveProject(projObj) {
+//   return {
+//     type: RECEIVE_PROJECT,
+//     projObj,
+//   };
+// }
 
-function receiveProject(projObj) {
+function addingProject(path, name) {
   return {
-    type: RECEIVE_PROJECT,
-    projObj,
+    type: ADDING_PROJECT,
+    projObj: {
+      uuid: uuid.v4(),
+      projectName: name,
+      basePath: path,
+    },
   };
 }
 
@@ -51,14 +64,11 @@ export function loadConfig() {
   };
 }
 
-export function addProject(name, path) {
+export function addProject(path, name) {
   return dispatch => {
-    return 
+    dispatch(addingProject(path, name));
+    return projConfig.initProject(path, name)
+      .then(response => dispatch(addedProject(response)))
+      .catch(err => )
   }
 }
-
-// export function loadProject(path) {
-//   return dispatch => {
-//
-//   }
-// }

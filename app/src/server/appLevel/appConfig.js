@@ -6,7 +6,10 @@ import fs from 'fs';
 import rimraf from 'rimraf';
 import {
   FAILED_READ_CONFIG,
+  FAILED_TO_WRITE_CONFIG,
+  PROJECT_NAME_EXISTS,
 } from './errorMsgs';
+
 
 const rimrafProm = Promise.promisify(rimraf);
 
@@ -41,7 +44,7 @@ const checkDockerInstall = co(function *g() {
  */
 const initConfig = (defaultConfig) => ({
   path: defaultConfig.configPath(),
-  projects: [],
+  projects: {},
   userDir: process.env.HOME,
   DOtoken: '',
 });
@@ -67,7 +70,8 @@ const readConfig = (configPath) =>
  */
 const writeConfig = (configObj) => {
   const strObj = utils.jsonStringifyPretty(configObj);
-  return utils.writeFile(configObj.path, strObj);
+  return utils.writeFile(configObj.path, strObj)
+    .catch(() => {throw FAILED_TO_WRITE_CONFIG; });
 };
 
 /**
@@ -143,6 +147,20 @@ export const loadPaths = (configObj, defaultConfig, callback) => {
 };
 
 /**
+ * checkUniqueName() returns true/false if the selected project name exists
+ *
+ * @param {String} projectName
+ * @param {Array} projArray
+ * @return {Boolean}
+ */
+const checkUniqueName = (projectName, projArray) => {
+  for (let i = 0; i < projArray.length; i++) {
+    if (projArray[i].projectName === projectName) return true;
+  }
+  return false;
+};
+
+/**
  * addProjToConfig() will add a project's path to the main config file
  * based on the passed in project base path and the default config object
  *
@@ -150,11 +168,13 @@ export const loadPaths = (configObj, defaultConfig, callback) => {
  * @param {Object} defaultConfig
  * @return {}
  */
-export const addProjToConfig = co(function *g(basePath, defaultConfig) {
+export const addProjToConfig = co(function *g(basePath, projectName, defaultConfig) {
   const configPath = defaultConfig.configPath();
   const readConfigFile = yield readConfig(configPath);
-  readConfigFile.projects.push(basePath);
-  yield utils.writeFile(configPath, utils.jsonStringifyPretty(readConfigFile));
+  const underscoreName = utils.spaceToUnder(projectName);
+  if (checkUniqueName(underscoreName, readConfigFile.projects)) throw PROJECT_NAME_EXISTS;
+  readConfigFile.projects.push({ basePath, projectName: underscoreName });
+  yield writeConfig(readConfigFile);
 });
 
 /**
