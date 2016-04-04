@@ -4,9 +4,8 @@ import R from 'ramda';
 import uuid from 'node-uuid';
 import * as utils from './utils';
 import * as appConfig from './appConfig';
-import { setNetworkParams, networkCreate } from './container';
+import { setNetworkParams, networkCreate } from './docker';
 import defaultConfig from './defaultConfig';
-import * as machine from './machine';
 
 /**
  * createProj() returns an object with project-level information, including a uuid
@@ -32,9 +31,9 @@ export const createProj = (basePath, projectName) => ({
  * @param {Object} projObj
  * @return {} creates a folder
  */
-export const createDockDev = (projObj) => {
-  return utils.mkdir(join(projObj.basePath, defaultConfig.projFolder));
-};
+export const createDockDev = (projObj) =>
+  utils.mkdir(join(projObj.basePath, defaultConfig.projFolder));
+
 /**
  * cleanProjToWrite() returns a formatted object with information to be stored in the project file
  * based on composing R.pick (which parameters to write) and indent formatting (jsonStringifyPretty)
@@ -69,19 +68,10 @@ export const writeProj = (projObj) =>
  * @param {Boolean} overwrite
  * @return {Object} projObj
  */
-export const initProject = co(function *g(basePath, projectName, overwrite) {
+export const initProject = co(function *g(basePath, projectName) {
   const projObj = createProj(basePath, projectName);
 
-  // allows to overwrite an existing project config
-  if (overwrite) {
-    try {
-      yield createDockDev(projObj);
-    } catch (e) {
-      console.log(e);
-    }
-  } else {
-    yield createDockDev(projObj);
-  }
+  yield createDockDev(projObj);
 
   yield writeProj(projObj);
   projObj.basePath = basePath;

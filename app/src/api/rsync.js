@@ -1,11 +1,7 @@
-// import { exec as childExec } from 'child_process';
 import { coroutine as co } from 'bluebird';
 import R from 'ramda';
 import * as machine from './machine.js';
 import { exec } from './utils';
-
-// promisify callback function
-// const execProm = Promise.promisify(childExec);
 
 /**
 * cleanFilePath() accepts a string file path and returns a string file path with any
@@ -119,16 +115,3 @@ export function generateRsync(projObj, destMachine) {
     return yield rsync(yield args);
   });
 }
-
-// - File watch
-//   - need ability to turnoff projFile watching
-//   - handle if the root projFolder name is changed (need new watch)
-//   - handle multiple project watches simultaneously
-//   - use closure to avoid getting machine inspect 2x (same for volume)
-//   - create one watcher and then reference root directory
-//
-// - Rsync
-//   - put the promise that resolves machine ip, ssh, volume location, etc in closure
-//   - return a function that requires no parameters, but will rsync after promise resolves
-//   - need to consider error handling, but otherwise this solution should work great
-//   - should you rsync only the projFile or projFolder that changed or everything

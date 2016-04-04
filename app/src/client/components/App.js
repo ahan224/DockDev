@@ -1,22 +1,14 @@
 import React from 'react';
 import NavLink from './NavLink';
 import ProjectLinks from './ProjectLinks';
-import * as projConfig from './server/projConfig.js';
-import * as appConfig from './server/appConfig.js';
-import defaultConfig from './server/defaultConfig.js';
-import addFolderIcon from './AddFolderIcon';
-import * as container from './server/container.js';
-import * as manageProj from './server/manageProj.js';
-import fileWatch from './server/fileWatch.js';
-import Icons from './icons';
-import * as machine from './server/machine.js';
-import * as deploy from './server/deploy.js';
-import errorHandler from './server/errorHandler.js';
-
-const svgStyle = {
-  width: '16px',
-  height: '16px',
-};
+import * as projConfig from './api/projConfig.js';
+import * as appConfig from './api/appConfig.js';
+import defaultConfig from './api/defaultConfig.js';
+import * as container from './api/docker.js';
+import * as manageProj from './api/manageProj.js';
+import fileWatch from './api/fileWatch.js';
+import * as deploy from './api/deploy.js';
+import errorHandler from './api/errorHandler.js';
 
 class App extends React.Component {
   constructor(props, context) {

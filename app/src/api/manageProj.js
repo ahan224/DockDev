@@ -1,4 +1,4 @@
-import * as container from './container.js';
+import * as container from './docker.js';
 import fileWatch from './fileWatch.js';
 import { coroutine as co } from 'bluebird';
 import { removeMachineFolder, createMachineFolder } from './machine.js';
