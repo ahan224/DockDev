@@ -1,16 +1,16 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { Router, Route, IndexRoute, hashHistory } from 'react-router';
-import App from './components/App';
-import Home from './components/appChild/Home';
-import AddProject from './components/appChild/AddProject';
-import ProjectDetails from './components/appChild/projChild/ProjectDetails';
-import ProjectSettings from './components/appChild/projChild/ProjectSettings';
-import ProjectDeploy from './components/appChild/projChild/ProjectDeploy';
-import ProjectNav from './components/appChild/ProjectNav';
-import AddContainer from './components/appChild/projChild/AddContainer';
-import Init from './components/appChild/Init';
-import Settings from './components/appChild/Settings';
+import App from './components/app/App';
+import Home from './components/app/Home';
+import AddProject from './components/app/AddProject';
+import ProjectDetails from './components/project/ProjectDetails';
+import ProjectSettings from './components/project/ProjectSettings';
+import ProjectDeploy from './components/project/ProjectDeploy';
+import ProjectNav from './components/project/ProjectNav';
+import AddContainer from './components/project/AddContainer';
+import Init from './components/app/Init';
+import Settings from './components/app/Settings';
 
 render((
   <Router history={hashHistory}>
