@@ -2,10 +2,10 @@ import { join } from 'path';
 import { coroutine as co } from 'bluebird';
 import R from 'ramda';
 import uuid from 'node-uuid';
-import * as utils from './utils';
-import * as appConfig from './appConfig';
-import { setNetworkParams, networkCreate } from './docker';
-import defaultConfig from './defaultConfig';
+import * as utils from '../utils/utils';
+import * as appConfig from '../appLevel/appConfig';
+import { setNetworkParams, networkCreate } from '../dockerAPI/docker';
+import defaultConfig from '../appLevel/defaultConfig';
 
 /**
  * createProj() returns an object with project-level information, including a uuid

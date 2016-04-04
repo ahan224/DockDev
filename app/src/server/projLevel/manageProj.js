@@ -1,8 +1,8 @@
-import * as container from './docker.js';
-import fileWatch from './fileWatch.js';
+import * as container from '../dockerAPI/docker.js';
+import fileWatch from '../projLevel/fileWatch.js';
 import { coroutine as co } from 'bluebird';
-import { removeMachineFolder, createMachineFolder } from './machine.js';
-import errorHandler from './errorHandler';
+import { removeMachineFolder, createMachineFolder } from '../dockerAPI/machine.js';
+import errorHandler from '../appLevel/errorHandler';
 
 /**
 * checkStatus() accepts a machine name and container id and returns the status

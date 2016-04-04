@@ -2,11 +2,11 @@ import rp from 'request-promise';
 import * as machine from './machine.js';
 import Promise, { coroutine as co } from 'bluebird';
 import { spawn } from 'child_process';
-import defaultConfig from './defaultConfig';
-import * as availableImages from './availableImages';
+import defaultConfig from '../appLevel/defaultConfig';
+import * as availableImages from '../appLevel/availableImages';
 import R from 'ramda';
 import uuidNode from 'node-uuid';
-import { exec as execProm } from './utils';
+import { exec as execProm } from '../utils/utils';
 
 // promisify callback function
 const exec = (args) => execProm(`docker ${args}`);
@@ -51,7 +51,7 @@ const commands = {
   containerCreate: {
     cmd: 'create',
     method: 'POST',
-    uri({ containerName }) {
+    uri(containerName) {
       return `/containers/${this.cmd}?name=${containerName}`;
     },
   },

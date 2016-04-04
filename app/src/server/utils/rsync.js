@@ -1,6 +1,6 @@
 import { coroutine as co } from 'bluebird';
 import R from 'ramda';
-import * as machine from './machine.js';
+import * as machine from '../dockerAPI/machine.js';
 import { exec } from './utils';
 
 /**
