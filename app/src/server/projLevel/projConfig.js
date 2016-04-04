@@ -6,6 +6,10 @@ import * as utils from '../utils/utils';
 import * as appConfig from '../appLevel/appConfig';
 import { setNetworkParams, networkCreate } from '../dockerAPI/docker';
 import defaultConfig from '../appLevel/defaultConfig';
+import {
+  FAILED_TO_CREATE_PROJ_DOCKDEV_DIR,
+  FAILED_PROJECT_WRITE,
+} from '../appLevel/errorMsgs';
 
 /**
  * createProj() returns an object with project-level information, including a uuid
@@ -32,7 +36,9 @@ export const createProj = (basePath, projectName) => ({
  * @return {} creates a folder
  */
 export const createDockDev = (projObj) =>
-  utils.mkdir(join(projObj.basePath, defaultConfig.projFolder));
+  utils.mkdir(join(projObj.basePath, defaultConfig.projFolder))
+    .then(() => true)
+    .catch(() => {throw FAILED_TO_CREATE_PROJ_DOCKDEV_DIR;});
 
 /**
  * cleanProjToWrite() returns a formatted object with information to be stored in the project file
@@ -55,7 +61,9 @@ const cleanProjToWrite = R.compose(
  * @return {} writes (or overwrites) the project file (dockdev.json)
  */
 export const writeProj = (projObj) =>
-  utils.writeFile(join(projObj.basePath, defaultConfig.projPath()), cleanProjToWrite(projObj));
+  utils.writeFile(join(projObj.basePath, defaultConfig.projPath()), cleanProjToWrite(projObj))
+    .then(() => true)
+    .catch(() => {throw FAILED_PROJECT_WRITE;});
 
 /**
  * initProject() creates the project object, then yields a promise to create the project folder
@@ -74,7 +82,6 @@ export const initProject = co(function *g(basePath, projectName) {
   yield createDockDev(projObj);
 
   yield writeProj(projObj);
-  projObj.basePath = basePath;
 
   yield appConfig.addProjToConfig(basePath, defaultConfig);
 

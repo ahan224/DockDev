@@ -43,7 +43,10 @@ gulp.task('react', () => {
 
   const bundler = browserify({
     entries: ['./app/src/client/index.js'],
-    transform: babelify.configure({presets: ["react", "es2015"]}),
+    transform: babelify.configure({
+      presets: ["react", "es2015"],
+      plugins:["transform-object-rest-spread"],
+    }),
     debug: true,
     fullPaths: true
   })
