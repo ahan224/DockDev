@@ -6,9 +6,9 @@ import * as deploy from './projLevel/deploy';
 import fileWatch from './projLevel/fileWatch';
 import * as projConfig from './projLevel/projConfig';
 import * as manageProj from './projLevel/manageProj';
+import * as rsync from './projLevel/rsync';
 import * as docker from './dockerAPI/docker';
 import * as machine from './dockerAPI/machine';
-import * as rsync from './utils/rsync';
 import * as utils from './utils/utils';
 
 export {
