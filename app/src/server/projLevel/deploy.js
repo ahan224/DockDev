@@ -1,4 +1,4 @@
-import { createMachine } from './machine.js';
+import { createMachine } from '../dockerAPI/machine.js';
 
 const DOtoken = '7b383cd4a9c6eff4bad70264a015bd5d3f9a21bfd690a2a18f80ff6dea717592';
 

@@ -1,5 +1,5 @@
 import chokidar from 'chokidar';
-import { generateRsync } from './rsync.js';
+import { generateRsync } from '../utils/rsync';
 import Promise from 'bluebird';
 
 Promise.config({
