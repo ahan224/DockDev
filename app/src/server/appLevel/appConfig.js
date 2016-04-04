@@ -1,15 +1,13 @@
 import { join } from 'path';
 import Promise, { coroutine as co } from 'bluebird';
-import * as utils from './utils';
-import * as machine from './machine.js';
+import * as utils from '../utils/utils';
+import * as machine from '../dockerAPI/machine';
 import fs from 'fs';
-import { exec as childExec } from 'child_process';
 import rimraf from 'rimraf';
-// import { networkDelete } from './container';
-// import defaultConfig from './defaultConfig';
+import {
+  FAILED_READ_CONFIG,
+} from './errorMsgs';
 
-// promisify callback function
-const exec = Promise.promisify(childExec);
 const rimrafProm = Promise.promisify(rimraf);
 
 /**
@@ -30,7 +28,7 @@ const checkDockerMachineInstalled = co(function *g() {
  * @return {Boolean} returns true or false
  */
 const checkDockerInstall = co(function *g() {
-  const result = yield exec('docker');
+  const result = yield utils.exec('docker');
   return result.split('\n').length > 1;
 });
 
@@ -45,6 +43,7 @@ const initConfig = (defaultConfig) => ({
   path: defaultConfig.configPath(),
   projects: [],
   userDir: process.env.HOME,
+  DOtoken: '',
 });
 
 /**
@@ -54,13 +53,10 @@ const initConfig = (defaultConfig) => ({
  * @param {String} configPath
  * @return {Object} configObj
  */
-const readConfig = co(function *g(configPath) {
-  try {
-    return JSON.parse(yield utils.readFile(configPath));
-  } catch (e) {
-    return undefined;
-  }
-});
+const readConfig = (configPath) =>
+  utils.readFile(configPath)
+    .then(JSON.parse)
+    .catch(() => {throw FAILED_READ_CONFIG;});
 
 /**
  * writeConfig() return a promise to write the initial config file
@@ -158,7 +154,7 @@ export const addProjToConfig = co(function *g(basePath, defaultConfig) {
   const configPath = defaultConfig.configPath();
   const readConfigFile = yield readConfig(configPath);
   readConfigFile.projects.push(basePath);
-  yield utils.writeFile(configPath, utils.jsonStringifyPretty(readConfigFile));
+  yield writeConfig(readConfigFile);
 });
 
 /**
@@ -209,7 +205,7 @@ export const initApp = co(function *g(defaultConfig, router, addConfig, addProje
   const checkDockDevMachine = yield machine.list();
   if (checkDockDevMachine.indexOf('dockdev') === -1) {
     router.replace('/init/3');
-    yield machine.createMachine(defaultConfig.machine);
+    yield machine.createVirtualBox(defaultConfig.machine);
   }
 
   router.replace('/');

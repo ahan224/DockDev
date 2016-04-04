@@ -1,22 +1,16 @@
 import React from 'react';
 import LeftNav from './appComp/LeftNav';
 import TopNav from './appComp/TopNav';
-import * as projConfig from './server/projConfig.js';
-import * as appConfig from './server/appConfig.js';
-import defaultConfig from './server/defaultConfig.js';
-import addFolderIcon from './appComp/AddFolderIcon';
-import * as container from './server/container.js';
-import * as manageProj from './server/manageProj.js';
-import fileWatch from './server/fileWatch.js';
-import Icons from './appComp/Icons';
-import * as machine from './server/machine.js';
-import * as deploy from './server/deploy.js';
-import errorHandler from './server/errorHandler.js';
-
-const svgStyle = {
-  width: '16px',
-  height: '16px',
-};
+import {
+  projConfig,
+  appConfig,
+  defaultConfig,
+  docker as container,
+  manageProj,
+  fileWatch,
+  deploy,
+  errorHandler,
+} from './server/main';
 
 class App extends React.Component {
   constructor(props, context) {

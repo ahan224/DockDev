@@ -1,12 +1,6 @@
-// import fs from 'fs';
-// import { exec as childExec } from 'child_process';
 import { coroutine as co } from 'bluebird';
 import R from 'ramda';
-import { readFile, exec as execProm } from './utils';
-
-// promisify certain callback functions
-// const readFile = Promise.promisify(fs.readFile);
-// const execProm = Promise.promisify(childExec);
+import { readFile, exec as execProm } from '../utils/utils';
 
 /**
  * exec() returns a docker-machine terminal command promise that resolves to the stdout
@@ -27,12 +21,33 @@ const exec = (args) => execProm(`docker-machine ${args}`);
 export const inspect = (machineName) => exec(`inspect ${machineName}`);
 
 /**
- * status() returns a string indicating if the machine is running
+ * status() returns a string indicating the status of the specified machineName
+ * return value is a string that is (i) Running, (ii) Stopped
  *
  * @param {String} machineName
  * @return {} returns a promise that resolves to the stdout
  */
 export const status = (machineName) => exec(`status ${machineName}`);
+
+/**
+ * checkMachineRunning() returns true/false if the docker machine is running
+ *
+ * @param {Object} defaultConfig
+ * @return {Boolean} returns a list docker machines
+ */
+export const checkMachineRunning = co(function *g(defaultConfig) {
+  const running = yield status(defaultConfig.machine);
+  return running.trim() !== 'Running';
+});
+
+/**
+ * removeMachine() deletes the specified machine returning true or error;
+ *
+ * @param {Object} defaultConfig
+ * @return {Boolean} returns a list docker machines
+ */
+export const removeMachine = (machineName) => exec(`rm -f ${machineName}`);
+
 
 /**
  * regenCerts() regenerates the certificates for the machine with force (no stdout output)
@@ -43,7 +58,7 @@ export const status = (machineName) => exec(`status ${machineName}`);
 export const regenCerts = (machineName) => exec(`regenerate-certs -f ${machineName}`);
 
 /**
- * start() starts a docker-machine
+ * start() starts the docker machine specified in arguments
  *
  * @param {String} machineName
  * @return {} returns a promise that resolves to the stdout
@@ -51,18 +66,30 @@ export const regenCerts = (machineName) => exec(`regenerate-certs -f ${machineNa
 export const start = (machineName) => exec(`start ${machineName}`);
 
 /**
- * createMachine() returns a new docker-machine without a shared folder
- * based on the passed in arguments string
+ * createMachine() executes 'docker-machine create' with an indeterminant number
+ * of arguments. https://docs.docker.com/machine/drivers/os-base/
+ *
+ * @param {...Args} args
+ * @return {} returns a promise that resolves to the stdout
+ */
+export const createMachine = (...args) => {
+  const params = ['create', ...args].join(' ');
+  return exec(params);
+};
+
+/**
+ * createVirtualBox() returns a new docker-machine without a shared folder
+ * based on the passed in 'machineName' string
  *
  * @param {String} machineName
  * @return {} returns a promise that resolves to the stdout
  */
-export const createMachine = (machineName) =>
-  exec(`create --driver virtualbox --virtualbox-no-share ${machineName}`);
+export const createVirtualBox = (machineName) =>
+  createMachine('--driver virtualbox', '--virtualbox-no-share', machineName);
 
 /**
  * env() returns an object with environment variables of a given machine
- * based on the passed in 'MachineName' string
+ * based on the passed in 'machineName' string
  *
  * @param {String} machineName
  * @return {Object} result
@@ -71,15 +98,17 @@ export const env = co(function *g(machineName) {
   let result = yield exec(`env ${machineName}`);
   result = R.fromPairs(result.split('\n').slice(0, 4).map(val => val.substr(7).split('=')));
   for (const prop in result) {
-    const len = result[prop].length - 2;
-    result[prop] = result[prop].substr(1).substr(0, len);
+    if (result.hasOwnProperty(prop)) {
+      const len = result[prop].length - 2;
+      result[prop] = result[prop].substr(1).substr(0, len);
+    }
   }
   return result;
 });
 
 /**
  * ssh() returns a docker-machine terminal ssh command to connect a remote machine
- * based on the passed in 'MachineName' string and arguments for the terminal command
+ * based on the passed in 'machineName' string and arguments for the terminal command
  *
  * @param {String} machineName
  * @param {String} args
@@ -94,7 +123,7 @@ export const ssh = (machineName, args) => exec(`ssh ${machineName} ${args}`);
  * @param {String} machineName
  * @return {Object} configObj
  */
-export const machineConfig = co(function *(machineName) {
+export const machineConfig = co(function *g(machineName) {
   const result = JSON.parse(yield inspect(machineName));
   const configObj = {
     uri: `https://${result.Driver.IPAddress}:2376`,
@@ -119,20 +148,21 @@ export const version = () => exec('version');
  */
 export const list = () => exec('ls');
 
-
+/**
+ * removeMachineFolder() removes the /tmp folder where project data is stored
+ *
+ * @param {Object} projObj
+ * @return {String}
+ */
 export const removeMachineFolder = (projObj) =>
   ssh(projObj.machine, 'rm -rf /home/docker/tmp');
 
+
+/**
+ * createMachineFolder() adds the /tmp folder where project data is stored
+ *
+ * @param {Object} projObj
+ * @return {String}
+ */
 export const createMachineFolder = (projObj) =>
   ssh(projObj.machine, 'mkdir /home/docker/tmp');
-
-
-export const checkMachineRunning = co(function *g(defaultConfig) {
-  const running = yield status(defaultConfig.machine);
-  if (running.trim() !== 'Running') {
-    yield start(defaultConfig.machine);
-    // yield regenCerts(defaultConfig.machine);
-    return false;
-  }
-  return true;
-});

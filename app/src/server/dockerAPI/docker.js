@@ -1,21 +1,22 @@
 import rp from 'request-promise';
 import * as machine from './machine.js';
 import Promise, { coroutine as co } from 'bluebird';
-import { exec as childExec, spawn } from 'child_process';
-import defaultConfig from './defaultConfig';
-import * as availableImages from './availableImages';
+import { spawn } from 'child_process';
+import defaultConfig from '../appLevel/defaultConfig';
+import * as availableImages from '../appLevel/availableImages';
 import R from 'ramda';
 import uuidNode from 'node-uuid';
+import { exec as execProm } from '../utils/utils';
 
 // promisify callback function
-const exec = Promise.promisify(childExec);
+const exec = (args) => execProm(`docker ${args}`);
 
 /**
-* @param {Object} dockerCommands that will be passed into the command line function below
+* @param {Object} commands that will be passed into the command line function below
 */
-const dockerCommands = {
+const commands = {
   // starts a container
-  start: {
+  containerStart: {
     cmd: 'start',
     method: 'POST',
     uri(containerId) {
@@ -23,7 +24,7 @@ const dockerCommands = {
     },
   },
   // stops a container
-  stop: {
+  containerStop: {
     cmd: 'stop',
     method: 'POST',
     uri(containerId) {
@@ -31,7 +32,7 @@ const dockerCommands = {
     },
   },
   // inspects a container
-  inspect: {
+  containerInspect: {
     cmd: 'json',
     method: 'GET',
     uri(containerId) {
@@ -39,7 +40,7 @@ const dockerCommands = {
     },
   },
   // creates a list of containers
-  list: {
+  containerList: {
     cmd: 'json',
     method: 'GET',
     uri() {
@@ -47,15 +48,15 @@ const dockerCommands = {
     },
   },
   // creates a container
-  create: {
+  containerCreate: {
     cmd: 'create',
     method: 'POST',
     uri(obj) {
-      return `/containers/${this.cmd}?name=${obj.name}`;
+      return `/containers/${this.cmd}?name=${obj.containerName}`;
     },
   },
   // restarts a container
-  restart: {
+  containerRestart: {
     cmd: 'restart',
     method: 'POST',
     uri(containerId) {
@@ -63,15 +64,15 @@ const dockerCommands = {
     },
   },
   // removes a container
-  remove: {
+  containerRemove: {
     cmd: '',
     method: 'DELETE',
     uri(containerId) {
       return `/containers/${containerId}?v=1&force=1`;
     },
   },
-  // creates a list of images
-  images: {
+  // returns the list of images already on the local computer
+  imagesList: {
     cmd: 'json',
     method: 'GET',
     uri(imageName) {
@@ -113,12 +114,12 @@ const dockerCommands = {
  * @return {Function} returns a function that takes 2 parameters
  */
 function commandMaker(cmd) {
-  return co(function *g(machineName, containerInfo) {
+  return co(function *g(machineName, arg) {
     const config = yield machine.machineConfig(machineName);
-    config.uri += cmd.uri(containerInfo);
+    config.uri += cmd.uri(arg);
     config.method = cmd.method;
     config.json = true;
-    if (cmd.cmd === 'create') config.body = containerInfo;
+    if (cmd.cmd === 'create') config.body = arg;
     return yield rp(config);
   });
 }
@@ -131,17 +132,17 @@ function commandMaker(cmd) {
  * @param {String} containerInfo
  * @return {Object} returns a promise to supply the config object
  */
-export const start = commandMaker(dockerCommands.start);
-export const stop = commandMaker(dockerCommands.stop);
-export const list = commandMaker(dockerCommands.list);
-export const inspect = commandMaker(dockerCommands.inspect);
-export const create = commandMaker(dockerCommands.create);
-export const restart = commandMaker(dockerCommands.restart);
-export const remove = commandMaker(dockerCommands.remove);
-export const images = commandMaker(dockerCommands.images);
-export const networkCreate = commandMaker(dockerCommands.networkCreate);
-export const networkDelete = commandMaker(dockerCommands.networkDelete);
-export const networkInspect = commandMaker(dockerCommands.networkInspect);
+export const containerStart = commandMaker(commands.containerStart);
+export const containerStop = commandMaker(commands.containerStop);
+export const containerList = commandMaker(commands.containerList);
+export const containerInspect = commandMaker(commands.containerInspect);
+export const containerCreate = commandMaker(commands.containerCreate);
+export const containerRestart = commandMaker(commands.containerRestart);
+export const containerRemove = commandMaker(commands.containerRemove);
+export const imagesList = commandMaker(commands.imagesList);
+export const networkCreate = commandMaker(commands.networkCreate);
+export const networkDelete = commandMaker(commands.networkDelete);
+export const networkInspect = commandMaker(commands.networkInspect);
 
 /**
  * pullSpawn() returns a promise to execute a docker command, 'pull' which will pull
@@ -172,19 +173,16 @@ export const pullSpawn = co(function *g(machineName, image, uuid, server, contai
 });
 
 /**
- * sendImage() returns a promise to execute a series of docker commands:
- *   'save', 'docker-machine ssh', and 'docker load' which will
- * send an image to the registry/ host
- * based on the passed in machine name and image
+ * pullImage() returns a promise to execute a docker command, 'pull' which will pull
+ * an image from the registry/host
  *
  * @param {String} machineName
  * @param {String} image
- * @return {} returns a promise to send the image to the host
+ * @return {} returns a promise to pull the image or reject if there is an error
  */
-export const sendImage = co(function *g(machineName, image) {
+export const pullImage = co(function *g(machineName, image) {
   const env = yield machine.env(machineName);
-  return yield exec(`docker save ${image} > tempImage.tar && docker-machine ssh
-    ${machineName} docker load < tempImage.tar`, { env });
+  return yield exec(`pull ${image}`, { env });
 });
 
 /**
@@ -195,9 +193,9 @@ export const sendImage = co(function *g(machineName, image) {
  * @param {String} containreId
  * @return {} returns a promise to execute docker logs
  */
-export const logs = co(function *g(machineName, containerId) {
+export const containerLogs = co(function *g(machineName, containerId) {
   const env = yield machine.env(machineName);
-  return yield exec(`docker logs ${containerId}`, { env });
+  return yield exec(`logs ${containerId}`, { env });
 });
 
 /**
@@ -276,7 +274,7 @@ export const add = co(function *g(uuid, image, callback) {
   callback(uuid, { containerId, image, server, status: 'pending', data: '' });
 
   // check to make sure image is on the local computer
-  if (!(yield images(defaultConfig.machine, image)).length) {
+  if (!(yield imagesList(defaultConfig.machine, image)).length) {
     try {
       yield pullSpawn(defaultConfig.machine, image, uuid, server, containerId, callback);
     } catch (err) {
@@ -285,8 +283,8 @@ export const add = co(function *g(uuid, image, callback) {
   }
 
   const tmpContainerId = containerId;
-  containerId = (yield create(defaultConfig.machine, containerConfig)).Id;
-  const inspectContainer = yield inspect(defaultConfig.machine, containerId);
+  containerId = (yield containerCreate(defaultConfig.machine, containerConfig)).Id;
+  const inspectContainer = yield containerInspect(defaultConfig.machine, containerId);
   const dest = inspectContainer.Mounts[0].Source;
   const name = inspectContainer.Name.substr(1);
   const newContainer = {
@@ -315,98 +313,7 @@ export const add = co(function *g(uuid, image, callback) {
  */
 export const removeContainer = co(function *g(projObj, containerId) {
   if (projObj.containers[containerId].status === 'complete') {
-    yield remove(projObj.machine, containerId);
+    yield containerRemove(projObj.machine, containerId);
   }
   return true;
 });
-
-// Example POST request to create a container
-// POST /containers/create HTTP/1.1
-// Content-Type: application/json
-//
-// {
-//        "Hostname": "",
-//        "Domainname": "",
-//        "User": "",
-//        "AttachStdin": false,
-//        "AttachStdout": true,
-//        "AttachStderr": true,
-//        "Tty": false,
-//        "OpenStdin": false,
-//        "StdinOnce": false,
-//        "Env": [
-//                "FOO=bar",
-//                "BAZ=quux"
-//        ],
-//        "Cmd": [
-//                "date"
-//        ],
-//        "Entrypoint": "",
-//        "Image": "ubuntu",
-//        "Labels": {
-//                "com.example.vendor": "Acme",
-//                "com.example.license": "GPL",
-//                "com.example.version": "1.0"
-//        },
-//        "Mounts": [
-//          {
-//            "Name": "fac362...80535",
-//            "Source": "/data",
-//            "Destination": "/data",
-//            "Driver": "local",
-//            "Mode": "ro,Z",
-//            "RW": false,
-//            "Propagation": ""
-//          }
-//        ],
-//        "WorkingDir": "",
-//        "NetworkDisabled": false,
-//        "MacAddress": "12:34:56:78:9a:bc",
-//        "ExposedPorts": {
-//                "22/tcp": {}
-//        },
-//        "StopSignal": "SIGTERM",
-//        "HostConfig": {
-//          "Binds": ["/tmp:/tmp"],
-//          "Links": ["redis3:redis"],
-//          "Memory": 0,
-//          "MemorySwap": 0,
-//          "MemoryReservation": 0,
-//          "KernelMemory": 0,
-//          "CpuShares": 512,
-//          "CpuPeriod": 100000,
-//          "CpuQuota": 50000,
-//          "CpusetCpus": "0,1",
-//          "CpusetMems": "0,1",
-//          "BlkioWeight": 300,
-//          "BlkioWeightDevice": [{}],
-//          "BlkioDeviceReadBps": [{}],
-//          "BlkioDeviceReadIOps": [{}],
-//          "BlkioDeviceWriteBps": [{}],
-//          "BlkioDeviceWriteIOps": [{}],
-//          "MemorySwappiness": 60,
-//          "OomKillDisable": false,
-//          "OomScoreAdj": 500,
-//          "PortBindings": { "22/tcp": [{ "HostPort": "11022" }] },
-//          "PublishAllPorts": false,
-//          "Privileged": false,
-//          "ReadonlyRootfs": false,
-//          "Dns": ["8.8.8.8"],
-//          "DnsOptions": [""],
-//          "DnsSearch": [""],
-//          "ExtraHosts": null,
-//          "VolumesFrom": ["parent", "other:ro"],
-//          "CapAdd": ["NET_ADMIN"],
-//          "CapDrop": ["MKNOD"],
-//          "GroupAdd": ["newgroup"],
-//          "RestartPolicy": { "Name": "", "MaximumRetryCount": 0 },
-//          "NetworkMode": "bridge",
-//          "Devices": [],
-//          "Ulimits": [{}],
-//          "LogConfig": { "Type": "json-file", "Config": {} },
-//          "SecurityOpt": [""],
-//          "CgroupParent": "",
-//          "VolumeDriver": "",
-//          "ShmSize": 67108864
-//       }
-//   }

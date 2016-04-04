@@ -1,6 +1,5 @@
 import React from 'react';
-import * as container from './server/container.js';
-import * as images from './server/availableImages.js';
+import { docker, availableImages } from './server/main';
 import DockerImage from './projChildComp/DockerImage';
 
 class AddContainer extends React.Component {
@@ -22,8 +21,8 @@ class AddContainer extends React.Component {
   }
 
   addImagesToState() {
-    const servers = images.getServers();
-    const dbs = images.getDbs();
+    const servers = availableImages.getServers();
+    const dbs = availableImages.getDbs();
     this.setState({ servers, dbs });
   }
 
@@ -50,7 +49,7 @@ class AddContainer extends React.Component {
   submit() {
     const containers = this.state.selDbs.concat(this.state.selServer);
     containers.forEach(val => {
-      container.add(this.props.params.uuid, val, this.props.addContainer);
+      docker.add(this.props.params.uuid, val, this.props.addContainer);
     });
 
     this.props.context.router.replace(`/projects/${this.props.params.uuid}`);
