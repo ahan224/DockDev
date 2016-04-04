@@ -23,7 +23,6 @@ const config = {
   configFile: 'dockdevConfig.json',
   errorLogFile: 'error.json',
   defaultPath: process.env.HOME,
-  DOToken: '',
   machine: 'dockdev',
   configPath(path = this.defaultPath) {
     return join(path, this.configFolder, this.configFile);
