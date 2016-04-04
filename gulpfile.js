@@ -54,6 +54,11 @@ gulp.task('react', () => {
     'ramda',
     'react-router',
     'electron',
+    'react-redux',
+    'redux',
+    'redux-thunk',
+    'redux-logger',
+    'react-router-redux',
     './server/main',
   ]);
 
@@ -87,7 +92,7 @@ gulp.task('bower', () => {
 gulp.task('watch', function() {
   gulp.watch(['./app/src/server/**/**',], ['server']);
   gulp.watch('./app/src/main.js', ['main']);
-  gulp.watch(['./app/src/client/index.js', 'app/src/client/components/*.js'], ['react']);
+  gulp.watch(['app/src/client/**/**'], ['react']);
   gulp.watch('./app/src/client/*/**', ['client-other']);
   gulp.watch('./app/index.html', ['html']);
   gulp.watch('./bower_components/*/**', ['bower']);

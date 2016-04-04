@@ -29,7 +29,28 @@ xdescribe('provision digitalocean droplet', function() {
 // you should also pull node, redis, and mongo
 describe('deploy a project to digital ocean', () => {
   const machineName = 'test';
-  const dbName = 'mongo1';
+
+  const server = {
+    image,
+    name: 'server1',
+    HostConfig: {
+      NetworkMode: 'test',
+      PortBindings: { '3000/tcp': [{ HostPort: '3000' }] },
+    },
+    WorkingDir: '/app',
+    Cmd: ['npm', 'start'],
+    ExposedPorts: {
+      '3000/tcp': {},
+    },
+  };
+
+  const db = {
+    image: 'mongo',
+    containerName: 'mongo1',
+    HostConfig: {
+      NetworkMode: 'test',
+    }
+  };
 
   before((() => {
 
