@@ -1,6 +1,6 @@
 import React from 'react';
 import R from 'ramda';
-import Container from './Container';
+import Container from './projChildComp/Container';
 
 const ProjectDetail = ({ projects, params, delContainer }) => {
   const proj = projects[params.uuid];
