@@ -62,6 +62,7 @@ gulp.task('react', () => {
     'redux-thunk',
     'redux-logger',
     'react-router-redux',
+    'node-uuid',
     './server/main',
   ]);
 

@@ -77,13 +77,15 @@ export const writeProj = (projObj) =>
  * @return {Object} projObj
  */
 export const initProject = co(function *g(basePath, projectName) {
+
+  // addProjToConfig confirms that the project name is unique
+  yield appConfig.addProjToConfig(basePath, projectName, defaultConfig);
+
   const projObj = createProj(basePath, projectName);
 
   yield createDockDev(projObj);
 
   yield writeProj(projObj);
-
-  yield appConfig.addProjToConfig(basePath, defaultConfig);
 
   yield networkCreate(defaultConfig.machine, setNetworkParams(projObj.uuid));
 
