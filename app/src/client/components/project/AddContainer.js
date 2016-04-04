@@ -1,6 +1,6 @@
 import React from 'react';
 import { docker, availableImages } from './server/main';
-import DockerImage from './projChildComp/DockerImage';
+import DockerImage from './assets/DockerImage';
 
 class AddContainer extends React.Component {
   constructor() {
