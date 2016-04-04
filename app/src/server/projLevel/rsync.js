@@ -1,7 +1,7 @@
 import { coroutine as co } from 'bluebird';
 import R from 'ramda';
-import * as machine from './machine.js';
-import { exec } from './utils';
+import * as machine from '../dockerAPI/machine.js';
+import { exec } from '../utils/utils';
 
 /**
 * cleanFilePath() accepts a string file path and returns a string file path with any

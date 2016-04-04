@@ -1,6 +1,6 @@
 import { coroutine as co } from 'bluebird';
 import R from 'ramda';
-import { readFile, exec as execProm } from './utils';
+import { readFile, exec as execProm } from '../utils/utils';
 
 /**
  * exec() returns a docker-machine terminal command promise that resolves to the stdout

@@ -1,7 +1,7 @@
 import { join } from 'path';
 import Promise, { coroutine as co } from 'bluebird';
-import * as utils from './utils';
-import * as machine from './machine.js';
+import * as utils from '../utils/utils';
+import * as machine from '../dockerAPI/machine';
 import fs from 'fs';
 import rimraf from 'rimraf';
 
