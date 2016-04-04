@@ -1,6 +1,5 @@
 import React from 'react';
-import * as docker from './api/docker.js';
-import * as availableImages from './api/availableImages.js';
+import { docker, availableImages } from './server/main';
 import DockerImage from './DockerImage';
 
 class AddContainer extends React.Component {

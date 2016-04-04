@@ -1,14 +1,16 @@
 import React from 'react';
 import NavLink from './NavLink';
 import ProjectLinks from './ProjectLinks';
-import * as projConfig from './api/projConfig.js';
-import * as appConfig from './api/appConfig.js';
-import defaultConfig from './api/defaultConfig.js';
-import * as container from './api/docker.js';
-import * as manageProj from './api/manageProj.js';
-import fileWatch from './api/fileWatch.js';
-import * as deploy from './api/deploy.js';
-import errorHandler from './api/errorHandler.js';
+import {
+  projConfig,
+  appConfig,
+  defaultConfig,
+  docker as container,
+  manageProj,
+  fileWatch,
+  deploy,
+  errorHandler,
+} from './server/main';
 
 class App extends React.Component {
   constructor(props, context) {
