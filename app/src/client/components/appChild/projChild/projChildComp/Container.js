@@ -8,8 +8,7 @@ const Container = ({ details, delContainer, uuid }) => {
         <div className="card-block">
           <h5 className="card-title">
           <button onClick={clickDelContainer}>Delete</button>
-            { details.image }
-            { details.status }
+            { details.image } - status: { details.status }
           </h5>
           <p className="card-text">
             With supporting text below as a natural lead-in to additional content.

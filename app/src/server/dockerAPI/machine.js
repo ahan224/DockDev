@@ -121,7 +121,6 @@ export const ssh = (machineName, args) => exec(`ssh ${machineName} ${args}`);
  * based on the passed in machine name
  *
  * @param {String} machineName
- * @param {String} containerInfo
  * @return {Object} configObj
  */
 export const machineConfig = co(function *g(machineName) {
