@@ -6,6 +6,7 @@ import {
   appConfig,
   defaultConfig,
   docker as container,
+  containerMgmt,
   manageProj,
   fileWatch,
   deploy,
@@ -28,10 +29,12 @@ class App extends React.Component {
     this.deployProject = this.deployProject.bind(this);
     this.updateToken = this.updateToken.bind(this);
     this.errorCallback = this.errorCallback.bind(this);
+    this.containerCheck = this.containerCheck.bind(this);
     this.state = {
       projects: {},
       activeProject: '',
       DOToken: '',
+      contMsg: '',
     };
   }
 
@@ -89,7 +92,7 @@ class App extends React.Component {
   // need to delete container from docker - handle pending/error containers
   delContainer(uuid, containerObj) {
     const projects = this.state.projects;
-    container.removeContainer(projects[uuid], containerObj.containerId)
+    containerMgmt.removeContainer(projects[uuid], containerObj.containerId)
       .then(() => {
         delete projects[uuid].containers[containerObj.containerId];
         projConfig.writeProj(projects[uuid]);
@@ -119,11 +122,21 @@ class App extends React.Component {
       .catch();
   }
 
+  containerCheck(projObj) {
+    if (projObj.false) {
+      delete projObj.false;
+      this.setState({ contMsg: 'Container pending or error. Please remove or wait' });
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   stopProject(uuid) {
     const projects = this.state.projects;
     manageProj.stopProject(projects[uuid], this.errorCallback)
       .then(proj => {
-        if (proj.uuid === this.state.activeProject) {
+        if (this.containerCheck(proj) && proj.uuid === this.state.activeProject) {
           this.setState({ activeProject: '' });
         }
       })
@@ -135,8 +148,10 @@ class App extends React.Component {
     const activeProject = projects[this.state.activeProject];
     manageProj.startProject(projects[uuid], activeProject, this.errorCallback)
       .then(proj => {
-        projects[uuid] = proj;
-        this.setState({ activeProject: proj.uuid });
+        if (this.containerCheck(proj)) {
+          projects[uuid] = proj;
+          this.setState({ activeProject: proj.uuid });
+        }
       })
       .catch(err => errorHandler('startProject', err, [uuid], this.errorCallback));
   }
@@ -146,7 +161,9 @@ class App extends React.Component {
     const activeProject = projects[this.state.activeProject];
     manageProj.restartProject(projects[uuid], activeProject, this.errorCallback)
       .then(proj => {
-        this.setState({ activeProject: proj.uuid });
+        if (this.containerCheck(proj)) {
+          this.setState({ activeProject: proj.uuid });
+        }
       })
       .catch(err => errorHandler('restartProject', err, [uuid], this.errorCallback));
   }
@@ -155,14 +172,16 @@ class App extends React.Component {
     const projects = this.state.projects;
     const activeProject = projects[this.state.activeProject];
     manageProj.removeProject(projects[uuid], this.errorCallback)
-      .then(() => {
-        if (activeProject === uuid) {
-          this.setState({ activeProject: '' });
+      .then(proj => {
+        if (this.containerCheck(proj)) {
+          if (activeProject === uuid) {
+            this.setState({ activeProject: '' });
+          }
+          appConfig.removeProjFromConfig(projects[uuid], defaultConfig);
+          this.context.router.replace('/');
+          delete projects[uuid];
+          this.setState({ projects });
         }
-        appConfig.removeProjFromConfig(projects[uuid], defaultConfig);
-        this.context.router.replace('/');
-        delete projects[uuid];
-        this.setState({ projects });
       })
       .catch(err => errorHandler('removeProject', err, [uuid], this.errorCallback));
   }

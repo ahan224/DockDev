@@ -4,7 +4,8 @@ import R from 'ramda';
 import uuid from 'node-uuid';
 import * as utils from '../utils/utils';
 import * as appConfig from '../appLevel/appConfig';
-import { setNetworkParams, networkCreate } from '../dockerAPI/docker';
+import { networkCreate } from '../dockerAPI/docker';
+import { setNetworkParams } from '../projLevel/containerMgmt';
 import defaultConfig from '../appLevel/defaultConfig';
 
 /**
