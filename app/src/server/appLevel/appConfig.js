@@ -8,6 +8,7 @@ import {
   FAILED_READ_CONFIG,
   FAILED_TO_WRITE_CONFIG,
   PROJECT_NAME_EXISTS,
+  PROJECT_DIR_USED,
 } from './errorMsgs';
 
 
@@ -147,7 +148,7 @@ export const loadPaths = (configObj, defaultConfig, callback) => {
 };
 
 /**
- * checkUniqueName() returns true/false if the selected project name exists
+ * checkUniqueName() returns true if the selected project name exists
  *
  * @param {String} projectName
  * @param {Array} projArray
@@ -156,6 +157,20 @@ export const loadPaths = (configObj, defaultConfig, callback) => {
 const checkUniqueName = (projectName, projArray) => {
   for (let i = 0; i < projArray.length; i++) {
     if (projArray[i].projectName === projectName) return true;
+  }
+  return false;
+};
+
+/**
+ * checkNewPath() returns true if the selected path is already a project
+ *
+ * @param {String} basePath
+ * @param {Array} projArray
+ * @return {Boolean}
+ */
+const checkNewPath = (basePath, projArray) => {
+  for (let i = 0; i < projArray.length; i++) {
+    if (projArray[i].basePath === basePath) return true;
   }
   return false;
 };
@@ -173,6 +188,7 @@ export const addProjToConfig = co(function *g(basePath, projectName, defaultConf
   const readConfigFile = yield readConfig(configPath);
   const underscoreName = utils.spaceToUnder(projectName);
   if (checkUniqueName(underscoreName, readConfigFile.projects)) throw PROJECT_NAME_EXISTS;
+  if (checkNewPath(basePath, readConfigFile.projects)) throw PROJECT_DIR_USED;
   readConfigFile.projects.push({ basePath, projectName: underscoreName });
   yield writeConfig(readConfigFile);
 });
