@@ -1,14 +1,15 @@
 import { join } from 'path';
 import { coroutine as co } from 'bluebird';
 import R from 'ramda';
-import uuid from 'node-uuid';
 import * as utils from '../utils/utils';
 import * as appConfig from '../appLevel/appConfig';
-import { setNetworkParams, networkCreate } from '../dockerAPI/docker';
 import defaultConfig from '../appLevel/defaultConfig';
+import errorHandler from '../appLevel/errorHandler';
 import {
   FAILED_TO_CREATE_PROJ_DOCKDEV_DIR,
   FAILED_PROJECT_WRITE,
+  PROJECT_DIR_USED,
+  PROJECT_NAME_EXISTS,
 } from '../appLevel/errorMsgs';
 
 /**
@@ -20,10 +21,10 @@ import {
  * @return {Object} projObj
  */
 export const createProj = (basePath, projectName) => ({
-  uuid: uuid.v4(),
   projectName,
+  cleanName: utils.cleanName(projectName),
   basePath,
-  containers: {},
+  containers: [],
   machine: defaultConfig.machine,
   remoteMachine: '',
 });
@@ -65,6 +66,13 @@ export const writeProj = (projObj) =>
     .then(() => true)
     .catch(() => {throw FAILED_PROJECT_WRITE;});
 
+
+const undoInitProject = co(function *g(projObj) {
+  yield appConfig.removeProjFromConfig(projObj, defaultConfig);
+  yield utils.rimrafProm(join(projObj.basePath, defaultConfig.projFolder));
+  return true;
+});
+
 /**
  * initProject() creates the project object, then yields a promise to create the project folder
  * then yields a promise to write the project file, then it adds the project object to memory
@@ -77,17 +85,24 @@ export const writeProj = (projObj) =>
  * @return {Object} projObj
  */
 export const initProject = co(function *g(basePath, projectName) {
-
-  // addProjToConfig confirms that the project name is unique
-  yield appConfig.addProjToConfig(basePath, projectName, defaultConfig);
-
-  const projObj = createProj(basePath, projectName);
-
-  yield createDockDev(projObj);
-
-  yield writeProj(projObj);
-
-  yield networkCreate(defaultConfig.machine, setNetworkParams(projObj.uuid));
-
-  return projObj;
+  let projObj;
+  try {
+    // create initial project object
+    projObj = createProj(basePath, projectName);
+    // addProjToConfig confirms that the project name & path are unique
+    yield appConfig.addProjToConfig(projObj, defaultConfig);
+    // create .dockdev folder in selected project folder
+    yield createDockDev(projObj);
+    // write the project object into the dockdev.json file
+    yield writeProj(projObj);
+    return projObj;
+  } catch (e) {
+    // send error to error logging
+    errorHandler('initProject', e, [basePath, projectName]);
+    // undo any part of the initProject function if unique (dont' remove existing)
+    if (e !== PROJECT_DIR_USED || e !== PROJECT_NAME_EXISTS) {
+      yield undoInitProject(projObj, defaultConfig);
+    }
+    throw e;
+  }
 });

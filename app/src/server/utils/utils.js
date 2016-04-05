@@ -1,13 +1,14 @@
 import fs from 'fs';
 import childProcess from 'child_process';
 import Promise from 'bluebird';
+import rimraf from 'rimraf';
 
 // promisify certain callback functions
 export const mkdir = Promise.promisify(fs.mkdir);
 export const writeFile = Promise.promisify(fs.writeFile);
 export const readFile = Promise.promisify(fs.readFile);
 export const exec = Promise.promisify(childProcess.exec);
-
+export const rimrafProm = Promise.promisify(rimraf);
 /**
  * find() returns an array of data using the 'find' terminal command
  * based on the passed in array of options for the 'find' terminal command
@@ -38,8 +39,8 @@ export const find = (array) => {
  */
 export const jsonStringifyPretty = (obj) => JSON.stringify(obj, null, 2);
 
-export const spaceToUnder = (str) => str.split(' ').join('_');
-export const underToSpace = (str) => str.split('_').join(' ');
+export const cleanName = (str) => str.split(' ').join('_');
+export const uncleanName = (str) => str.split('_').join(' ');
 
 // function promisify(fun) {
 //   return function(...args) {

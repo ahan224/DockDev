@@ -1,12 +1,18 @@
-import uuid from 'node-uuid';
-import { defaultConfig, appConfig, projConfig } from './server/main';
+import moment from 'moment';
+import {
+  defaultConfig,
+  appConfig,
+  projConfig,
+  utils,
+} from './server/main';
 
 export const REQUEST_CONFIG = 'REQUEST_CONFIG';
 export const RECEIVE_CONFIG = 'RECEIVE_CONFIG';
 export const REQUEST_PROJECT = 'REQUEST_PROJECT';
 export const RECEIVE_PROJECT = 'RECEIVE_PROJECT';
-export const ADDED_PROJECT = 'ADD_PROJECT';
 export const ADDING_PROJECT = 'ADDING_PROJECT';
+export const ADDED_PROJECT = 'ADDED_PROJECT';
+export const ERROR_ADDING_PROJECT = 'ERROR_ADDING_PROJECT';
 
 function requestConfig() {
   return {
@@ -18,6 +24,7 @@ function requestConfig() {
 function receiveConfig(config) {
   return {
     type: RECEIVE_CONFIG,
+    isFetching: false,
     projects: config.projects,
     tokens: config.tokes,
   };
@@ -40,11 +47,8 @@ function receiveConfig(config) {
 function addingProject(path, name) {
   return {
     type: ADDING_PROJECT,
-    projObj: {
-      uuid: uuid.v4(),
-      projectName: name,
-      basePath: path,
-    },
+    message: `Adding project ${name}`,
+    timestamp: moment().format('MM-D-YYYY, h:mm:ss a'),
   };
 }
 
@@ -55,7 +59,6 @@ function addedProject(projObj) {
   };
 }
 
-
 export function loadConfig() {
   return dispatch => {
     dispatch(requestConfig());
@@ -64,8 +67,12 @@ export function loadConfig() {
   };
 }
 
-function addProjectError(error) {
-  return error;
+function addProjectError(err, name) {
+  return {
+    type: ERROR_ADDING_PROJECT,
+    message: `Couldn't add ${name}: error = ${err}`,
+    timestamp: moment().format('MM-D-YYYY, h:mm:ss a'),
+  };
 }
 
 export function addProject(path, name) {
@@ -73,6 +80,6 @@ export function addProject(path, name) {
     dispatch(addingProject(path, name));
     return projConfig.initProject(path, name)
       .then(response => dispatch(addedProject(response)))
-      .catch(err => dispatch(addProjectError(err)));
+      .catch(err => dispatch(addProjectError(err, name)));
   };
 }

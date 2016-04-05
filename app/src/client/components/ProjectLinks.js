@@ -2,10 +2,9 @@ import React from 'react';
 import { Link } from 'react-router';
 
 const ProjectLinks = ({ projects }) => {
-  projects = projects || [];
   const projLinks = projects.map((proj, idx) => (
       <li key={idx} className="nav-item">
-        <Link className="nav-link" to={`/projects/${proj}`}>{proj}</Link>
+        <Link className="nav-link" to={`/projects/${proj.cleanName}`}>{proj.projectName}</Link>
       </li>
     )
   );
@@ -20,7 +19,7 @@ const ProjectLinks = ({ projects }) => {
 };
 
 ProjectLinks.propTypes = {
-  projects: React.PropTypes.object,
+  projects: React.PropTypes.array,
 };
 
 export default ProjectLinks;
