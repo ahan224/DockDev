@@ -1,7 +1,6 @@
 import React from 'react';
 
 const DockerImage = ({ name, handler, style }) => (
-
        <div className="col-xs-12 col-md-6 col-lg-4">
          <div className="card text-xs-left">
            <div className="card-block" onClick={handler} style={style}>

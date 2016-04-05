@@ -11,12 +11,12 @@ class App extends Component {
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(loadConfig());
+    this.props.loadConfig();
   }
 
   render() {
     const { children, projects } = this.props;
+    console.log(projects);
     return (
       <div>
         <ul role="nav" id="menu" className="nav">
@@ -59,20 +59,20 @@ class App extends Component {
 }
 
 function mapStateToProps(state) {
-  const { config } = state;
-  const projects = config.projects || [];
-  return { config, projects };
+  const { projects } = state;
+  return { projects };
 }
 
 App.propTypes = {
   children: PropTypes.object,
-  config: PropTypes.object,
-  dispatch: PropTypes.func.isRequired,
-  projects: PropTypes.array,
+  projects: PropTypes.object,
+  loadConfig: PropTypes.func.isRequired,
 };
 
 App.contextTypes = {
   router: PropTypes.object.isRequired,
 };
 
-export default connect(mapStateToProps)(App);
+export default connect(mapStateToProps, {
+  loadConfig,
+})(App);

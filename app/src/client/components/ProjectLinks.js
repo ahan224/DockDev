@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router';
+import { utils } from './server/main';
 
 const ProjectLinks = ({ projects }) => {
-  const projLinks = projects.map((proj, idx) => (
+  const projArray = utils.projectsObjToArray(projects);
+  const projLinks = projArray.map((proj, idx) => (
       <li key={idx} className="nav-item">
         <Link className="nav-link" to={`/projects/${proj.cleanName}`}>{proj.projectName}</Link>
       </li>
@@ -19,7 +21,7 @@ const ProjectLinks = ({ projects }) => {
 };
 
 ProjectLinks.propTypes = {
-  projects: React.PropTypes.array,
+  projects: React.PropTypes.object,
 };
 
 export default ProjectLinks;

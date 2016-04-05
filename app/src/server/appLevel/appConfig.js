@@ -8,6 +8,7 @@ import {
   FAILED_TO_WRITE_CONFIG,
   PROJECT_NAME_EXISTS,
   PROJECT_DIR_USED,
+  FAILED_TO_READ_PROJECT,
 } from './errorMsgs';
 
 /**
@@ -41,9 +42,9 @@ const checkDockerInstall = co(function *g() {
  */
 const initConfig = (defaultConfig) => ({
   path: defaultConfig.configPath(),
-  projects: {},
+  projects: [],
   userDir: process.env.HOME,
-  DOtoken: '',
+  DOToken: '',
 });
 
 /**
@@ -89,59 +90,44 @@ const createConfigFolder = (defaultConfig) =>
  * @return {Object} config
  */
 export const loadConfigFile = co(function *g(defaultConfig) {
-  let config = yield readConfig(defaultConfig.configPath());
-
-  // if config is undefined then config file does not exist
-  if (!config) {
-    try {
-      yield createConfigFolder(defaultConfig);
-    } catch (e) {
-      console.log(e);
-    }
-    config = initConfig(defaultConfig);
+  try {
+    return yield createConfigFolder(defaultConfig);
+  } catch (e) {
+    const config = initConfig(defaultConfig);
     yield writeConfig(config);
     return config;
   }
-
-  return config;
 });
 
 /**
- * loadPathsFile() returns a promise that a path will resolve whether or not it is good
- * based on the passed in path
+ * removeBadProject() removes a failed load project from the app config file
  *
- * @param {String} basePath
- * @return {} promise to resolve 'ERROR' or the projet object
+ * @param {String} path
+ * @param {Object} defaultConfig
+ * @return {Promise}
  */
-const loadPathsFile = (path, defaultConfig) =>
-  new Promise((resolve) => {
-    fs.readFile(join(path, defaultConfig.projPath()), (err, result) => {
-      if (err) return resolve('ERROR');
-      const proj = JSON.parse(result.toString());
-      proj.basePath = path;
-      return resolve(proj);
-    });
-  });
+export const removeBadProject = co(function *g(path, defaultConfig) {
+  const configPath = defaultConfig.configPath();
+  const readConfigFile = yield readConfig(configPath);
+  readConfigFile.projects =
+   readConfigFile.projects.filter(obj => obj.basePath !== path);
+  yield writeConfig(readConfigFile);
+  return true;
+});
 
 /**
- * loadPaths() will load all the paths for every project and if a project fails to load
- * it will run a callback on those failed paths
+ * loadProject() will read the project configuration from the specified path
  *
- * @param {Object} configObj
+ * @param {String} path
  * @param {Object} defaultConfig
- * @param {Function} callback
- * @return {}
+ * @return {Promise}
  */
-export const loadPaths = (configObj, defaultConfig, callback) => {
-  const goodPaths = [];
-
-  configObj.projects.forEach(path => {
-    goodPaths.push(loadPathsFile(path, defaultConfig)
-      .then(data => {
-        if (data !== 'ERROR') callback(data);
-      }));
-  });
-};
+export const loadProject = (path, defaultConfig) =>
+  utils.readFile(join(path, defaultConfig.projPath()))
+    .catch(() => {
+      removeBadProject(path, defaultConfig); // the sequence here may need to be reconsidered
+      throw FAILED_TO_READ_PROJECT;
+    });
 
 /**
  * checkUniqueName() returns true if the selected project name exists
@@ -253,3 +239,41 @@ export const initApp = co(function *g(defaultConfig, router, addConfig, addProje
 
   return true;
 });
+
+
+// /**
+//  * loadPathsFile() returns a promise that a path will resolve whether or not it is good
+//  * based on the passed in path
+//  *
+//  * @param {String} basePath
+//  * @return {} promise to resolve 'ERROR' or the projet object
+//  */
+// const loadPathsFile = (path, defaultConfig) =>
+//   new Promise((resolve) => {
+//     fs.readFile(join(path, defaultConfig.projPath()), (err, result) => {
+//       if (err) return resolve('ERROR');
+//       const proj = JSON.parse(result.toString());
+//       proj.basePath = path;
+//       return resolve(proj);
+//     });
+//   });
+//
+// /**
+//  * loadPaths() will load all the paths for every project and if a project fails to load
+//  * it will run a callback on those failed paths
+//  *
+//  * @param {Object} configObj
+//  * @param {Object} defaultConfig
+//  * @param {Function} callback
+//  * @return {}
+//  */
+// export const loadPaths = (configObj, defaultConfig, callback) => {
+//   const goodPaths = [];
+//
+//   configObj.projects.forEach(path => {
+//     goodPaths.push(loadPathsFile(path, defaultConfig)
+//       .then(data => {
+//         if (data !== 'ERROR') callback(data);
+//       }));
+//   });
+// };
