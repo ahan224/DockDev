@@ -16,7 +16,7 @@ class App extends Component {
   }
 
   render() {
-    const { children, config } = this.props;
+    const { children, projects } = this.props;
     return (
       <div>
         <ul role="nav" id="menu" className="nav">
@@ -30,7 +30,7 @@ class App extends Component {
               <img src="./client/images/png/addIcon@2x.png"></img>
             </NavLink>
           </li>
-          {<ProjectLinks projects={config.projects} />}
+          {<ProjectLinks projects={projects} />}
         </ul>
           <div id="right-column">
             <div className="content-top-nav">
@@ -60,13 +60,15 @@ class App extends Component {
 
 function mapStateToProps(state) {
   const { config } = state;
-  return { config };
+  const projects = config.projects || [];
+  return { config, projects };
 }
 
 App.propTypes = {
   children: PropTypes.object,
   config: PropTypes.object,
   dispatch: PropTypes.func.isRequired,
+  projects: PropTypes.array,
 };
 
 App.contextTypes = {

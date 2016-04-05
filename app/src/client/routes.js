@@ -2,8 +2,8 @@ import React from 'react';
 import { Route, IndexRoute } from 'react-router';
 
 import App from './containers/App';
-// import Home from './components/Home';
-// import AddProject from './components/AddProject';
+import Home from './components/Home';
+import AddProject from './containers/AddProject';
 // import ProjectDetails from './components/ProjectDetails';
 // import ProjectSettings from './components/ProjectSettings';
 // import ProjectDeploy from './components/ProjectDeploy';
@@ -13,11 +13,12 @@ import App from './containers/App';
 // import Settings from './components/Settings';
 
 export default (
-  <Route path="/" component={App} />
+  <Route path="/" component={App} >
+    <IndexRoute component={Home} />
+    <Route path="/addProject" component={AddProject} />
+  </Route>
 );
 
-// <IndexRoute component={Home} />
-// <Route path="/addProject" component={AddProject} />
 // <Route path="/init/:id" component={Init} />
 // <Route path="/settings" component={Settings} />
 // <Route path="/projects/:uuid" component={ProjectNav} >

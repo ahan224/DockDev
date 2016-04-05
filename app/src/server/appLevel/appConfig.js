@@ -3,16 +3,12 @@ import Promise, { coroutine as co } from 'bluebird';
 import * as utils from '../utils/utils';
 import * as machine from '../dockerAPI/machine';
 import fs from 'fs';
-import rimraf from 'rimraf';
 import {
   FAILED_READ_CONFIG,
   FAILED_TO_WRITE_CONFIG,
   PROJECT_NAME_EXISTS,
   PROJECT_DIR_USED,
 } from './errorMsgs';
-
-
-const rimrafProm = Promise.promisify(rimraf);
 
 /**
  * checkDockerMachineInstalled() returns true if docker machine is installed or false if not
@@ -183,13 +179,16 @@ const checkNewPath = (basePath, projArray) => {
  * @param {Object} defaultConfig
  * @return {}
  */
-export const addProjToConfig = co(function *g(basePath, projectName, defaultConfig) {
+export const addProjToConfig = co(function *g(projObj, defaultConfig) {
   const configPath = defaultConfig.configPath();
   const readConfigFile = yield readConfig(configPath);
-  const underscoreName = utils.spaceToUnder(projectName);
-  if (checkUniqueName(underscoreName, readConfigFile.projects)) throw PROJECT_NAME_EXISTS;
-  if (checkNewPath(basePath, readConfigFile.projects)) throw PROJECT_DIR_USED;
-  readConfigFile.projects.push({ basePath, projectName: underscoreName });
+  if (checkUniqueName(projObj.cleanName, readConfigFile.projects)) throw PROJECT_NAME_EXISTS;
+  if (checkNewPath(projObj.basePath, readConfigFile.projects)) throw PROJECT_DIR_USED;
+  readConfigFile.projects.push({
+    basePath: projObj.basePath,
+    projectName: projObj.projectName,
+    cleanName: projObj.cleanName,
+  });
   yield writeConfig(readConfigFile);
 });
 
@@ -204,9 +203,9 @@ export const addProjToConfig = co(function *g(basePath, projectName, defaultConf
 export const removeProjFromConfig = co(function *g(projObj, defaultConfig) {
   const configPath = defaultConfig.configPath();
   const readConfigFile = yield readConfig(configPath);
-  readConfigFile.projects = readConfigFile.projects.filter(path => path !== projObj.basePath);
-  yield utils.writeFile(configPath, utils.jsonStringifyPretty(readConfigFile));
-  yield rimrafProm(join(projObj.basePath, defaultConfig.projFolder));
+  readConfigFile.projects =
+    readConfigFile.projects.filter(obj => obj.basePath !== projObj.basePath);
+  yield writeConfig(readConfigFile);
   return true;
 });
 

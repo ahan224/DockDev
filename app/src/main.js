@@ -12,7 +12,7 @@ app.on('ready', () => {
   mainWindow = new BrowserWindow({ width: 950, height: 650 });
   mainWindow.loadURL(join('file://', __dirname, 'index.html'));
 
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
   mainWindow.on('close', () => {
     mainWindow = null;
   });
