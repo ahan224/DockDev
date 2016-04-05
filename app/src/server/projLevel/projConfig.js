@@ -1,6 +1,5 @@
 import { join } from 'path';
 import { coroutine as co } from 'bluebird';
-import R from 'ramda';
 import * as utils from '../utils/utils';
 import * as appConfig from '../appLevel/appConfig';
 import defaultConfig from '../appLevel/defaultConfig';
@@ -42,18 +41,6 @@ export const createDockDev = (projObj) =>
     .catch(() => {throw FAILED_TO_CREATE_PROJ_DOCKDEV_DIR;});
 
 /**
- * cleanProjToWrite() returns a formatted object with information to be stored in the project file
- * based on composing R.pick (which parameters to write) and indent formatting (jsonStringifyPretty)
- *
- * @param {Object} projObj
- * @return {Object} 'clean' projObj
- */
-const cleanProjToWrite = R.compose(
-  utils.jsonStringifyPretty,
-  R.pick(defaultConfig.projWriteParams)
-);
-
-/**
  * writeProj() returns a promise to write the dockdev.josn file with the project information
  * based on passing in the project object
  *  should be used with readProj for existing projects
@@ -62,7 +49,10 @@ const cleanProjToWrite = R.compose(
  * @return {} writes (or overwrites) the project file (dockdev.json)
  */
 export const writeProj = (projObj) =>
-  utils.writeFile(join(projObj.basePath, defaultConfig.projPath()), cleanProjToWrite(projObj))
+  utils.writeFile(
+    join(projObj.basePath, defaultConfig.projPath()),
+    utils.jsonStringifyPretty(projObj)
+  )
     .then(() => true)
     .catch(() => {throw FAILED_PROJECT_WRITE;});
 
@@ -100,8 +90,7 @@ export const initProject = co(function *g(basePath, projectName) {
     // send error to error logging
     errorHandler('initProject', e, [basePath, projectName]);
     // undo any part of the initProject function if unique (dont' remove existing)
-    if (e !== PROJECT_DIR_USED || e !== PROJECT_NAME_EXISTS) {
-      console.log(e);
+    if (e !== PROJECT_DIR_USED && e !== PROJECT_NAME_EXISTS) {
       yield undoInitProject(projObj, defaultConfig);
     }
     throw e;

@@ -1,14 +1,15 @@
 import { join } from 'path';
-import Promise, { coroutine as co } from 'bluebird';
+import { coroutine as co } from 'bluebird';
 import * as utils from '../utils/utils';
 import * as machine from '../dockerAPI/machine';
-import fs from 'fs';
 import {
   FAILED_READ_CONFIG,
   FAILED_TO_WRITE_CONFIG,
   PROJECT_NAME_EXISTS,
   PROJECT_DIR_USED,
   FAILED_TO_READ_PROJECT,
+  EEXIST,
+  FAILED_TO_CREATE_CONFIG_DIR,
 } from './errorMsgs';
 
 /**
@@ -80,7 +81,12 @@ const writeConfig = (configObj) => {
  * @return {} makes a folder
  */
 const createConfigFolder = (defaultConfig) =>
-  utils.mkdir(join(defaultConfig.defaultPath, defaultConfig.configFolder));
+  utils.mkdir(join(defaultConfig.defaultPath, defaultConfig.configFolder))
+    .then(() => true)
+    .catch(err => {
+      if (err.code !== EEXIST) throw FAILED_TO_CREATE_CONFIG_DIR;
+      return false;
+    });
 
 /**
  * loadConfigFile() returns the config object from ~/.dockdevconfig or creates/writes it
@@ -91,11 +97,14 @@ const createConfigFolder = (defaultConfig) =>
  */
 export const loadConfigFile = co(function *g(defaultConfig) {
   try {
-    return yield createConfigFolder(defaultConfig);
+    if (yield createConfigFolder(defaultConfig)) {
+      const config = initConfig(defaultConfig);
+      yield writeConfig(config);
+      return config;
+    }
+    return yield readConfig(defaultConfig.configPath());
   } catch (e) {
-    const config = initConfig(defaultConfig);
-    yield writeConfig(config);
-    return config;
+    throw e; // potentially need to additional handling here
   }
 });
 
@@ -124,6 +133,7 @@ export const removeBadProject = co(function *g(path, defaultConfig) {
  */
 export const loadProject = (path, defaultConfig) =>
   utils.readFile(join(path, defaultConfig.projPath()))
+    .then(JSON.parse)
     .catch(() => {
       removeBadProject(path, defaultConfig); // the sequence here may need to be reconsidered
       throw FAILED_TO_READ_PROJECT;

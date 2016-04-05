@@ -16,7 +16,6 @@ class App extends Component {
 
   render() {
     const { children, projects } = this.props;
-    console.log(projects);
     return (
       <div>
         <ul role="nav" id="menu" className="nav">
