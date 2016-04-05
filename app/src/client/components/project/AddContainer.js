@@ -1,5 +1,5 @@
 import React from 'react';
-import { docker, availableImages } from './server/main';
+import { containerMgmt, availableImages } from './server/main';
 import DockerImage from './assets/DockerImage';
 
 class AddContainer extends React.Component {
@@ -48,8 +48,15 @@ class AddContainer extends React.Component {
 
   submit() {
     const containers = this.state.selDbs.concat(this.state.selServer);
+    console.log("first", this.props.projects[this.props.params.uuid].projectName);
+    const projContainers = this.props.projects[this.props.params.uuid].containers;
     containers.forEach(val => {
-      docker.add(this.props.params.uuid, val, this.props.addContainer);
+      containerMgmt.add(
+        this.props.params.uuid,
+        val,
+        this.props.addContainer,
+        this.props.projects[this.props.params.uuid].projectName,
+        projContainers);
     });
 
     this.props.context.router.replace(`/projects/${this.props.params.uuid}`);
@@ -116,6 +123,7 @@ AddContainer.propTypes = {
   params: React.PropTypes.object,
   addContainer: React.PropTypes.func,
   context: React.PropTypes.object,
+  projects: React.PropTypes.object,
 };
 
 export default AddContainer;
