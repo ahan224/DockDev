@@ -12,9 +12,9 @@ import uuidNode from 'node-uuid';
  * @param {String} uuid
  * @return {Object} returns an object with the image, project path, network mode, and working dir
  */
-export const setServerParams = (image, uuid) => ({
+export const setServerParams = (image, uuid, containerName) => ({
   image,
-  containerName: 'server1',
+  containerName,
   HostConfig: {
     Binds: ['/home/docker/tmp:/app'],
     NetworkMode: uuid,
@@ -38,9 +38,9 @@ export const setServerParams = (image, uuid) => ({
  * @param {String} uuid
  * @return {Object} returns an object with the networkMode
  */
-export const setDbParams = (image, uuid) => ({
+export const setDbParams = (image, uuid, containerName) => ({
   image,
-  containerName: 'mongo1',
+  containerName,
   HostConfig: {
     NetworkMode: uuid,
     Dns: [],
@@ -71,16 +71,24 @@ export const setNetworkParams = (uuid) => ({
  * @param {Function} callback
  * @return {Object} newContainer
  */
-export const add = co(function *g(uuid, image, callback) {
+export const add = co(function *g(uuid, image, callback, projectName, currContainers) {
   const server = availableImages.servers.indexOf(image) > -1;
-  const containerConfig = server ? setServerParams(image, uuid) : setDbParams(image, uuid);
+  const containerName = projectName + image;
+  const containerConfig =
+    server ? setServerParams(image, uuid, containerName) : setDbParams(image, uuid, containerName);
+
+  for (const key in currContainers) {
+    if (currContainers[key].image === containerConfig.image) {
+      return;
+    }
+  }
 
   let containerId = uuidNode.v4();
 
   callback(uuid, { containerId, image, server, status: 'pending', data: '' });
 
   // check to make sure image is on the local computer
-  if (!(yield imagesList(defaultConfig.machine, image)).length) {
+  if (!(yield docker.imagesList(defaultConfig.machine, image)).length) {
     try {
       yield docker.pullSpawn(defaultConfig.machine, image, uuid, server, containerId, callback);
     } catch (err) {
@@ -89,8 +97,8 @@ export const add = co(function *g(uuid, image, callback) {
   }
 
   const tmpContainerId = containerId;
-  containerId = (yield containerCreate(defaultConfig.machine, containerConfig)).Id;
-  const inspectContainer = yield containerInspect(defaultConfig.machine, containerId);
+  containerId = (yield docker.containerCreate(defaultConfig.machine, containerConfig)).Id;
+  const inspectContainer = yield docker.containerInspect(defaultConfig.machine, containerId);
   const dest = inspectContainer.Mounts[0].Source;
   const name = inspectContainer.Name.substr(1);
   const newContainer = {
@@ -119,7 +127,7 @@ export const add = co(function *g(uuid, image, callback) {
  */
 export const removeContainer = co(function *g(projObj, containerId) {
   if (projObj.containers[containerId].status === 'complete') {
-    yield containerRemove(projObj.machine, containerId);
+    yield docker.containerRemove(projObj.machine, containerId);
   }
   return true;
 });

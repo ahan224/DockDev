@@ -6,6 +6,7 @@ import {
   appConfig,
   defaultConfig,
   docker as container,
+  containerMgmt,
   manageProj,
   fileWatch,
   deploy,
@@ -89,7 +90,7 @@ class App extends React.Component {
   // need to delete container from docker - handle pending/error containers
   delContainer(uuid, containerObj) {
     const projects = this.state.projects;
-    container.removeContainer(projects[uuid], containerObj.containerId)
+    containerMgmt.removeContainer(projects[uuid], containerObj.containerId)
       .then(() => {
         delete projects[uuid].containers[containerObj.containerId];
         projConfig.writeProj(projects[uuid]);
