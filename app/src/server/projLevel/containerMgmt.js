@@ -129,5 +129,9 @@ export const removeContainer = co(function *g(projObj, containerId) {
   if (projObj.containers[containerId].status === 'complete') {
     yield docker.containerRemove(projObj.machine, containerId);
   }
+  // if (projObj.containers[containerId].status === 'error' ||
+  //     projObj.containers[containerId].status === 'pending') {
+  //   yield docker.containerRemove(projObj.machine, containerId);
+  // }
   return true;
 });
