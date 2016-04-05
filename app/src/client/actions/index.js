@@ -64,11 +64,15 @@ export function loadConfig() {
   };
 }
 
+function addProjectError(error) {
+  return error;
+}
+
 export function addProject(path, name) {
   return dispatch => {
     dispatch(addingProject(path, name));
     return projConfig.initProject(path, name)
       .then(response => dispatch(addedProject(response)))
-      .catch(err => )
-  }
+      .catch(err => dispatch(addProjectError(err)));
+  };
 }
