@@ -101,6 +101,7 @@ export const initProject = co(function *g(basePath, projectName) {
     errorHandler('initProject', e, [basePath, projectName]);
     // undo any part of the initProject function if unique (dont' remove existing)
     if (e !== PROJECT_DIR_USED || e !== PROJECT_NAME_EXISTS) {
+      console.log(e);
       yield undoInitProject(projObj, defaultConfig);
     }
     throw e;
