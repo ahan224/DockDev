@@ -18,7 +18,7 @@ import errorHandler from '../appLevel/errorHandler';
 
 const checkStatus = co(function *g(machineName, containerId, errorCallback) {
   try {
-    const inspectResults = yield container.inspect(machineName, containerId);
+    const inspectResults = yield container.containerInspect(machineName, containerId);
     return inspectResults.State.Running ? 1 : 0;
   } catch (e) {
     const error = yield errorHandler('checkStatus', e, arguments, errorCallback);
@@ -55,7 +55,7 @@ export const stopProject = co(function *g(projObj, errorCallback) {
       }
       case 1: {
         try {
-          container.stop(projObj.machine, containerId);
+          container.containerStop(projObj.machine, containerId);
         } catch (e) {
           yield errorHandler('stopProject', e, arguments, errorCallback);
           const error = {
@@ -136,7 +136,7 @@ export const startProject = co(function *g(projObj, activeProject, errorCallback
       }
       case 0: {
         try {
-          container.start(projObj.machine, containerId);
+          container.containerStart(projObj.machine, containerId);
         } catch (e) {
           yield errorHandler('startProject', e, arguments, errorCallback);
           const error = {
@@ -187,7 +187,7 @@ export const removeProject = co(function *g(projObj, errorCallback) {
       }
       default: {
         try {
-          container.remove(projObj.machine, containerId);
+          container.containerRemove(projObj.machine, containerId);
         } catch (e) {
           yield errorHandler('removeProject', e, arguments, errorCallback);
           const error = {
