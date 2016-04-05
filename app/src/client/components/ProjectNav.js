@@ -2,20 +2,19 @@ import React from 'react';
 import { Link } from 'react-router';
 
 const ProjectNav = (props) => {
-  const uuid = props.params.uuid;
-  const proj = props.projects[uuid];
+  const projectName = props.params.projectName;
 
-  const start = () => props.startProject(uuid);
-  const stop = () => props.stopProject(uuid);
-  const restart = () => props.restartProject(uuid);
-  const remove = () => props.removeProject(uuid);
+  const start = '';
+  const stop = '';
+  const restart = '';
+  const remove = '';
 
   return (
     <div >
       <div className="proj-nav">
         <div className="col-xs-4 proj-detail-title" style={{ padding: '0px' }}>
           <h5 className="text-capitalize">
-            {proj.projectName}
+            {projectName}
           </h5>
         </div>
         <div className="btn-group container-player-btns" data-toggle="buttons">
@@ -38,16 +37,16 @@ const ProjectNav = (props) => {
         </div>
         <ul className="nav nav-inline">
             <li className="nav-item">
-              <Link className="nav-link" to={`/projects/${uuid}`}>
+              <Link className="nav-link" to={`/projects/${projectName}`}>
                 H
               </Link>
             </li>
           <li className="nav-item">
-            <Link className="nav-link" to={`/projects/${uuid}/container`}> +
+            <Link className="nav-link" to={`/projects/${projectName}/container`}> +
             </Link>
           </li>
             <li className="nav-item">
-              <Link className="nav-link" to={`/projects/${uuid}/deploy`}>Deploy</Link>
+              <Link className="nav-link" to={`/projects/${projectName}/deploy`}>Deploy</Link>
             </li>
         </ul>
       </div>

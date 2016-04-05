@@ -1,3 +1,4 @@
+import { push } from 'react-router-redux';
 import moment from 'moment';
 import {
   defaultConfig,
@@ -127,4 +128,8 @@ export function addProject(path, name) {
       .then(response => dispatch(addedProject(response)))
       .catch(err => dispatch(addProjectError(err, name)));
   };
+}
+
+export function redirectHome() {
+  return dispatch => dispatch(push('/'));
 }

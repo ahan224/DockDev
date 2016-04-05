@@ -10,10 +10,6 @@ export const readFile = Promise.promisify(fs.readFile);
 export const exec = Promise.promisify(childProcess.exec);
 export const rimrafProm = Promise.promisify(rimraf);
 
-mkdir('~/Documents/TEST11')
-  .then(console.log)
-  .catch(console.log);
-
 /**
  * find() returns an array of data using the 'find' terminal command
  * based on the passed in array of options for the 'find' terminal command
