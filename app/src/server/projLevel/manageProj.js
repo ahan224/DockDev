@@ -5,6 +5,25 @@ import { removeMachineFolder, createMachineFolder } from '../dockerAPI/machine';
 import errorHandler from '../appLevel/errorHandler';
 
 /**
+* contIssues() stops the functions if there is a container that is pending or error status
+* based on the passed in project object
+*
+* @param {object} projObj
+* @return {object} projObj
+*/
+function contIssues(projObj) {
+  for (var key in projObj.containers) {
+    console.log(projObj.containers[key].status);
+    if (projObj.containers[key].status === 'error' ||
+        projObj.containers[key].status === 'pending') {
+      projObj.false = true;
+      return projObj;
+    }
+  }
+  return true;
+}
+
+/**
 * checkStatus() accepts a machine name and container id and returns the status
 * -2 === couln't access docker-machine
 * -1 === container does not exists
@@ -15,7 +34,6 @@ import errorHandler from '../appLevel/errorHandler';
 * @param {String} containerId
 * @return {Number}
 */
-
 const checkStatus = co(function *g(machineName, containerId, errorCallback) {
   try {
     const inspectResults = yield container.containerInspect(machineName, containerId);
@@ -35,6 +53,8 @@ function getServer(projObj) {
 }
 
 export const stopProject = co(function *g(projObj, errorCallback) {
+  const checkCont = contIssues(projObj);
+  if (checkCont.false) return checkCont;
   const containersArray = Object.keys(projObj.containers);
 
   for (let i = 0; i < containersArray.length; i++) {
@@ -78,6 +98,8 @@ export const stopProject = co(function *g(projObj, errorCallback) {
 });
 
 export const startProject = co(function *g(projObj, activeProject, errorCallback) {
+  const checkCont = contIssues(projObj);
+  if (checkCont.false) return checkCont;
   const server = getServer(projObj);
   try {
     yield removeMachineFolder(projObj);
@@ -168,6 +190,9 @@ export const restartProject = co(function *g(projObj, activeProject, errorCallba
 
 export const removeProject = co(function *g(projObj, errorCallback) {
   // remove the containers
+  const checkCont = contIssues(projObj);
+  if (checkCont.false) return checkCont;
+
   const containersArray = Object.keys(projObj.containers);
   for (let i = 0; i < containersArray.length; i++) {
     const containerId = containersArray[i];
