@@ -4,9 +4,7 @@ import * as utils from '../utils/utils';
 import * as machine from '../dockerAPI/machine';
 import fs from 'fs';
 import rimraf from 'rimraf';
-import {
-  FAILED_READ_CONFIG,
-} from './errorMsgs';
+import defaultConfig from '../appLevel/defaultConfig';
 
 const rimrafProm = Promise.promisify(rimraf);
 
@@ -55,8 +53,7 @@ const initConfig = (defaultConfig) => ({
  */
 const readConfig = (configPath) =>
   utils.readFile(configPath)
-    .then(JSON.parse)
-    .catch(() => {throw FAILED_READ_CONFIG;});
+    .then(JSON.parse);
 
 /**
  * writeConfig() return a promise to write the initial config file
@@ -95,15 +92,19 @@ export const loadConfigFile = co(function *g(defaultConfig) {
     try {
       yield createConfigFolder(defaultConfig);
     } catch (e) {
-      console.log(e);
+      console.log("hi I am the error message", e);
     }
-    config = initConfig(defaultConfig);
+    config = initConfig(defaultConfig)
     yield writeConfig(config);
     return config;
   }
 
   return config;
 });
+
+loadConfigFile(defaultConfig)
+  .then(data => console.log('data: ', data))
+  .catch(err => console.log('error: ', err));
 
 /**
  * loadPathsFile() returns a promise that a path will resolve whether or not it is good
@@ -153,6 +154,7 @@ export const loadPaths = (configObj, defaultConfig, callback) => {
 export const addProjToConfig = co(function *g(basePath, defaultConfig) {
   const configPath = defaultConfig.configPath();
   const readConfigFile = yield readConfig(configPath);
+  console.log("Am I defined?", readConfigFile);
   readConfigFile.projects.push(basePath);
   yield writeConfig(readConfigFile);
 });

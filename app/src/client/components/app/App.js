@@ -1,6 +1,6 @@
 import React from 'react';
-import LeftNav from './appComp/LeftNav';
-import TopNav from './appComp/TopNav';
+import LeftNav from './assets/LeftNav';
+import TopNav from './assets/TopNav';
 import {
   projConfig,
   appConfig,

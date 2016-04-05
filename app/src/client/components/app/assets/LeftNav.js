@@ -1,6 +1,6 @@
 import React from 'react';
-import ProjectLinks from './leftNavComp/ProjectLinks';
-import NavLink from './leftNavComp/NavLink';
+import ProjectLinks from './ProjectLinks';
+import NavLink from './NavLink';
 
 const LeftNav = ({ projects, exampleClick }) => (
   <ul role="nav" id="menu" className="nav">

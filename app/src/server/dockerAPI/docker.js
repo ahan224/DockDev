@@ -208,7 +208,7 @@ export const containerLogs = co(function *g(machineName, containerId) {
  */
 export const setServerParams = (image, uuid) => ({
   image,
-  name: 'server1',
+  containerName: 'server1',
   HostConfig: {
     Binds: ['/home/docker/tmp:/app'],
     NetworkMode: uuid,
@@ -234,7 +234,7 @@ export const setServerParams = (image, uuid) => ({
  */
 export const setDbParams = (image, uuid) => ({
   image,
-  name: 'mongo1',
+  containerName: 'mongo1',
   HostConfig: {
     NetworkMode: uuid,
     Dns: [],
