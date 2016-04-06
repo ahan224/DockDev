@@ -4,6 +4,7 @@ import {
   defaultConfig,
   appConfig,
   projConfig,
+  availableImages,
 } from './server/main';
 
 export const REQUEST_CONFIG = 'REQUEST_CONFIG';
@@ -16,6 +17,7 @@ export const ERROR_ADDING_PROJECT = 'ERROR_ADDING_PROJECT';
 export const ERROR_LOADING_CONFIG = 'ERROR_LOADING_CONFIG';
 export const ERROR_LOADING_PROJECT = 'ERROR_LOADING_PROJECT';
 export const ADDED_CONTAINER = 'ADDED_CONTAINER';
+export const GET_IMAGES = 'GET_IMAGES';
 
 function requestConfig() {
   return {
@@ -132,4 +134,11 @@ export function addProject(path, name) {
 
 export function redirectHome() {
   return dispatch => dispatch(push('/'));
+}
+
+export function loadImages() {
+  return {
+    type: GET_IMAGES,
+    images: availableImages.getImages(),
+  };
 }

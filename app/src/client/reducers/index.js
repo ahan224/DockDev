@@ -12,6 +12,7 @@ import {
   ERROR_LOADING_PROJECT,
   ERROR_LOADING_CONFIG,
   ADDED_CONTAINER,
+  GET_IMAGES,
 } from '../actions';
 
 function config(state = { isFetching: false }, action) {
@@ -69,7 +70,6 @@ function containers(state = [], action) {
   }
 }
 
-
 function project(state = {}, action) {
   switch (action.type) {
     case ADDED_PROJECT:
@@ -95,11 +95,24 @@ function projects(state = {}, action) {
   }
 }
 
+function availableImages(state = [], action) {
+  switch (action.type) {
+    case GET_IMAGES:
+      return [
+        ...state,
+        ...action.images,
+      ];
+    default:
+      return state;
+  }
+}
+
 const rootReducer = combineReducers({
   config,
   routing,
   projects,
   alerts,
+  availableImages,
 });
 
 export default rootReducer;

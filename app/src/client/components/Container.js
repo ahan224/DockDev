@@ -12,7 +12,7 @@ const Container = ({ container }) => {
             { container.status }
           </h5>
           <p className="card-text">
-            With supporting text below as a natural lead-in to additional content.
+            URL
           </p>
         </div>
       </div>
