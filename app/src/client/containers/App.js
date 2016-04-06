@@ -8,7 +8,6 @@ import ProjectLinks from '../components/ProjectLinks';
 class App extends Component {
   componentDidMount() {
     this.props.loadConfig();
-    this.props.loadImages();
   }
 
   render() {
@@ -63,7 +62,6 @@ App.propTypes = {
   children: PropTypes.object,
   projects: PropTypes.object,
   loadConfig: PropTypes.func.isRequired,
-  loadImages: PropTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps, {

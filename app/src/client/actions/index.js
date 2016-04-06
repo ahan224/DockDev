@@ -17,7 +17,8 @@ export const ERROR_ADDING_PROJECT = 'ERROR_ADDING_PROJECT';
 export const ERROR_LOADING_CONFIG = 'ERROR_LOADING_CONFIG';
 export const ERROR_LOADING_PROJECT = 'ERROR_LOADING_PROJECT';
 export const ADDED_CONTAINER = 'ADDED_CONTAINER';
-export const GET_IMAGES = 'GET_IMAGES';
+export const LOAD_IMAGES = 'LOAD_IMAGES';
+export const TOGGLE_SELECT_IMAGE = 'TOGGLE_SELECT_IMAGE';
 
 function requestConfig() {
   return {
@@ -136,9 +137,31 @@ export function redirectHome() {
   return dispatch => dispatch(push('/'));
 }
 
-export function loadImages() {
+export function loadImages(images) {
   return {
-    type: GET_IMAGES,
-    images: availableImages.getImages(),
+    type: LOAD_IMAGES,
+    images,
+  };
+}
+
+export function getImages(projectName) {
+  return (dispatch, getState) => {
+    const { projects } = getState();
+    const containers = projects[projectName].containers
+      .map(used => used.image);
+    const images = availableImages.getImages()
+      .map(image => ({
+        ...image,
+        used: containers.indexOf(image) > -1,
+      }));
+    dispatch(loadImages(images));
+  };
+}
+
+export function toggleImage(image, idx) {
+  return {
+    type: TOGGLE_SELECT_IMAGE,
+    image,
+    idx,
   };
 }
