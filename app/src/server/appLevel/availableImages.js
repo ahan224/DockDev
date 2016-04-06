@@ -23,9 +23,13 @@ const dbs = [
 /**
 * @param {Object} ImageObj has the name of the image and it's available versions
 */
-function ImageObj(name) {
+function ImageObj(name, server) {
   this.name = name;
   this.versions = [];
+  this.selected = false;
+  this.used = false;
+  this.server = server;
+  this.available = true;
 }
 
 /**
@@ -35,7 +39,7 @@ function ImageObj(name) {
  * @return {Array} returns an Array of server image objects
  */
 export function getServers() {
-  return servers.map(val => new ImageObj(val));
+  return servers.map(val => new ImageObj(val, true));
 }
 
 /**
@@ -45,7 +49,9 @@ export function getServers() {
  * @return {Array} returns an Array of database image objects
  */
 export function getDbs() {
-  return dbs.map(val => new ImageObj(val));
+  return dbs.map(val => new ImageObj(val, false));
 }
 
-// getServers();
+export function getImages() {
+  return [...getServers(), ...getDbs()];
+}

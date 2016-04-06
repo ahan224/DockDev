@@ -1,17 +1,14 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { loadConfig } from '../actions/index';
+import { loadConfig, loadImages } from '../actions/index';
 
 import NavLink from '../components/NavLink';
 import ProjectLinks from '../components/ProjectLinks';
 
 class App extends Component {
-  constructor(props, context) {
-    super(props, context);
-  }
-
   componentDidMount() {
     this.props.loadConfig();
+    this.props.loadImages();
   }
 
   render() {
@@ -66,12 +63,9 @@ App.propTypes = {
   children: PropTypes.object,
   projects: PropTypes.object,
   loadConfig: PropTypes.func.isRequired,
-};
-
-App.contextTypes = {
-  router: PropTypes.object.isRequired,
+  loadImages: PropTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps, {
-  loadConfig,
+  loadConfig, loadImages,
 })(App);
