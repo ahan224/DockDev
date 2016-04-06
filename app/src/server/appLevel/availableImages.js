@@ -1,8 +1,6 @@
 // list of available server images for the user
 export const servers = [
   'node',
-  'python',
-  'go',
 ];
 
 // list of available database images for the user

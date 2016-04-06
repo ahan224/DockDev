@@ -12,7 +12,8 @@ import {
   ERROR_LOADING_PROJECT,
   ERROR_LOADING_CONFIG,
   ADDED_CONTAINER,
-  GET_IMAGES,
+  LOAD_IMAGES,
+  TOGGLE_SELECT_IMAGE,
 } from '../actions';
 
 function config(state = { isFetching: false }, action) {
@@ -97,10 +98,15 @@ function projects(state = {}, action) {
 
 function availableImages(state = [], action) {
   switch (action.type) {
-    case GET_IMAGES:
+    case LOAD_IMAGES:
       return [
-        ...state,
         ...action.images,
+      ];
+    case TOGGLE_SELECT_IMAGE:
+      return [
+        ...state.slice(0, action.idx),
+        action.image,
+        ...state.slice(action.idx + 1),
       ];
     default:
       return state;
