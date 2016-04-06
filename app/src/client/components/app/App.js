@@ -1,22 +1,17 @@
 import React from 'react';
-import NavLink from './NavLink';
-import ProjectLinks from './ProjectLinks';
-import * as projConfig from './server/projConfig.js';
-import * as appConfig from './server/appConfig.js';
-import defaultConfig from './server/defaultConfig.js';
-import addFolderIcon from './AddFolderIcon';
-import * as container from './server/container.js';
-import * as manageProj from './server/manageProj.js';
-import fileWatch from './server/fileWatch.js';
-import Icons from './icons';
-import * as machine from './server/machine.js';
-import * as deploy from './server/deploy.js';
-import errorHandler from './server/errorHandler.js';
-
-const svgStyle = {
-  width: '16px',
-  height: '16px',
-};
+import LeftNav from './assets/LeftNav';
+import TopNav from './assets/TopNav';
+import {
+  projConfig,
+  appConfig,
+  defaultConfig,
+  docker as container,
+  containerMgmt,
+  manageProj,
+  fileWatch,
+  deploy,
+  errorHandler,
+} from './server/main';
 
 class App extends React.Component {
   constructor(props, context) {
@@ -34,10 +29,12 @@ class App extends React.Component {
     this.deployProject = this.deployProject.bind(this);
     this.updateToken = this.updateToken.bind(this);
     this.errorCallback = this.errorCallback.bind(this);
+    this.containerCheck = this.containerCheck.bind(this);
     this.state = {
       projects: {},
       activeProject: '',
       DOToken: '',
+      contMsg: '',
     };
   }
 
@@ -95,7 +92,7 @@ class App extends React.Component {
   // need to delete container from docker - handle pending/error containers
   delContainer(uuid, containerObj) {
     const projects = this.state.projects;
-    container.removeContainer(projects[uuid], containerObj.containerId)
+    containerMgmt.removeContainer(projects[uuid], containerObj.containerId)
       .then(() => {
         delete projects[uuid].containers[containerObj.containerId];
         projConfig.writeProj(projects[uuid]);
@@ -115,7 +112,7 @@ class App extends React.Component {
   }
 
   addNewProject(path, name) {
-    projConfig.initProject(path, name, true)
+    projConfig.initProject(path, name)
       .then(proj => {
         const projects = this.state.projects;
         projects[proj.uuid] = proj;
@@ -125,11 +122,21 @@ class App extends React.Component {
       .catch();
   }
 
+  containerCheck(projObj) {
+    if (projObj.false) {
+      delete projObj.false;
+      this.setState({ contMsg: 'Container pending or error. Please remove or wait' });
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   stopProject(uuid) {
     const projects = this.state.projects;
     manageProj.stopProject(projects[uuid], this.errorCallback)
       .then(proj => {
-        if (proj.uuid === this.state.activeProject) {
+        if (this.containerCheck(proj) && proj.uuid === this.state.activeProject) {
           this.setState({ activeProject: '' });
         }
       })
@@ -141,8 +148,10 @@ class App extends React.Component {
     const activeProject = projects[this.state.activeProject];
     manageProj.startProject(projects[uuid], activeProject, this.errorCallback)
       .then(proj => {
-        projects[uuid] = proj;
-        this.setState({ activeProject: proj.uuid });
+        if (this.containerCheck(proj)) {
+          projects[uuid] = proj;
+          this.setState({ activeProject: proj.uuid });
+        }
       })
       .catch(err => errorHandler('startProject', err, [uuid], this.errorCallback));
   }
@@ -152,7 +161,9 @@ class App extends React.Component {
     const activeProject = projects[this.state.activeProject];
     manageProj.restartProject(projects[uuid], activeProject, this.errorCallback)
       .then(proj => {
-        this.setState({ activeProject: proj.uuid });
+        if (this.containerCheck(proj)) {
+          this.setState({ activeProject: proj.uuid });
+        }
       })
       .catch(err => errorHandler('restartProject', err, [uuid], this.errorCallback));
   }
@@ -161,14 +172,16 @@ class App extends React.Component {
     const projects = this.state.projects;
     const activeProject = projects[this.state.activeProject];
     manageProj.removeProject(projects[uuid], this.errorCallback)
-      .then(() => {
-        if (activeProject === uuid) {
-          this.setState({ activeProject: '' });
+      .then(proj => {
+        if (this.containerCheck(proj)) {
+          if (activeProject === uuid) {
+            this.setState({ activeProject: '' });
+          }
+          appConfig.removeProjFromConfig(projects[uuid], defaultConfig);
+          this.context.router.replace('/');
+          delete projects[uuid];
+          this.setState({ projects });
         }
-        appConfig.removeProjFromConfig(projects[uuid], defaultConfig);
-        this.context.router.replace('/');
-        delete projects[uuid];
-        this.setState({ projects });
       })
       .catch(err => errorHandler('removeProject', err, [uuid], this.errorCallback));
   }
@@ -194,47 +207,10 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <ul role="nav" id="menu" className="nav">
-          <li className="search-wrapper">
-            {/*<input className="main-search-input"></input>*/}
-              {/*<span className="input-group-addon">
-                <img src="./client/images/png/search.png"></img>
-              </span>*/}
-          </li>
-          <li className="nav-item proj-anchor">
-            <NavLink to="/" onlyActiveOnIndex>
-              <label onClick={this.exampleClick}>
-                Projects
-              </label>
-            </NavLink>
-          </li>
-          <li className="add-proj-wrapper">
-            <NavLink to="/addProject" className="add-proj-icon">
-              <img src="./client/images/png/addIcon@2x.png"></img>
-            </NavLink>
-          </li>
-          <ProjectLinks projects={this.state.projects} />
-        </ul>
+        <LeftNav projects={this.state.projects} exampleClick={this.exampleClick} />
+        <TopNav activeProject={this.state.activeProject} />
+
           <div id="right-column">
-            <div className="content-top-nav">
-             <div className="btn-group top-nav-btn-group" data-toggle="buttons">
-               <label className="btn btn-primary active">
-                 <input type="radio" name="options" id="option1" autoComplete="off"  />
-                   <img src="./client/images/png/music@2x.png"></img>
-
-               </label>
-               <label className="btn btn-primary">
-                 <input type="radio" name="options" id="option2" autoComplete="off"  />
-                   <img src="./client/images/png/power@2x.png"></img>
-
-               </label>
-               <label className="btn btn-primary">
-                 <input type="radio" name="options" id="option3" autoComplete="off"  />
-                   <img src="./client/images/png/tool@2x.png"></img>
-
-               </label>
-             </div>
-            </div>
             <div id="content">
               {React.cloneElement(this.props.children,
                 {

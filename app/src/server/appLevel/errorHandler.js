@@ -1,7 +1,7 @@
 import { coroutine as co } from 'bluebird';
 import moment from 'moment';
-import * as utils from './utils';
-import defaultConfig from './defaultConfig';
+import * as utils from '../utils/utils';
+import defaultConfig from '../appLevel/defaultConfig';
 
 
 function ErrorMessage(from, error, args) {

@@ -1,50 +1,29 @@
+/*eslint-env mocha */
+
 import { expect } from 'chai';
 import { join } from 'path';
 import rimraf from 'rimraf';
 import { readFileSync, mkdirSync, readdirSync, writeFileSync } from 'fs';
 import R from 'ramda';
-import * as rsync from '../app/build/server/rsync.js';
-import { addFileWatcher } from '../app/build/server/fileWatch.js';
-import { removeContainer, addContainer } from '../app/build/server/container.js';
-import * as projConfig from '../app/build/server/projConfig.js';
-import defaultConfig from '../app/build/server/defaultConfig.js';
+import * as rsync from '../../app/build/api/rsync.js';
+import { addFileWatcher } from '../../app/build/api/fileWatch.js';
+import { removeContainer, addContainer } from '../../app/build/api/docker.js';
+import * as projConfig from '../../app/build/api/projConfig.js';
+import defaultConfig from '../../app/build/api/defaultConfig.js';
 
-//
-// describe('should write an app level config file', () => {
-//   let result;
-//   const basePath = join(__dirname, 'configFolder');
-//
-// // need to delete the configFolder and File before, then run the
-//   before(() => {
-//     // remove configFolder if it exists
-//     rimraf.sync(basePath);
-//
-//     // will create in basePath and also searches for projectFolders in the test directory
-//     mkdirSync(basePath);
-//   });
-//
-//   // this should probably be moved to the existing project tests (project2)
-//   it('writeConfig should write a file', () => {
-//     appConfig.writeConfig(__dirname, basePath);
-//     result = readFileSync(defaultConfig.configPath(basePath));
-//     return result
-//       .then(data => {
-//         expect(data.userSelectedDirectory).to.equal(process.env.HOME);
-//         expect(data.projects).to.be.empty;
-//       });
-//   });
-// });
+const userFolder = join(__dirname, '..', 'userFolder');
+const genBasePath = (projectName) => join(userFolder, projectName);
+
 
 describe('initiate new DockDev project via individual functions', () => {
   const projectName = 'project1';
-  const basePath = join(__dirname, 'userFolder', projectName);
-  // const dockDevPath = join(basePath, '.dockdev');
+  const basePath = genBasePath(projectName);
   let result;
   let projObj;
 
   before(() => {
     // make sure there is a userFolder
-    try { mkdirSync(join(__dirname, 'userFolder')); }
+    try { mkdirSync(userFolder); }
     catch (e) {}
 
     // remove project projFolder if it exists
@@ -89,15 +68,11 @@ describe('initiate new DockDev project via individual functions', () => {
 
 describe('initiate new DockDev project via initiateProject', () => {
   const projectName = 'project2';
-  const basePath = join(__dirname, 'userFolder', projectName);
+  const basePath = genBasePath(projectName);
   // const dockDevPath = join(basePath, '.dockdev');
   let result;
 
   before(() => {
-    // make sure there is a userFolder
-    try { mkdirSync(join(__dirname, 'userFolder')); }
-    catch (e) {}
-
     // remove project projFolder if it exists
     rimraf.sync(basePath);
 
@@ -134,15 +109,10 @@ describe('initiate new DockDev project via initiateProject', () => {
 
 describe('read and modify an existing project', () => {
   const projectName = 'project3';
-  const basePath = join(__dirname, 'userFolder', projectName);
-  // const dockDevPath = join(basePath, '.dockdev');
+  const basePath = genBasePath(projectName);
   let result;
 
   before(() => {
-    // make sure there is a userFolder
-    try { mkdirSync(join(__dirname, 'userFolder')); }
-    catch (e) {}
-
     // remove project projFolder if it exists
     rimraf.sync(basePath);
 
@@ -160,25 +130,15 @@ describe('read and modify an existing project', () => {
   });
 });
 
-// describe('find our target files in specified directory', () => {
-//
-//
-// })
-
-
 describe('add and modify containers within a project', () => {
   const projectName = 'project4';
-  const basePath = join(__dirname, 'userFolder', projectName);
+  const basePath = genBasePath(projectName);
   // const dockDevPath = join(basePath, '.dockdev');
   const image = 'node';
   let result;
   let containerId;
 
   before(() => {
-    // make sure there is a userFolder
-    try { mkdirSync(join(__dirname, 'userFolder')); }
-    catch (e) {}
-
     // remove project projFolder if it exists
     rimraf.sync(basePath);
 
@@ -215,17 +175,12 @@ describe('add and modify containers within a project', () => {
 
 describe('should sync files to docker machine', () => {
   const projectName = 'project5';
-  const basePath = join(__dirname, 'userFolder', projectName);
-  // const dockDevPath = join(basePath, '.dockdev');
+  const basePath = genBasePath(projectName);
   const image = 'node';
   let result;
   let containerId;
 
   before(() => {
-    // make sure there is a userFolder
-    try { mkdirSync(join(__dirname, 'userFolder')); }
-    catch (e) {}
-
     // remove project projFolder if it exists
     rimraf.sync(basePath);
 
@@ -261,33 +216,6 @@ describe('should sync files to docker machine', () => {
         setTimeout(done, 1900);
         // need to add test here
         return;
-      });
-  });
-});
-
-xdescribe('should write a config file', () => {
-  let result;
-  const basePath = join(__dirname, 'configFolder');
-
-// need to delete the configFolder and File before, then run the
-  before(() => {
-    try { mkdirSync(basePath); }
-    catch (e) {}
-
-    // remove configFolder if it exists
-    rimraf.sync(basePath);
-
-    // will create in basePath and also searches for projectFolders in the test directory
-    projConfig.writeConfig(__dirname, basePath);
-    result = readFileSync(defaultConfig.configPath(basePath));
-  });
-
-  // this should probably be moved to the existing project tests (project2)
-  it('writeConfig should write a file', () => {
-    return result
-      .then(data => {
-        expect(data.userSelectedDirectory).to.equal(process.env.HOME);
-        expect(data.projects).to.be.empty;
       });
   });
 });

@@ -1,7 +1,6 @@
 import React from 'react';
-import * as container from './server/container.js';
-import * as images from './server/availableImages.js';
-import DockerImage from './DockerImage';
+import { containerMgmt, availableImages } from './server/main';
+import DockerImage from './assets/DockerImage';
 
 class AddContainer extends React.Component {
   constructor() {
@@ -22,8 +21,8 @@ class AddContainer extends React.Component {
   }
 
   addImagesToState() {
-    const servers = images.getServers();
-    const dbs = images.getDbs();
+    const servers = availableImages.getServers();
+    const dbs = availableImages.getDbs();
     this.setState({ servers, dbs });
   }
 
@@ -49,8 +48,15 @@ class AddContainer extends React.Component {
 
   submit() {
     const containers = this.state.selDbs.concat(this.state.selServer);
+    console.log("first", this.props.projects[this.props.params.uuid].projectName);
+    const projContainers = this.props.projects[this.props.params.uuid].containers;
     containers.forEach(val => {
-      container.add(this.props.params.uuid, val, this.props.addContainer);
+      containerMgmt.add(
+        this.props.params.uuid,
+        val,
+        this.props.addContainer,
+        this.props.projects[this.props.params.uuid].projectName,
+        projContainers);
     });
 
     this.props.context.router.replace(`/projects/${this.props.params.uuid}`);
@@ -117,6 +123,7 @@ AddContainer.propTypes = {
   params: React.PropTypes.object,
   addContainer: React.PropTypes.func,
   context: React.PropTypes.object,
+  projects: React.PropTypes.object,
 };
 
 export default AddContainer;
