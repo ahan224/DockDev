@@ -1,5 +1,5 @@
 import React from 'react';
-import { remote } from 'electron';
+// import { remote } from 'electron';
 
 const Settings = ({ DOToken, updateToken }) => (
   <div>
@@ -29,10 +29,5 @@ Settings.propTypes = {
   updateToken: React.PropTypes.func,
   DOToken: React.PropTypes.string,
 };
-
-// onClick={popFileSelector}
-// onChange={projNameHandler}
-//          placeholder={config}
-
 
 export default Settings;
