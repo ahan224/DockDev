@@ -1,12 +1,18 @@
 import React from 'react';
+import Gif from './assets/Gif';
 
 const ProjectDeploy = ({ params, deployProject }) => {
-  const clickDeploy = () => deployProject(params.uuid);
+  const image = [];
+  const clickDeploy = () => {
+    image.push(Gif);
+    deployProject(params.uuid);
+  };
   return (
     <div>
       <div className="alert alert-success" role="alert">
-        <button onClick={clickDeploy}>Deploy</button>
+        <button onClick={clickDeploy}>Push</button>
       </div>
+      <Gif />
     </div>
   );
 };
