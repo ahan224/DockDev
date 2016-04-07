@@ -1,9 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { loadConfig, loadImages } from '../actions/index';
+import { loadConfig, loadImages } from '../../actions/index';
 
-import NavLink from '../components/NavLink';
-import ProjectLinks from '../components/ProjectLinks';
+import NavLink from '../../components/assets/NavLink';
+import ProjectLinks from '../../components/assets/ProjectLinks';
 
 class App extends Component {
   componentDidMount() {

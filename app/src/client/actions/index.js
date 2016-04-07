@@ -31,6 +31,15 @@ export const ERROR_PULLING_IMAGE = 'ERROR_PULLING_IMAGE';
 export const ERROR_CHECKING_IMAGE_STATUS = 'ERROR_CHECKING_IMAGE_STATUS';
 export const ERROR_CREATING_CONTAINER = 'ERROR_CREATING_CONTAINER';
 
+function createMessage(type, message) {
+  return {
+    type,
+    message,
+    time: moment(),
+    timestamp: moment().format('MM-D-YYYY, h:mm:ss a'),
+  };
+}
+
 function requestConfig() {
   return {
     type: REQUEST_CONFIG,
@@ -64,12 +73,10 @@ function receiveProject(projObj) {
 }
 
 function loadProjectError(err, project) {
-  return {
-    type: ERROR_LOADING_PROJECT,
-    message: `Couldn't load project ${project.projectName} @ ${project.basePath} error = ${err}`,
-    time: moment(),
-    timestamp: moment().format('MM-D-YYYY, h:mm:ss a'),
-  };
+  return createMessage(
+    ERROR_LOADING_PROJECT,
+    `Couldn't load project ${project.projectName} @ ${project.basePath} error = ${err}`
+  );
 }
 
 function loadProject(project) {
@@ -88,14 +95,11 @@ function loadProjects(projects) {
   };
 }
 
-
 function addingProject(path, name) {
-  return {
-    type: ADDING_PROJECT,
-    message: `Adding project ${name}`,
-    time: moment(),
-    timestamp: moment().format('MM-D-YYYY, h:mm:ss a'),
-  };
+  return createMessage(
+    ADDING_PROJECT,
+    `Adding project ${name}`
+  );
 }
 
 function addedProject(projObj) {
@@ -106,12 +110,10 @@ function addedProject(projObj) {
 }
 
 function loadConfigError(err) {
-  return {
-    type: ERROR_LOADING_CONFIG,
-    message: `Couldn't load config file: error = ${err}`,
-    time: moment(),
-    timestamp: moment().format('MM-D-YYYY, h:mm:ss a'),
-  };
+  return createMessage(
+    ERROR_LOADING_CONFIG,
+    `Couldn't load config file: error = ${err}`
+  );
 }
 
 export function loadConfig() {
@@ -127,12 +129,10 @@ export function loadConfig() {
 }
 
 function addProjectError(err, name) {
-  return {
-    type: ERROR_ADDING_PROJECT,
-    message: `Couldn't add ${name}: error = ${err}`,
-    time: moment(),
-    timestamp: moment().format('MM-D-YYYY, h:mm:ss a'),
-  };
+  return createMessage(
+    ERROR_ADDING_PROJECT,
+    `Couldn't add ${name}: error = ${err}`
+  );
 }
 
 export function addProject(path, name) {
