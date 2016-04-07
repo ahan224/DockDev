@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import DockerImage from './DockerImage';
+import DockerImage from '../assets/DockerImage';
 
 class AddContainer extends Component {
   componentDidMount() {
@@ -56,13 +56,13 @@ class AddContainer extends Component {
             <button className="btn btn-sm btn-primary-outline container-save" onClick={this.submit}>
               Save
             </button>
-              {servers}
             <div className="divider"></div>
+              {servers}
           </div>
           <div className="col-xs-12" id="databases">
             <h5>Databases</h5>
-              {dbs}
             <div className="divider"></div>
+              {dbs}
           </div>
       </div>
     );

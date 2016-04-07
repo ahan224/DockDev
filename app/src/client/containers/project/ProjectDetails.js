@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Container from '../components/Container';
+import Container from '../../components/assets/Container';
 
 const ProjectDetail = ({ project }) => {
   const server = project.containers

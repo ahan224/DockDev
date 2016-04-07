@@ -17,7 +17,7 @@ function handleErrors() {
  this.emit('end');
 }
 
-gulp.task('default', ['server', 'react', 'main', 'client-other', 'html', 'bower', 'watch']);
+gulp.task('default', ['server', 'react', 'main', 'css', 'images', 'html', 'bower', 'watch']);
 
 gulp.task('server', () => {
   return gulp.src('./app/src/server/**/**')
@@ -53,17 +53,18 @@ gulp.task('react', () => {
   })
 
   bundler.external([
-    'react',
-    'react-dom',
-    'ramda',
-    'react-router',
     'electron',
+    'node-uuid',
     'react-redux',
     'redux',
     'redux-thunk',
     'redux-logger',
     'react-router-redux',
-    'node-uuid',
+    'react',
+    'react-dom',
+    'ramda',
+    'react-router',
+    'moment',
     './server/main',
   ]);
 
@@ -74,13 +75,13 @@ gulp.task('react', () => {
     .pipe(gulp.dest('./app/build/client'))
 });
 
-gulp.task('client-other', () => {
-  return gulp.src(['./app/src/client/*/**', '!./app/src/client/index.js', '!./app/src/client/components/*.js'])
-    .pipe(gulp.dest('./app/build/client/'))
+gulp.task('css', () => {
+  return gulp.src('./app/src/client/css/**/*')
+    .pipe(gulp.dest('./app/build/client/css'))
 })
 
 gulp.task('images', () => {
-  return gulp.src('./app/src/client/images/*')
+  return gulp.src('./app/src/client/images/**/*')
     .pipe(gulp.dest('./app/build/client/images'))
 })
 
@@ -90,15 +91,16 @@ gulp.task('html', () => {
 })
 
 gulp.task('bower', () => {
-  return gulp.src('./bower_components/*/**')
+  return gulp.src('./bower_components/**/*')
     .pipe(gulp.dest('./app/build/client/bower_components'))
 })
 
 gulp.task('watch', function() {
-  gulp.watch(['./app/src/server/**/**',], ['server']);
+  gulp.watch(['./app/src/server/**/*.js',], ['server']);
   gulp.watch('./app/src/main.js', ['main']);
-  gulp.watch(['app/src/client/**/**'], ['react']);
-  gulp.watch('./app/src/client/*/**', ['client-other']);
+  gulp.watch(['app/src/client/**/*.js'], ['react']);
+  gulp.watch('./app/src/client/css/**/*', ['css']);
+  gulp.watch('./app/src/client/images/**/*', ['images']);
   gulp.watch('./app/index.html', ['html']);
-  gulp.watch('./bower_components/*/**', ['bower']);
+  gulp.watch('./bower_components/**/*', ['bower']);
 });

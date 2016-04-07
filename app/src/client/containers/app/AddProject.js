@@ -1,7 +1,7 @@
 import React from 'react';
 import { remote } from 'electron';
 import { connect } from 'react-redux';
-import { addProject, redirectHome } from '../actions/index';
+import { addProject, redirectHome } from '../../actions/index';
 
 const AddProject = ({ submit }) => {
   let projectName;

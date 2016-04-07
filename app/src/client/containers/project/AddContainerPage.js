@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import AddContainer from '../components/AddContainer';
-import { getImages, toggleImage } from '../actions/index';
+import AddContainer from '../../components/project/AddContainer';
+import { getImages, toggleImage } from '../../actions/index';
 
 function mapStateToProps(state, ownProps) {
   const project = state.projects[ownProps.params.projectName];
