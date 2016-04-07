@@ -7,7 +7,8 @@ class AddContainer extends Component {
   }
 
   render() {
-    const { availableImages } = this.props;
+    const { availableImages, clickAddContainers } = this.props;
+    const clickAdd = () => clickAddContainers(this.props.project.cleanName);
     const servers = availableImages.filter(image => image.server)
       .map((image, idx) => {
         const style = {};
@@ -31,9 +32,9 @@ class AddContainer extends Component {
         const style = {};
         if (image.selected) {
           style.color = 'white';
-          style.backgroundColor = '#286090';
-          style.borderRadius = '6px';
-          style.borderColor = '#286090';
+          style.backgroundColor = '#71A0D7';
+          style.borderRadius = '2px';
+          style.borderColor = '#6894C8';
         }
         const onClick = () => this.props.onClick(image, idx + servers.length);
 
@@ -53,7 +54,9 @@ class AddContainer extends Component {
           </div>
           <div className="col-xs-12" >
             <h5>Servers</h5>
-            <button className="btn btn-sm btn-primary-outline container-save" onClick={this.submit}>
+            <button className="btn btn-sm btn-primary-outline container-save"
+              onClick={clickAdd}
+            >
               Save
             </button>
             <div className="divider"></div>
@@ -74,6 +77,7 @@ AddContainer.propTypes = {
   project: PropTypes.object.isRequired,
   availableImages: PropTypes.array.isRequired,
   onClick: PropTypes.func.isRequired,
+  clickAddContainers: PropTypes.func.isRequired,
 };
 
 export default AddContainer;

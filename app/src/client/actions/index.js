@@ -5,6 +5,7 @@ import {
   appConfig,
   projConfig,
   availableImages,
+  containerMgmt,
 } from './server/main';
 
 export const REQUEST_CONFIG = 'REQUEST_CONFIG';
@@ -19,9 +20,9 @@ export const ERROR_LOADING_PROJECT = 'ERROR_LOADING_PROJECT';
 export const ADDED_CONTAINER = 'ADDED_CONTAINER';
 export const LOAD_IMAGES = 'LOAD_IMAGES';
 export const TOGGLE_SELECT_IMAGE = 'TOGGLE_SELECT_IMAGE';
+export const SETTING_UP_CONTAINER = 'SETTING_UP_CONTAINER';
 
 // in progress
-export const SETTING_UP_CONTAINER = 'SETTING_UP_CONTAINER';
 export const CHECK_IMAGE_STATUS = 'CHECK_IMAGE_STATUS';
 export const PULLING_IMAGE = 'PULLING_IMAGE';
 export const PULLED_IMAGE = 'PULLED_IMAGE';
@@ -57,12 +58,10 @@ function receiveConfig(config) {
 }
 
 function requestProject(project) {
-  return {
-    type: REQUEST_PROJECT,
-    message: `Trying to load ${project.projectName} @ ${project.basePath}`,
-    time: moment(),
-    timestamp: moment().format('MM-D-YYYY, h:mm:ss a'),
-  };
+  return createMessage(
+    REQUEST_PROJECT,
+    `Trying to load ${project.projectName} @ ${project.basePath}`
+  );
 }
 
 function receiveProject(projObj) {
@@ -163,7 +162,7 @@ export function getImages(projectName) {
     const images = availableImages.getImages()
       .map(image => ({
         ...image,
-        used: containers.indexOf(image) > -1,
+        used: containers.indexOf(image.name) > -1,
       }));
     dispatch(loadImages(images));
   };
@@ -174,5 +173,32 @@ export function toggleImage(image, idx) {
     type: TOGGLE_SELECT_IMAGE,
     image,
     idx,
+  };
+}
+
+export function checkImageStatus(containerObj) {
+  return createMessage(
+    CHECK_IMAGE_STATUS,
+    `project name: ${containerObj.cleanName} container name: ${containerObj.name}`
+  );
+}
+
+export function settingUpContainer(cleanName, imageObj) {
+  return dispatch => {
+    const containerObj = containerMgmt.createContainerObj(cleanName, imageObj);
+    dispatch(checkImageStatus(containerObj));
+    dispatch({
+      type: SETTING_UP_CONTAINER,
+      containerObj,
+    });
+  };
+}
+
+export function clickAddContainers(cleanName) {
+  return (dispatch, getState) => {
+    const images = getState().availableImages;
+    images.forEach(image => {
+      if (image.selected) dispatch(settingUpContainer(cleanName, image));
+    });
   };
 }

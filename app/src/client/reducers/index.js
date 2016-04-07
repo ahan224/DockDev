@@ -11,9 +11,9 @@ import {
   ERROR_ADDING_PROJECT,
   ERROR_LOADING_PROJECT,
   ERROR_LOADING_CONFIG,
-  ADDED_CONTAINER,
   LOAD_IMAGES,
   TOGGLE_SELECT_IMAGE,
+  SETTING_UP_CONTAINER,
 } from '../actions';
 
 function config(state = { isFetching: false }, action) {
@@ -53,7 +53,10 @@ function alerts(state = [], action) {
 
 function container(state = {}, action) {
   switch (action.type) {
-    case ADDED_CONTAINER:
+    case SETTING_UP_CONTAINER:
+      return {
+        ...action.containerObj,
+      };
     default:
       return state;
   }
@@ -61,7 +64,7 @@ function container(state = {}, action) {
 
 function containers(state = [], action) {
   switch (action.type) {
-    case ADDED_CONTAINER:
+    case SETTING_UP_CONTAINER:
       return [
         ...state,
         container({}, action),
@@ -77,7 +80,11 @@ function project(state = {}, action) {
     case RECEIVE_PROJECT:
       return { ...state,
         ...action.projObj,
-        containers: containers(action.containers, action),
+      };
+    case SETTING_UP_CONTAINER:
+      return {
+        ...state,
+        containers: containers(state.containers, action),
       };
     default:
       return state;
@@ -89,7 +96,11 @@ function projects(state = {}, action) {
     case ADDED_PROJECT:
     case RECEIVE_PROJECT:
       return { ...state,
-        [action.projObj.cleanName]: project(state[action.cleanName], action),
+        [action.projObj.cleanName]: project(state[action.projObj.cleanName], action),
+      };
+    case SETTING_UP_CONTAINER:
+      return { ...state,
+        [action.containerObj.cleanName]: project(state[action.containerObj.cleanName], action),
       };
     default:
       return state;
