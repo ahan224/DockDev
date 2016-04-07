@@ -62,7 +62,8 @@ export const setNetworkParams = (cleanName) => ({
  * @param {Object} imageObj
  * @return {Object} returns a baseline container object
  */
-export const createContainerObj = (cleanName, imageObj) => ({
+const containerObj = (cleanName, imageObj) => ({
+  cleanName,
   image: imageObj.name,
   dockerId: '',
   name: `${cleanName}_${imageObj.name}`,
@@ -70,6 +71,9 @@ export const createContainerObj = (cleanName, imageObj) => ({
   server: imageObj.server,
   status: 'pending',
 });
+
+// export const createContainerObj = (cleanName, imageObj) =>
+
 
 // check image status
 // pull image if necessary -- from docker API
@@ -87,25 +91,25 @@ export const createContainerObj = (cleanName, imageObj) => ({
  * @param {Function} callback
  * @return {Object} newContainer
  */
-export const add = co(function *g(cleanName, imageObj) {
-  const containerConfig = server ? setServerParams(image, uuid) : setDbParams(image, uuid);
-
-  // check to make sure image is on the local computer
-  if (!(yield imagesList(defaultConfig.machine, image)).length) {
-    try {
-      yield pullSpawn(defaultConfig.machine, image, uuid, server, containerId, callback);
-    } catch (err) {
-      return callback(uuid, { containerId, image, server, status: 'error', err });
-    }
-  }
-
-  const tmpContainerId = containerId;
-  containerId = (yield containerCreate(defaultConfig.machine, containerConfig)).Id;
-  const inspectContainer = yield containerInspect(defaultConfig.machine, containerId);
-  const dest = inspectContainer.Mounts[0].Source;
-
-  return newContainer;
-});
+// export const add = co(function *g(cleanName, imageObj) {
+//   const containerConfig = server ? setServerParams(image, uuid) : setDbParams(image, uuid);
+//
+//   // check to make sure image is on the local computer
+//   if (!(yield imagesList(defaultConfig.machine, image)).length) {
+//     try {
+//       yield pullSpawn(defaultConfig.machine, image, uuid, server, containerId, callback);
+//     } catch (err) {
+//       return callback(uuid, { containerId, image, server, status: 'error', err });
+//     }
+//   }
+//
+//   const tmpContainerId = containerId;
+//   containerId = (yield containerCreate(defaultConfig.machine, containerConfig)).Id;
+//   const inspectContainer = yield containerInspect(defaultConfig.machine, containerId);
+//   const dest = inspectContainer.Mounts[0].Source;
+//
+//   return newContainer;
+// });
 
 /**
  * removeContainer() returns true after it deletes a container

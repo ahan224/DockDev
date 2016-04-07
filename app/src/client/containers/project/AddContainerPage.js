@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import AddContainer from '../../components/project/AddContainer';
-import { getImages, toggleImage } from '../../actions/index';
+import { getImages, toggleImage, clickAddContainers } from '../../actions/index';
 
 function mapStateToProps(state, ownProps) {
   const project = state.projects[ownProps.params.projectName];
@@ -11,6 +11,7 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
   return {
     getImages: (projectName) => dispatch(getImages(projectName)),
+    clickAddContainers: (cleanName) => dispatch(clickAddContainers(cleanName)),
     onClick: (image, idx) => {
       if (!image.used) {
         dispatch(toggleImage({ ...image, selected: !image.selected }, idx));
@@ -21,5 +22,5 @@ function mapDispatchToProps(dispatch) {
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+    mapDispatchToProps
 )(AddContainer);

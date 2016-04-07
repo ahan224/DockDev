@@ -9,6 +9,7 @@ import fileWatch from './projLevel/fileWatch';
 import * as manageProj from './projLevel/manageProj';
 import * as projConfig from './projLevel/projConfig';
 import * as rsync from './projLevel/rsync';
+import * as containerMgmt from './projLevel/containerMgmt';
 import * as utils from './utils/utils';
 
 export {
@@ -23,5 +24,6 @@ export {
   manageProj,
   projConfig,
   rsync,
+  containerMgmt,
   utils,
 };
