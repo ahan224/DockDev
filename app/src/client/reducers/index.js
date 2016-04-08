@@ -23,6 +23,8 @@ import {
   ERROR_DELETING_CONTAINER,
   START_PROJECT,
   ERROR_STARTING_PROJECT,
+  STOPPED_PROJECT,
+  ERROR_STOPPING_PROJECT,
 } from '../actions';
 
 function config(state = { isFetching: false }, action) {
@@ -53,6 +55,8 @@ function alerts(state = [], action) {
     case ERROR_CREATING_CONTAINER:
     case ERROR_DELETING_CONTAINER:
     case ERROR_STARTING_PROJECT:
+    case ERROR_STOPPING_PROJECT:
+    case STOPPED_PROJECT:
       return [
         ...state,
         {
@@ -160,9 +164,12 @@ function activeProject(state = {}, action) {
     case START_PROJECT:
       return {
         project: action.project,
+        fileWatch: action.watching,
+      };
+    case STOPPED_PROJECT:
+      return {
+        project: '',
         fileWatch: '',
-        rsync: '',
-        lastSync: '',
       };
     default:
       return state;
