@@ -83,7 +83,7 @@ function getSyncContainer(projObj) {
   let result;
   for (const container in projObj.containers) {
     if (projObj.containers[container].server) {
-      result = projObj.containers[container].containerId;
+      result = projObj.containers[container].dockerId;
       break;
     }
   }

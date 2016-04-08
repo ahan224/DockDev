@@ -15,7 +15,7 @@ Promise.config({
  * @return {Emitter} all
  */
 function fileWatch(projObj) {
-  const watcher = projObj.fileWatcher = chokidar.watch(projObj.basePath);
+  const watcher = chokidar.watch(projObj.basePath);
 
   const projectSync = generateRsync(projObj, 'machine');
 
