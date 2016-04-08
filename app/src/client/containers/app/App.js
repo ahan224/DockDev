@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { loadConfig, loadImages } from '../../actions/index';
+import { loadConfig } from '../../actions/index';
 
 import NavLink from '../../components/assets/NavLink';
 import ProjectLinks from '../../components/assets/ProjectLinks';
@@ -65,5 +65,5 @@ App.propTypes = {
 };
 
 export default connect(mapStateToProps, {
-  loadConfig, loadImages,
+  loadConfig,
 })(App);

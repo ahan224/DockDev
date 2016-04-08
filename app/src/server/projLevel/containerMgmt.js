@@ -119,7 +119,7 @@ export const createContainer = co(function *g(projObj, imageObj) {
 
   // if the image is not available on the local machine then tell UI pull it
   if (!(yield imagesList(defaultConfig.machine, imageObj.name)).length) {
-    container.status = 'pull_image';
+    container.status = 'pending';
   } else {
     // create the container & update the object with the docker generated id
     container.dockerId =
@@ -135,7 +135,7 @@ export const createContainer = co(function *g(projObj, imageObj) {
 export const pullImageForProject = co(function *g(container, path) {
   yield pullImage(container.machine, container.image);
 
-  const newContainer = { ...containerObj, status: 'complete' };
+  const newContainer = { ...container, status: 'complete' };
   yield writeContainer(newContainer, path);
   return newContainer;
 });

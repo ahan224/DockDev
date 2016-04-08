@@ -84,7 +84,7 @@ function containers(state = [], action) {
       return [
         ...state.slice(0, action.idx),
         container({}, action),
-        ...state.slice(action.idx),
+        ...state.slice(action.idx + 1),
       ];
     default:
       return state;
