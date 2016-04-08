@@ -17,20 +17,19 @@ export const ADDED_PROJECT = 'ADDED_PROJECT';
 export const ERROR_ADDING_PROJECT = 'ERROR_ADDING_PROJECT';
 export const ERROR_LOADING_CONFIG = 'ERROR_LOADING_CONFIG';
 export const ERROR_LOADING_PROJECT = 'ERROR_LOADING_PROJECT';
-export const ADDED_CONTAINER = 'ADDED_CONTAINER';
 export const LOAD_IMAGES = 'LOAD_IMAGES';
 export const TOGGLE_SELECT_IMAGE = 'TOGGLE_SELECT_IMAGE';
 export const SETTING_UP_CONTAINER = 'SETTING_UP_CONTAINER';
-
-// in progress
-export const CHECK_IMAGE_STATUS = 'CHECK_IMAGE_STATUS';
+export const ADDED_CONTAINER = 'ADDED_CONTAINER';
+export const ERROR_CREATING_CONTAINER = 'ERROR_CREATING_CONTAINER';
 export const PULLING_IMAGE = 'PULLING_IMAGE';
 export const PULLED_IMAGE = 'PULLED_IMAGE';
-export const CREATING_CONTAINER = 'CREATING_CONTAINER';
-export const CREATED_CONTAINER = 'CREATED_CONTAINER';
+
+// in progress
+// export const CREATING_CONTAINER = 'CREATING_CONTAINER';
+// export const CREATED_CONTAINER = 'CREATED_CONTAINER';
 export const ERROR_PULLING_IMAGE = 'ERROR_PULLING_IMAGE';
-export const ERROR_CHECKING_IMAGE_STATUS = 'ERROR_CHECKING_IMAGE_STATUS';
-export const ERROR_CREATING_CONTAINER = 'ERROR_CREATING_CONTAINER';
+
 
 function createMessage(type, message) {
   return {
@@ -81,12 +80,11 @@ function loadProjectError(err, project) {
 function loadProject(project) {
   return dispatch => {
     dispatch(requestProject(project));
-    return appConfig.loadProject(project.basePath, defaultConfig)
+    return projConfig.loadProject(project.basePath)
       .then(response => dispatch(receiveProject(response)))
       .catch(err => dispatch(loadProjectError(err, project)));
   };
 }
-
 
 function loadProjects(projects) {
   return dispatch => {
@@ -176,29 +174,82 @@ export function toggleImage(image, idx) {
   };
 }
 
-export function checkImageStatus(containerObj) {
+export function settingUpContainer(projObj, imageObj) {
   return createMessage(
-    CHECK_IMAGE_STATUS,
-    `project name: ${containerObj.cleanName} container name: ${containerObj.name}`
+    SETTING_UP_CONTAINER,
+    `We're setting up a ${imageObj.name} container for ${projObj.projectName}`
   );
 }
 
-export function settingUpContainer(cleanName, imageObj) {
+export function addedContainer(containerObj) {
+  return {
+    type: ADDED_CONTAINER,
+    containerObj,
+  };
+}
+
+export function createContainerError(err, projObj, imageObj) {
+  return createMessage(
+    ERROR_CREATING_CONTAINER,
+    `There was an error adding ${imageObj.name} to ${projObj.projectName}, err = ${err}`
+  );
+}
+
+export function pullingImage(imageName, projectName) {
+  return createMessage(
+    PULLING_IMAGE,
+    `Pulling ${imageName} for ${projectName}`
+  );
+}
+
+export function pulledImage(containerObj, idx) {
+  return {
+    type: PULLED_IMAGE,
+    containerObj,
+    idx,
+  };
+}
+
+export function pullImageError(err, imageName, projectName) {
+  return createMessage(
+    ERROR_PULLING_IMAGE,
+    `There was an error pulling ${imageName} for ${projectName}, err = ${err}`
+  );
+}
+
+export function pullImage(containerObj) {
+  return (dispatch, getState) => {
+    const { projectName, basePath, containers } = getState().projects[containerObj.cleanName];
+    const idx = projConfig.findContainer(containers, containerObj.name);
+    dispatch(pullingImage(containerObj.image, projectName));
+    return containerMgmt.pullImageForProject(containerObj, basePath)
+      .then(response => dispatch(pulledImage(response, idx)))
+      .catch(err => dispatch(pullImageError(err, containerObj.image, projectName)));
+  };
+}
+
+export function createContainerStatus(containerObj) {
   return dispatch => {
-    const containerObj = containerMgmt.createContainerObj(cleanName, imageObj);
-    dispatch(checkImageStatus(containerObj));
-    dispatch({
-      type: SETTING_UP_CONTAINER,
-      containerObj,
-    });
+    dispatch(addedContainer(containerObj));
+    if (containerObj.status === 'pull_image') dispatch(pullImage(containerObj));
+  };
+}
+
+export function createContainer(projObj, imageObj) {
+  return dispatch => {
+    dispatch(settingUpContainer(projObj, imageObj));
+    return containerMgmt.createContainer(projObj, imageObj)
+      .then(response => dispatch(createContainerStatus(response)))
+      .catch(err => dispatch(createContainerError(err, projObj, imageObj)));
   };
 }
 
 export function clickAddContainers(cleanName) {
   return (dispatch, getState) => {
     const images = getState().availableImages;
-    images.forEach(image => {
-      if (image.selected) dispatch(settingUpContainer(cleanName, image));
+    const projObj = getState().projects[cleanName];
+    images.forEach(imageObj => {
+      if (imageObj.selected) dispatch(createContainer(projObj, imageObj));
     });
   };
 }

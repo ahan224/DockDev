@@ -1,10 +1,13 @@
 import { coroutine as co } from 'bluebird';
 import defaultConfig from '../appLevel/defaultConfig';
+import { writeContainer } from './projConfig';
 import {
   containerRemove,
   imagesList,
   containerCreate,
-  containerInspect,
+  pullImage,
+  networkCreate,
+  networkDelete,
 } from '../dockerAPI/docker';
 
 /**
@@ -17,15 +20,16 @@ import {
  */
 export const setServerParams = (image, cleanName) => ({
   image,
+  name: `${cleanName}_${image}`,
   HostConfig: {
-    Binds: ['/home/docker/tmp:/app'],
+    Binds: [`${defaultConfig.dest}:${defaultConfig.workDir}`],
     NetworkMode: cleanName,
-    PortBindings: { '3000/tcp': [{ HostPort: '3000' }] },
+    PortBindings: { [`${defaultConfig.port}/tcp`]: [{ HostPort: `${defaultConfig.port}` }] },
   },
-  WorkingDir: '/app',
-  Cmd: ['npm', 'start'],
+  WorkingDir: defaultConfig.workDir,
+  Cmd: defaultConfig.serverCmd,
   ExposedPorts: {
-    '3000/tcp': {},
+    [`${defaultConfig.port}/tcp`]: {},
   },
 });
 
@@ -39,10 +43,23 @@ export const setServerParams = (image, cleanName) => ({
  */
 export const setDbParams = (image, cleanName) => ({
   image,
+  name: `${cleanName}_${image}`,
   HostConfig: {
     NetworkMode: cleanName,
   },
 });
+
+/**
+ * getContainerConfig() returns the container config object controlling for server or db
+ *
+ * @param {Object} imageObj
+ * @return {Object} returns the docker configuration object to create a container
+ */
+const getContainerConfig = (container, imageObj) => (
+  imageObj.server ?
+    setServerParams(imageObj.name, container.cleanName) :
+    setDbParams(imageObj.name, container.cleanName)
+);
 
 /**
  * setNetworkParams() returns an object with the project uuid
@@ -56,7 +73,31 @@ export const setNetworkParams = (cleanName) => ({
 });
 
 /**
- * createContainerObj() returns the base container object based on the project and image
+ * createProjectNetwork() creates a new network for the project
+ *
+ * @param {Object} projObj
+ * @return {Promise} returns true or throws an error if unable to create the network
+ */
+export const createProjectNetwork = (projObj) =>
+  networkCreate(defaultConfig.machine, setNetworkParams(projObj.cleanName))
+    .then(() => true);
+
+/**
+ * deleteProjectNetwork() creates a new network for the project
+ *
+ * @param {Object} projObj
+ * @return {Promise} returns true or throws an error if unable to delete the network
+ */
+export const deleteProjectNetwork = (projObj, ignoreErrors) =>
+  networkDelete(defaultConfig.machine, setNetworkParams(projObj.cleanName))
+    .then(() => true)
+    .catch(err => {
+      if (!ignoreErrors) throw err;
+    });
+
+
+/**
+ * containerObj() returns the base container object based on the project and image
  *
  * @param {String} cleanName
  * @param {Object} imageObj
@@ -67,17 +108,37 @@ const containerObj = (cleanName, imageObj) => ({
   image: imageObj.name,
   dockerId: '',
   name: `${cleanName}_${imageObj.name}`,
-  dest: '',
+  dest: (imageObj.server ? defaultConfig.dest : ''),
   server: imageObj.server,
   status: 'pending',
+  machine: defaultConfig.machine,
 });
 
-// export const createContainerObj = (cleanName, imageObj) =>
+export const createContainer = co(function *g(projObj, imageObj) {
+  const container = containerObj(projObj.cleanName, imageObj);
 
+  // if the image is not available on the local machine then tell UI pull it
+  if (!(yield imagesList(defaultConfig.machine, imageObj.name)).length) {
+    container.status = 'pull_image';
+  } else {
+    // create the container & update the object with the docker generated id
+    container.dockerId =
+      (yield containerCreate(defaultConfig.machine, getContainerConfig(container, imageObj))).Id;
+    container.status = 'complete';
+  }
 
-// check image status
-// pull image if necessary -- from docker API
-// add container
+  // write changes to project file
+  yield writeContainer(container, projObj.basePath);
+  return container;
+});
+
+export const pullImageForProject = co(function *g(container, path) {
+  yield pullImage(container.machine, container.image);
+
+  const newContainer = { ...containerObj, status: 'complete' };
+  yield writeContainer(newContainer, path);
+  return newContainer;
+});
 
 
 /**

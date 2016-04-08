@@ -18,7 +18,7 @@ import {
 } from '../appLevel/errorMsgs';
 
 // promisify callback function
-const exec = (args) => execProm(`docker ${args}`);
+const exec = (args, env) => execProm(`docker ${args}`, env);
 
 /**
 * @param {Object} commands that will be passed into the command line function below
@@ -65,7 +65,7 @@ const commands = {
     cmd: 'create',
     method: 'POST',
     uri(obj) {
-      return `/containers/${this.cmd}?name=${obj.containerName}`;
+      return `/containers/${this.cmd}?name=${obj.name}`;
     },
     error: FAILED_TO_CREATE_CONTAINER,
   },
@@ -126,9 +126,8 @@ const commands = {
   },
 };
 
-
 /**
- * commandMaker() returns a function that takes 2 parameters
+ * dockerCommand() returns a function that takes 2 parameters
  * based on the passed in command object, which represents a task to perform in the command line
  *
  * @param {Object} cmd
@@ -142,10 +141,8 @@ function dockerCommand(cmd) {
       config.uri += cmd.uri(arg);
       config.method = cmd.method;
       config.json = true;
-      error = arg.error;
-      const body = { ...arg };
-      delete body.error;
-      if (cmd.cmd === 'create') config.body = body;
+      error = cmd.error;
+      if (cmd.cmd === 'create') config.body = arg;
       return yield rp(config);
     } catch (e) {
       if (e === FAILED_TO_ACCESS_MACHINE) throw FAILED_TO_ACCESS_MACHINE;

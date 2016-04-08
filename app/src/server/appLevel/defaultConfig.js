@@ -38,6 +38,12 @@ const config = {
   projPath() {
     return join(this.projFolder, this.projFile);
   },
+
+  // container config
+  dest: '/home/docker/tmp',
+  workDir: '/app',
+  port: 3000,
+  serverCmd: ['npm', 'start'],
 };
 
 export default config;

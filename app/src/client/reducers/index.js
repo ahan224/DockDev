@@ -14,6 +14,12 @@ import {
   LOAD_IMAGES,
   TOGGLE_SELECT_IMAGE,
   SETTING_UP_CONTAINER,
+  ADDED_CONTAINER,
+  ERROR_PULLING_IMAGE,
+  PULLING_IMAGE,
+  ERROR_CREATING_CONTAINER,
+  PULLED_IMAGE,
+
 } from '../actions';
 
 function config(state = { isFetching: false }, action) {
@@ -35,9 +41,13 @@ function alerts(state = [], action) {
   switch (action.type) {
     case ADDING_PROJECT:
     case REQUEST_PROJECT:
+    case SETTING_UP_CONTAINER:
+    case PULLING_IMAGE:
     case ERROR_ADDING_PROJECT:
     case ERROR_LOADING_PROJECT:
     case ERROR_LOADING_CONFIG:
+    case ERROR_PULLING_IMAGE:
+    case ERROR_CREATING_CONTAINER:
       return [
         ...state,
         {
@@ -53,7 +63,8 @@ function alerts(state = [], action) {
 
 function container(state = {}, action) {
   switch (action.type) {
-    case SETTING_UP_CONTAINER:
+    case ADDED_CONTAINER:
+    case PULLED_IMAGE:
       return {
         ...action.containerObj,
       };
@@ -64,10 +75,16 @@ function container(state = {}, action) {
 
 function containers(state = [], action) {
   switch (action.type) {
-    case SETTING_UP_CONTAINER:
+    case ADDED_CONTAINER:
       return [
         ...state,
         container({}, action),
+      ];
+    case PULLED_IMAGE:
+      return [
+        ...state.slice(0, action.idx),
+        container({}, action),
+        ...state.slice(action.idx),
       ];
     default:
       return state;
@@ -81,7 +98,8 @@ function project(state = {}, action) {
       return { ...state,
         ...action.projObj,
       };
-    case SETTING_UP_CONTAINER:
+    case ADDED_CONTAINER:
+    case PULLED_IMAGE:
       return {
         ...state,
         containers: containers(state.containers, action),
@@ -98,7 +116,8 @@ function projects(state = {}, action) {
       return { ...state,
         [action.projObj.cleanName]: project(state[action.projObj.cleanName], action),
       };
-    case SETTING_UP_CONTAINER:
+    case ADDED_CONTAINER:
+    case PULLED_IMAGE:
       return { ...state,
         [action.containerObj.cleanName]: project(state[action.containerObj.cleanName], action),
       };
