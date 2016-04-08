@@ -21,6 +21,8 @@ import {
   PULLED_IMAGE,
   DELETED_CONTAINER,
   ERROR_DELETING_CONTAINER,
+  START_PROJECT,
+  ERROR_STARTING_PROJECT,
 } from '../actions';
 
 function config(state = { isFetching: false }, action) {
@@ -50,6 +52,7 @@ function alerts(state = [], action) {
     case ERROR_PULLING_IMAGE:
     case ERROR_CREATING_CONTAINER:
     case ERROR_DELETING_CONTAINER:
+    case ERROR_STARTING_PROJECT:
       return [
         ...state,
         {
@@ -152,12 +155,27 @@ function availableImages(state = [], action) {
   }
 }
 
+function activeProject(state = {}, action) {
+  switch (action.type) {
+    case START_PROJECT:
+      return {
+        project: action.project,
+        fileWatch: '',
+        rsync: '',
+        lastSync: '',
+      };
+    default:
+      return state;
+  }
+}
+
 const rootReducer = combineReducers({
   config,
   routing,
   projects,
   alerts,
   availableImages,
+  activeProject,
 });
 
 export default rootReducer;
