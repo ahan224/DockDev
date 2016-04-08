@@ -231,7 +231,7 @@ export function pullImage(containerObj) {
 export function createContainerStatus(containerObj) {
   return dispatch => {
     dispatch(addedContainer(containerObj));
-    if (containerObj.status === 'pull_image') dispatch(pullImage(containerObj));
+    if (containerObj.status === 'pending') dispatch(pullImage(containerObj));
   };
 }
 

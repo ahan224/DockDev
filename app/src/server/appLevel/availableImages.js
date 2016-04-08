@@ -16,6 +16,7 @@ const dbs = [
   'rethinkdb',
   'cassandra',
   'couchbase',
+  'busybox',
 ];
 
 /**
