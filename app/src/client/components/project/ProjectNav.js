@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 
 const ProjectNav = (props) => {
   const projectName = props.params.projectName;
 
-  const start = '';
   const stop = '';
   const restart = '';
   const remove = '';
@@ -20,7 +19,8 @@ const ProjectNav = (props) => {
         <div className="btn-group container-player-btns" data-toggle="buttons">
           <label className="btn btn-primary active">
             <input type="radio" name="options" id="option1" autoComplete="off" />
-              <img src="./client/images/png/arrow@2x.png" onClick={start}></img>
+              <img src="./client/images/png/arrow@2x.png" onClick={props.clickStartProject}>
+              </img>
           </label>
           <label className="btn btn-primary">
             <input type="radio" name="options" id="option2" autoComplete="off" />
@@ -56,44 +56,9 @@ const ProjectNav = (props) => {
 };
 
 ProjectNav.propTypes = {
-  children: React.PropTypes.object,
-  projects: React.PropTypes.object,
-  params: React.PropTypes.object,
-  addContainer: React.PropTypes.func,
-  context: React.PropTypes.object,
-  delContainer: React.PropTypes.func,
-  activeProject: React.PropTypes.string,
-  startProject: React.PropTypes.func,
-  stopProject: React.PropTypes.func,
-  restartProject: React.PropTypes.func,
-  removeProject: React.PropTypes.func,
-  deployProject: React.PropTypes.func,
+  children: PropTypes.object.isRequired,
+  params: PropTypes.object.isRequired,
+  clickStartProject: PropTypes.func.isRequired,
 };
-
-
-// projects,
-// addContainer,
-// delContainer,
-// children,
-// params,
-// context,
-// activeProject,
-// startProject,
-// stopProject,
-// restartProject,
-// removeProject,
-// deployProject,
-
-// projects,
-// addContainer,
-// context,
-// delContainer,
-// addFileWatcher,
-// activeProject,
-// startProject,
-// stopProject,
-// restartProject,
-// removeProject,
-// deployProject,
 
 export default ProjectNav;

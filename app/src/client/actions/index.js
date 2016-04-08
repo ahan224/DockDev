@@ -27,6 +27,8 @@ export const PULLED_IMAGE = 'PULLED_IMAGE';
 export const ERROR_PULLING_IMAGE = 'ERROR_PULLING_IMAGE';
 export const DELETED_CONTAINER = 'DELETED_CONTAINER';
 export const ERROR_DELETING_CONTAINER = 'ERROR_DELETING_CONTAINER';
+export const ERROR_STARTING_PROJECT = 'ERROR_STARTING_PROJECT';
+export const START_PROJECT = 'START_PROJECT';
 
 function createMessage(type, message) {
   return {
@@ -275,5 +277,32 @@ export function clickDelContainer(containerObj) {
     return containerMgmt.deleteProjectContainer(containerObj, basePath)
       .then(() => dispatch(deletedContainer(containerObj, idx)))
       .catch(err => dispatch(deleteContainerError(err, containerObj, projectName)));
+  };
+}
+
+function startProjectError(err, projectName) {
+  return createMessage(
+    ERROR_STARTING_PROJECT,
+    `There was an error starting ${projectName}, err = ${err}`
+  );
+}
+
+function startProject(project) {
+  return {
+    type: START_PROJECT,
+    project,
+  };
+}
+
+export function clickStartProject(cleanName) {
+  return (dispatch, getState) => {
+    const { activeProject, projects } = getState();
+    const project = projects[cleanName];
+    if (activeProject.project) {
+      const error =
+        `Couldn't start ${project.projectName}, ${activeProject.project.projectName} is active`;
+      return dispatch(startProjectError(error, project.projectName));
+    }
+    return dispatch(startProject(project));
   };
 }
