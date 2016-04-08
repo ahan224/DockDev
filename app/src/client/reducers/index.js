@@ -19,7 +19,8 @@ import {
   PULLING_IMAGE,
   ERROR_CREATING_CONTAINER,
   PULLED_IMAGE,
-
+  DELETED_CONTAINER,
+  ERROR_DELETING_CONTAINER,
 } from '../actions';
 
 function config(state = { isFetching: false }, action) {
@@ -48,6 +49,7 @@ function alerts(state = [], action) {
     case ERROR_LOADING_CONFIG:
     case ERROR_PULLING_IMAGE:
     case ERROR_CREATING_CONTAINER:
+    case ERROR_DELETING_CONTAINER:
       return [
         ...state,
         {
@@ -86,6 +88,11 @@ function containers(state = [], action) {
         container({}, action),
         ...state.slice(action.idx + 1),
       ];
+    case DELETED_CONTAINER:
+      return [
+        ...state.slice(0, action.idx),
+        ...state.slice(action.idx + 1),
+      ];
     default:
       return state;
   }
@@ -100,6 +107,7 @@ function project(state = {}, action) {
       };
     case ADDED_CONTAINER:
     case PULLED_IMAGE:
+    case DELETED_CONTAINER:
       return {
         ...state,
         containers: containers(state.containers, action),
@@ -118,6 +126,7 @@ function projects(state = {}, action) {
       };
     case ADDED_CONTAINER:
     case PULLED_IMAGE:
+    case DELETED_CONTAINER:
       return { ...state,
         [action.containerObj.cleanName]: project(state[action.containerObj.cleanName], action),
       };

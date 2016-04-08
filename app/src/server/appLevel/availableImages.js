@@ -17,6 +17,7 @@ const dbs = [
   'cassandra',
   'couchbase',
   'busybox',
+  'blahablada',
 ];
 
 /**

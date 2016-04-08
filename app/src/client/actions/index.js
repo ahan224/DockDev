@@ -24,12 +24,9 @@ export const ADDED_CONTAINER = 'ADDED_CONTAINER';
 export const ERROR_CREATING_CONTAINER = 'ERROR_CREATING_CONTAINER';
 export const PULLING_IMAGE = 'PULLING_IMAGE';
 export const PULLED_IMAGE = 'PULLED_IMAGE';
-
-// in progress
-// export const CREATING_CONTAINER = 'CREATING_CONTAINER';
-// export const CREATED_CONTAINER = 'CREATED_CONTAINER';
 export const ERROR_PULLING_IMAGE = 'ERROR_PULLING_IMAGE';
-
+export const DELETED_CONTAINER = 'DELETED_CONTAINER';
+export const ERROR_DELETING_CONTAINER = 'ERROR_DELETING_CONTAINER';
 
 function createMessage(type, message) {
   return {
@@ -210,10 +207,10 @@ export function pulledImage(containerObj, idx) {
   };
 }
 
-export function pullImageError(err, imageName, projectName) {
+export function pullImageError(containerObj, projectName) {
   return createMessage(
     ERROR_PULLING_IMAGE,
-    `There was an error pulling ${imageName} for ${projectName}, err = ${err}`
+    `There was an error pulling ${containerObj.image} for ${projectName}`
   );
 }
 
@@ -223,8 +220,10 @@ export function pullImage(containerObj) {
     const idx = projConfig.findContainer(containers, containerObj.name);
     dispatch(pullingImage(containerObj.image, projectName));
     return containerMgmt.pullImageForProject(containerObj, basePath)
-      .then(response => dispatch(pulledImage(response, idx)))
-      .catch(err => dispatch(pullImageError(err, containerObj.image, projectName)));
+      .then(response => {
+        dispatch(pulledImage(response, idx));
+        if (response.status === 'error') dispatch(pullImageError(containerObj, projectName));
+      });
   };
 }
 
@@ -251,5 +250,30 @@ export function clickAddContainers(cleanName) {
     images.forEach(imageObj => {
       if (imageObj.selected) dispatch(createContainer(projObj, imageObj));
     });
+  };
+}
+
+export function deletedContainer(containerObj, idx) {
+  return {
+    type: DELETED_CONTAINER,
+    containerObj,
+    idx,
+  };
+}
+
+export function deleteContainerError(err, container, projectName) {
+  return createMessage(
+    ERROR_DELETING_CONTAINER,
+    `There was an error deleting ${container.name} from ${projectName}, err = ${err}`
+  );
+}
+
+export function clickDelContainer(containerObj) {
+  return (dispatch, getState) => {
+    const { projectName, basePath, containers } = getState().projects[containerObj.cleanName];
+    const idx = projConfig.findContainer(containers, containerObj.name);
+    return containerMgmt.deleteProjectContainer(containerObj, basePath)
+      .then(() => dispatch(deletedContainer(containerObj, idx)))
+      .catch(err => dispatch(deleteContainerError(err, containerObj, projectName)));
   };
 }

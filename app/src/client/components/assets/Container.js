@@ -1,13 +1,12 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
-const Container = ({ container }) => {
-  const clickDelContainer = '';
+const Container = ({ container, onClick }) => {
   return (
     <div className="col-xs-12 col-md-6 col-lg-4">
       <div className="card text-xs-left">
         <div className="card-block">
           <h5 className="card-title">
-          <button onClick={clickDelContainer}>Delete</button>
+          <button onClick={onClick}>Delete</button>
             { container.image }
             { container.status }
           </h5>
@@ -21,7 +20,8 @@ const Container = ({ container }) => {
 };
 
 Container.propTypes = {
-  container: React.PropTypes.object,
+  container: PropTypes.object,
+  onClick: PropTypes.func,
 };
 
 export default Container;

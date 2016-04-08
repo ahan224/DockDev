@@ -95,7 +95,6 @@ export const deleteProjectNetwork = (projObj, ignoreErrors) =>
       if (!ignoreErrors) throw err;
     });
 
-
 /**
  * containerObj() returns the base container object based on the project and image
  *
@@ -114,6 +113,13 @@ const containerObj = (cleanName, imageObj) => ({
   machine: defaultConfig.machine,
 });
 
+/**
+ * createContainer() creates creates a container for the specified project
+ *
+ * @param {Object} projObj
+ * @param {Object} imageObj
+ * @return {Object} returns a container object that is held in store and written to disk
+ */
 export const createContainer = co(function *g(projObj, imageObj) {
   const container = containerObj(projObj.cleanName, imageObj);
 
@@ -128,18 +134,39 @@ export const createContainer = co(function *g(projObj, imageObj) {
   }
 
   // write changes to project file
-  yield writeContainer(container, projObj.basePath);
+  yield writeContainer(container, projObj.basePath, 'add');
   return container;
 });
 
+/**
+ * pullImageForProject() pulls the specified docker image for when selected for a project
+ *
+ * @param {Object} container
+ * @param {String} path
+ * @return {Object} returns a container object with status updated to (i) complete or (ii) error
+ */
 export const pullImageForProject = co(function *g(container, path) {
-  yield pullImage(container.machine, container.image);
+  let newContainer;
+  try {
+    yield pullImage(container.machine, container.image);
+    newContainer = { ...container, status: 'complete' };
+  } catch (e) {
+    newContainer = { ...container, status: 'error' };
+  }
 
-  const newContainer = { ...container, status: 'complete' };
-  yield writeContainer(newContainer, path);
+  yield writeContainer(newContainer, path, 'update');
   return newContainer;
 });
 
+/**
+ * deleteProjectContainer() removes the specified container and deletes from project file
+ *
+ * @param {Object} containerName
+ * @param {String} path
+ * @return {Object} returns true or throws an error
+ */
+export const deleteProjectContainer = (container, path) =>
+  writeContainer(container, path, 'delete');
 
 /**
  * add() returns a new container object. It will first attempt to use a local image
