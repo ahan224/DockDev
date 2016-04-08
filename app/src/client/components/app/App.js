@@ -1,6 +1,7 @@
 import React from 'react';
 import LeftNav from './assets/LeftNav';
 import TopNav from './assets/TopNav';
+import Loading from './Loading';
 import {
   projConfig,
   appConfig,
@@ -210,6 +211,7 @@ class App extends React.Component {
       <div>
         <LeftNav projects={this.state.projects} exampleClick={this.exampleClick} />
         <TopNav activeProject={this.state.activeProject} />
+        <Loading />
 
           <div id="right-column">
             <div id="content">

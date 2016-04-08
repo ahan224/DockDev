@@ -4,6 +4,7 @@ import Container from './assets/Container';
 
 const ProjectDetail = ({ projects, params, delContainer }) => {
   const proj = projects[params.uuid];
+  console.log('projects: ', proj);
   const server = R.toPairs(proj.containers)
     .filter(cont => cont[1].server)
     .map(cont =>
