@@ -5,9 +5,6 @@ import * as machine from '../dockerAPI/machine';
 import {
   FAILED_READ_CONFIG,
   FAILED_TO_WRITE_CONFIG,
-  PROJECT_NAME_EXISTS,
-  PROJECT_DIR_USED,
-  FAILED_TO_READ_PROJECT,
   EEXIST,
   FAILED_TO_CREATE_CONFIG_DIR,
 } from './errorMsgs';
@@ -18,7 +15,7 @@ import {
  *
  * @return {Boolean} returns true or false
  */
-const checkDockerMachineInstalled = co(function *g() {
+export const checkDockerMachineInstalled = co(function *g() {
   const result = yield machine.version();
   return result.substr(0, 6) === 'docker';
 });
@@ -29,7 +26,7 @@ const checkDockerMachineInstalled = co(function *g() {
  *
  * @return {Boolean} returns true or false
  */
-const checkDockerInstall = co(function *g() {
+export const checkDockerInstall = co(function *g() {
   const result = yield utils.exec('docker');
   return result.split('\n').length > 1;
 });
@@ -41,7 +38,7 @@ const checkDockerInstall = co(function *g() {
  * @param {Object} defaultConfig
  * @return {Object} configObj
  */
-const initConfig = (defaultConfig) => ({
+export const initConfig = (defaultConfig) => ({
   path: defaultConfig.configPath(),
   projects: [],
   userDir: process.env.HOME,
@@ -55,7 +52,7 @@ const initConfig = (defaultConfig) => ({
  * @param {String} configPath
  * @return {Object} configObj
  */
-const readConfig = (configPath) =>
+export const readConfig = (configPath) =>
   utils.readFile(configPath)
     .then(JSON.parse)
     .catch(() => {throw FAILED_READ_CONFIG;});
@@ -67,7 +64,7 @@ const readConfig = (configPath) =>
  * @param {Object} configObj
  * @return {} writes config file
  */
-const writeConfig = (configObj) => {
+export const writeConfig = (configObj) => {
   const strObj = utils.jsonStringifyPretty(configObj);
   return utils.writeFile(configObj.path, strObj)
     .catch(() => {throw FAILED_TO_WRITE_CONFIG; });
@@ -109,103 +106,6 @@ export const loadConfigFile = co(function *g(defaultConfig) {
 });
 
 /**
- * removeBadProject() removes a failed load project from the app config file
- *
- * @param {String} path
- * @param {Object} defaultConfig
- * @return {Promise}
- */
-export const removeBadProject = co(function *g(path, defaultConfig) {
-  const configPath = defaultConfig.configPath();
-  const readConfigFile = yield readConfig(configPath);
-  readConfigFile.projects =
-   readConfigFile.projects.filter(obj => obj.basePath !== path);
-  yield writeConfig(readConfigFile);
-  return true;
-});
-
-/**
- * loadProject() will read the project configuration from the specified path
- *
- * @param {String} path
- * @param {Object} defaultConfig
- * @return {Promise}
- */
-export const loadProject = (path, defaultConfig) =>
-  utils.readFile(join(path, defaultConfig.projPath()))
-    .then(JSON.parse)
-    .catch(() => {
-      removeBadProject(path, defaultConfig); // the sequence here may need to be reconsidered
-      throw FAILED_TO_READ_PROJECT;
-    });
-
-/**
- * checkUniqueName() returns true if the selected project name exists
- *
- * @param {String} projectName
- * @param {Array} projArray
- * @return {Boolean}
- */
-const checkUniqueName = (projectName, projArray) => {
-  for (let i = 0; i < projArray.length; i++) {
-    if (projArray[i].projectName === projectName) return true;
-  }
-  return false;
-};
-
-/**
- * checkNewPath() returns true if the selected path is already a project
- *
- * @param {String} basePath
- * @param {Array} projArray
- * @return {Boolean}
- */
-const checkNewPath = (basePath, projArray) => {
-  for (let i = 0; i < projArray.length; i++) {
-    if (projArray[i].basePath === basePath) return true;
-  }
-  return false;
-};
-
-/**
- * addProjToConfig() will add a project's path to the main config file
- * based on the passed in project base path and the default config object
- *
- * @param {String} basePath
- * @param {Object} defaultConfig
- * @return {}
- */
-export const addProjToConfig = co(function *g(projObj, defaultConfig) {
-  const configPath = defaultConfig.configPath();
-  const readConfigFile = yield readConfig(configPath);
-  if (checkUniqueName(projObj.cleanName, readConfigFile.projects)) throw PROJECT_NAME_EXISTS;
-  if (checkNewPath(projObj.basePath, readConfigFile.projects)) throw PROJECT_DIR_USED;
-  readConfigFile.projects.push({
-    basePath: projObj.basePath,
-    projectName: projObj.projectName,
-    cleanName: projObj.cleanName,
-  });
-  yield writeConfig(readConfigFile);
-});
-
-/**
- * removeProjFromConfig() will delete a project's path to the main config file
- * based on the passed in project base path and the default config object
- *
- * @param {String} basePath
- * @param {Object} defaultConfig
- * @return {}
- */
-export const removeProjFromConfig = co(function *g(projObj, defaultConfig) {
-  const configPath = defaultConfig.configPath();
-  const readConfigFile = yield readConfig(configPath);
-  readConfigFile.projects =
-    readConfigFile.projects.filter(obj => obj.basePath !== projObj.basePath);
-  yield writeConfig(readConfigFile);
-  return true;
-});
-
-/**
  * initApp() will run through several processes at app initiation. First,
  * it will check if docker machine is installed, then docker, then check
  * if there is a dockdev machine created yet, then it will redirect to the
@@ -218,34 +118,34 @@ export const removeProjFromConfig = co(function *g(projObj, defaultConfig) {
  * @param {Function} addProject
  * @return {Boolean} true
  */
-export const initApp = co(function *g(defaultConfig, router, addConfig, addProject) {
-  try {
-    yield checkDockerMachineInstalled();
-  } catch (e) {
-    router.replace('/init/1');
-    return false;
-  }
-
-  try {
-    yield checkDockerInstall();
-  } catch (e) {
-    router.replace('/init/2');
-    return false;
-  }
-
-  const checkDockDevMachine = yield machine.list();
-  if (checkDockDevMachine.indexOf('dockdev') === -1) {
-    router.replace('/init/3');
-    yield machine.createVirtualBox(defaultConfig.machine);
-  }
-
-  router.replace('/');
-
-  const config = yield loadConfigFile(defaultConfig);
-
-  addConfig(config);
-
-  loadPaths(config, defaultConfig, addProject);
-
-  return true;
-});
+// export const initApp = co(function *g(defaultConfig, router, addConfig, addProject) {
+//   try {
+//     yield checkDockerMachineInstalled();
+//   } catch (e) {
+//     router.replace('/init/1');
+//     return false;
+//   }
+//
+//   try {
+//     yield checkDockerInstall();
+//   } catch (e) {
+//     router.replace('/init/2');
+//     return false;
+//   }
+//
+//   const checkDockDevMachine = yield machine.list();
+//   if (checkDockDevMachine.indexOf('dockdev') === -1) {
+//     router.replace('/init/3');
+//     yield machine.createVirtualBox(defaultConfig.machine);
+//   }
+//
+//   router.replace('/');
+//
+//   const config = yield loadConfigFile(defaultConfig);
+//
+//   addConfig(config);
+//
+//   loadPaths(config, defaultConfig, addProject);
+//
+//   return true;
+// });
