@@ -117,14 +117,24 @@ export const findContainer = (containerArray, name) => {
  * @param {String} path
  * @return {} writes (or overwrites) the project file (dockdev.json)
  */
-export const writeContainer = co(function *g(container, path) {
+export const writeContainer = co(function *g(container, path, action) {
   const projObj = yield loadProject(path);
-  const containerIdx = findContainer(projObj.containers, container.name);
-  if (containerIdx !== -1) {
-    projObj.containers[containerIdx] = container;
-  } else {
+
+  if (action === 'add') {
     projObj.containers.push(container);
+  } else {
+    const idx = findContainer(projObj.containers, container.name);
+    if (action === 'update') {
+      projObj.containers[idx] = container;
+    }
+    if (action === 'delete') {
+      projObj.containers = [
+        ...projObj.containers.slice(0, idx),
+        ...projObj.containers.slice(idx + 1),
+      ];
+    }
   }
+
   return yield writeProj(projObj);
 });
 

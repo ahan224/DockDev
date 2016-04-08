@@ -1,25 +1,35 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Container from '../../components/assets/Container';
+import { clickDelContainer } from '../../actions/index';
 
-const ProjectDetail = ({ project }) => {
-  const server = project.containers
+const ProjectDetail = (props) => {
+  const server = props.project.containers
     .filter(cont => cont.server)
-    .map(cont =>
-      <Container
-        key={cont.projectName}
-        container={cont}
-      />
-    );
+    .map(cont => {
+      const onClick = () => props.clickDelContainer(cont);
+      return (
+        <Container
+          key={cont.name}
+          container={cont}
+          onClick={onClick}
+        />
+      );
+    });
 
-  const dbs = project.containers
+  const dbs = props.project.containers
     .filter(cont => !cont.server)
-    .map(cont =>
-      <Container
-        key={cont.projecName}
-        container={cont}
-      />
-    );
+    .map(cont => {
+      const onClick = () => props.clickDelContainer(cont);
+      return (
+        <Container
+          key={cont.name}
+          container={cont}
+          onClick={onClick}
+        />
+      );
+    });
+
   return (
     <div className="project-wrapper">
         <div className="row">
@@ -42,6 +52,7 @@ const ProjectDetail = ({ project }) => {
 
 ProjectDetail.propTypes = {
   project: React.PropTypes.object,
+  clickDelContainer: React.PropTypes.func,
 };
 
 function mapStateToProps(state, ownProps) {
@@ -49,4 +60,7 @@ function mapStateToProps(state, ownProps) {
   return { project };
 }
 
-export default connect(mapStateToProps)(ProjectDetail);
+export default connect(
+  mapStateToProps,
+  { clickDelContainer }
+)(ProjectDetail);
