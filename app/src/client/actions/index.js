@@ -6,6 +6,8 @@ import {
   projConfig,
   availableImages,
   containerMgmt,
+  fileWatch,
+  rsync,
 } from './server/main';
 
 export const REQUEST_CONFIG = 'REQUEST_CONFIG';
@@ -29,6 +31,8 @@ export const DELETED_CONTAINER = 'DELETED_CONTAINER';
 export const ERROR_DELETING_CONTAINER = 'ERROR_DELETING_CONTAINER';
 export const ERROR_STARTING_PROJECT = 'ERROR_STARTING_PROJECT';
 export const START_PROJECT = 'START_PROJECT';
+export const ERROR_STOPPING_PROJECT = 'START_PROJECT';
+export const STOPPED_PROJECT = 'START_PROJECT';
 
 function createMessage(type, message) {
   return {
@@ -291,6 +295,7 @@ function startProject(project) {
   return {
     type: START_PROJECT,
     project,
+    watching: fileWatch(project),
   };
 }
 
@@ -305,4 +310,36 @@ export function clickStartProject(cleanName) {
     }
     return dispatch(startProject(project));
   };
+}
+
+function stopProjectError(err, projectName) {
+  return createMessage(
+    ERROR_STOPPING_PROJECT,
+    `There was an error stopping ${projectName}, err = ${err}`
+  );
+}
+
+function stopProject(projectName) {
+  return createMessage(
+    STOPPED_PROJECT,
+    `Project ${projectName} has stopped`
+  );
+}
+
+export function clickStopProject(cleanName) {
+  return (dispatch, getState) => {
+    const { activeProject } = getState();
+    if (activeProject.project.projectName !== cleanName) {
+      const error =
+        `Couldn't stop ${cleanName}, ${activeProject.project.projectName} is active`;
+      return dispatch(stopProjectError(error, cleanName));
+    }
+    return dispatch(stopProject(activeProject.project.projectName));
+  };
+}
+
+export function rsyncArgs(project) {
+  const basePath = rsync.cleanFilePath(project.basePath);
+  const dest = 
+
 }
