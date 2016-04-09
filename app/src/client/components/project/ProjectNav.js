@@ -4,8 +4,6 @@ import { Link } from 'react-router';
 const ProjectNav = (props) => {
   const projectName = props.params.projectName;
 
-  const stop = '';
-  const restart = '';
   const remove = '';
 
   return (
@@ -24,11 +22,11 @@ const ProjectNav = (props) => {
           </label>
           <label className="btn btn-primary">
             <input type="radio" name="options" id="option2" autoComplete="off" />
-              <img src="./client/images/png/shapes@2x.png" onClick={stop}></img>
+              <img src="./client/images/png/shapes@2x.png" onClick={props.clickStopProject}></img>
           </label>
           <label className="btn btn-primary">
             <input type="radio" name="options" id="option3" autoComplete="off" />
-              <img src="./client/images/png/arrows@2x.png" onClick={restart}></img>
+              <img src="./client/images/png/arrows@2x.png" onClick={props.clickRestartProject}></img>
           </label>
           <label className="btn btn-primary">
             <input type="radio" name="options" id="option3" autoComplete="off" />
@@ -59,6 +57,7 @@ ProjectNav.propTypes = {
   children: PropTypes.object.isRequired,
   params: PropTypes.object.isRequired,
   clickStartProject: PropTypes.func.isRequired,
+  clickStopProject: PropTypes.func.isRequired,
 };
 
 export default ProjectNav;
