@@ -65,6 +65,8 @@ gulp.task('react', () => {
     'ramda',
     'react-router',
     'moment',
+    'chokidar',
+    'bluebird',
     './server/main',
   ]);
 
