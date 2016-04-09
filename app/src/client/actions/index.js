@@ -1,5 +1,6 @@
 import { push } from 'react-router-redux';
 import moment from 'moment';
+import chokidar from 'chokidar';
 import {
   defaultConfig,
   appConfig,
@@ -8,6 +9,8 @@ import {
   containerMgmt,
   fileWatch,
   rsync,
+  machine,
+  utils,
 } from './server/main';
 
 export const REQUEST_CONFIG = 'REQUEST_CONFIG';
@@ -31,8 +34,11 @@ export const DELETED_CONTAINER = 'DELETED_CONTAINER';
 export const ERROR_DELETING_CONTAINER = 'ERROR_DELETING_CONTAINER';
 export const ERROR_STARTING_PROJECT = 'ERROR_STARTING_PROJECT';
 export const START_PROJECT = 'START_PROJECT';
-export const ERROR_STOPPING_PROJECT = 'START_PROJECT';
-export const STOPPED_PROJECT = 'START_PROJECT';
+export const ERROR_STOPPING_PROJECT = 'ERROR_STOPPING_PROJECT';
+export const STOPPED_PROJECT = 'STOPPED_PROJECT';
+export const ERROR_SYNC_INFO = 'ERROR_SYNC_INFO';
+export const ERROR_SYNCING_PROJECT = 'ERROR_SYNCING_PROJECT';
+export const ERROR_RESTARTING_PROJECT = 'ERROR_RESTARTING_PROJECT';
 
 function createMessage(type, message) {
   return {
@@ -284,6 +290,14 @@ export function clickDelContainer(containerObj) {
   };
 }
 
+function startProject(project, watcher) {
+  return {
+    type: START_PROJECT,
+    project,
+    watcher,
+  };
+}
+
 function startProjectError(err, projectName) {
   return createMessage(
     ERROR_STARTING_PROJECT,
@@ -291,11 +305,43 @@ function startProjectError(err, projectName) {
   );
 }
 
-function startProject(project) {
-  return {
-    type: START_PROJECT,
-    project,
-    watching: fileWatch(project),
+function rsyncInfoError(err, project) {
+  return createMessage(
+    ERROR_SYNC_INFO,
+    `There was an error grabbing syncing info for ${project.projectName}, err = ${err}`
+  );
+}
+
+function fileWatchError(err, project) {
+  return createMessage(
+    ERROR_SYNCING_PROJECT,
+    `There was an error syncing ${project.projectName}, err = ${err}`
+  );
+}
+
+function fileWatching(project, syncArgs) {
+  return dispatch => {
+    const throttled = new rsync.ThrottleSync(function() {
+      rsync.rsync(syncArgs)
+        .then()
+        .catch(err => dispatch(fileWatchError(err, project)));
+    }, 100);
+    const watcher = chokidar.watch(project.basePath);
+    watcher.on('all', throttled.start);
+    return dispatch(startProject(project, watcher));
+  };
+}
+
+function rsyncProj(project) {
+  return dispatch => {
+    const basePath = rsync.cleanFilePath(project.basePath);
+    const serverId = rsync.getServerCont(project);
+    const destPath = project.containers[serverId].dest;
+    return machine.inspect(project.machine)
+      .then(rsync.selectSSHandIP)
+      .then(machineInfo =>
+        dispatch(fileWatching(project, rsync.createRsyncArgs(basePath, destPath, machineInfo))))
+      .catch(err => dispatch(rsyncInfoError(err, project)));
   };
 }
 
@@ -308,7 +354,7 @@ export function clickStartProject(cleanName) {
         `Couldn't start ${project.projectName}, ${activeProject.project.projectName} is active`;
       return dispatch(startProjectError(error, project.projectName));
     }
-    return dispatch(startProject(project));
+    return dispatch(rsyncProj(project));
   };
 }
 
@@ -316,6 +362,13 @@ function stopProjectError(err, projectName) {
   return createMessage(
     ERROR_STOPPING_PROJECT,
     `There was an error stopping ${projectName}, err = ${err}`
+  );
+}
+
+function restartProjectError(err, projectName) {
+  return createMessage(
+    ERROR_RESTARTING_PROJECT,
+    `There was an error restarting ${projectName}, err = ${err}`
   );
 }
 
@@ -338,8 +391,28 @@ export function clickStopProject(cleanName) {
   };
 }
 
-export function rsyncArgs(project) {
-  const basePath = rsync.cleanFilePath(project.basePath);
-  const dest = 
+export function clickRestartProject(cleanName) {
+  return (dispatch, getState) => {
+    const { activeProject } = getState();
+    if (activeProject.project.projectName !== cleanName) {
+      const error =
+        `Couldn't restart ${cleanName}, ${activeProject.project.projectName} is active`;
+      return dispatch(restartProjectError(error, cleanName));
+    }
+    // do we need to promisify stop project??
+    dispatch(stopProject(activeProject.project.projectName));
+    return dispatch(startProject(activeProject.project.projectName));
+  };
+}
 
+export function clickReMoveProject(cleanName) {
+  return (dispatch, getState) => {
+    const { activeProject } = getState();
+    if (activeProject.project.projectName !== cleanName) {
+      const error =
+        `Couldn't stop ${cleanName}, ${activeProject.project.projectName} is active`;
+      return dispatch(stopProjectError(error, cleanName));
+    }
+    return dispatch(stopProject(activeProject.project.projectName));
+  };
 }
