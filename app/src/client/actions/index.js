@@ -1,10 +1,15 @@
 import { push } from 'react-router-redux';
 import moment from 'moment';
+import chokidar from 'chokidar';
+import Promise from 'bluebird';
 import {
   appConfig,
   projConfig,
   availableImages,
   containerMgmt,
+  rsync,
+  docker,
+  machine,
 } from './server/main';
 
 export const REQUEST_CONFIG = 'REQUEST_CONFIG';
@@ -30,6 +35,15 @@ export const ERROR_STARTING_PROJECT = 'ERROR_STARTING_PROJECT';
 export const START_PROJECT = 'START_PROJECT';
 export const UPDATE_DOTOKEN = 'UPDATE_DOTOKEN';
 export const ERROR_UPDATING_DOTOKEN = 'ERROR_UPDATING_DOTOKEN';
+export const ERROR_STOPPING_PROJECT = 'ERROR_STOPPING_PROJECT';
+export const STOPPED_PROJECT = 'STOPPED_PROJECT';
+export const ERROR_SYNC_INFO = 'ERROR_SYNC_INFO';
+export const ERROR_SYNCING_PROJECT = 'ERROR_SYNCING_PROJECT';
+export const ERROR_RESTARTING_PROJECT = 'ERROR_RESTARTING_PROJECT';
+export const ERROR_STARTING_CONTAINERS = 'ERROR_STARTING_CONTAINERS';
+export const ERROR_STOPPING_CONTAINERS = 'ERROR_STOPPING_CONTAINERS';
+export const ERROR_RESTARTING_CONTAINERS = 'ERROR_RESTARTING_CONTAINERS';
+export const RESTARTED_PROJECT = 'RESTARTED_PROJECT';
 
 export function redirectHome() {
   return dispatch => dispatch(push('/'));
@@ -288,6 +302,14 @@ export function clickDelContainer(containerObj) {
   };
 }
 
+function startProject(project, watcher) {
+  return {
+    type: START_PROJECT,
+    project,
+    watcher,
+  };
+}
+
 function startProjectError(err, projectName) {
   return createMessage(
     ERROR_STARTING_PROJECT,
@@ -295,10 +317,61 @@ function startProjectError(err, projectName) {
   );
 }
 
-function startProject(project) {
-  return {
-    type: START_PROJECT,
-    project,
+function startContainersError(err, projectName) {
+  return createMessage(
+    ERROR_STARTING_CONTAINERS,
+    `There was an error starting containers for ${projectName}, err = ${err}`
+  );
+}
+
+function startContainers(project, watcher) {
+  return dispatch => {
+    const containerArray = project.containers.map(cont =>
+      docker.containerStart(cont.machine, cont.dockerId));
+    Promise.all(containerArray)
+      .then(() => dispatch(startProject(project, watcher)))
+      .catch(err => dispatch(startContainersError(err, project.projectName)));
+  };
+}
+
+function rsyncInfoError(err, project) {
+  return createMessage(
+    ERROR_SYNC_INFO,
+    `There was an error grabbing syncing info for ${project.projectName}, err = ${err}`
+  );
+}
+
+function fileWatchError(err, project) {
+  return createMessage(
+    ERROR_SYNCING_PROJECT,
+    `There was an error syncing ${project.projectName}, err = ${err}`
+  );
+}
+
+function fileWatching(project, syncArgs) {
+  return dispatch => {
+    const projectSync = () =>
+      rsync.rsync(syncArgs)
+        .catch(err => dispatch(fileWatchError(err, project)));
+    const throttled = new rsync.ThrottleSync(projectSync, 100);
+    const watcher = chokidar.watch(project.basePath);
+    watcher.on('all', throttled.start.bind(throttled));
+    return dispatch(startContainers(project, watcher));
+  };
+}
+
+function rsyncProj(project) {
+  return dispatch => {
+    const basePath = rsync.cleanFilePath(project.basePath);
+    const server = project.containers.filter(cont => cont.server);
+    const destPath = server.dest;
+    return machine.inspect(project.machine)
+      .then(rsync.selectSSHandIP)
+      .then(machineInfo =>
+        dispatch(
+          fileWatching(project, rsync.createRsyncArgs(`${basePath}/`, destPath, machineInfo)))
+        )
+      .catch(err => dispatch(rsyncInfoError(err, project)));
   };
 }
 
@@ -311,7 +384,107 @@ export function clickStartProject(cleanName) {
         `Couldn't start ${project.projectName}, ${activeProject.project.projectName} is active`;
       return dispatch(startProjectError(error, project.projectName));
     }
-    return dispatch(startProject(project));
+    return dispatch(rsyncProj(project));
+  };
+}
+
+function stopProjectError(err, projectName) {
+  return createMessage(
+    ERROR_STOPPING_PROJECT,
+    `There was an error stopping ${projectName}, err = ${err}`
+  );
+}
+
+function stopContainersError(err, projectName) {
+  return createMessage(
+    ERROR_STOPPING_CONTAINERS,
+    `There was an error stopping containers for ${projectName}, err = ${err}`
+  );
+}
+
+function stopProject(projectName) {
+  return createMessage(
+    STOPPED_PROJECT,
+    `Project ${projectName} has stopped`
+  );
+}
+
+function stopContainers(project) {
+  return dispatch => {
+    const containerArray = project.containers.map(cont =>
+      docker.containerStop(cont.machine, cont.dockerId));
+    Promise.all(containerArray)
+      .then(() => dispatch(stopProject(project.projectName)))
+      .catch(err => dispatch(stopContainersError(err, project.projectName)));
+  };
+}
+
+export function clickStopProject(cleanName) {
+  return (dispatch, getState) => {
+    const { activeProject } = getState();
+    if (activeProject.project.projectName !== cleanName) {
+      const error =
+        `Couldn't stop ${cleanName}, ${activeProject.project.projectName} is active`;
+      return dispatch(stopProjectError(error, cleanName));
+    }
+    activeProject.watcher.close();
+    return dispatch(stopContainers(activeProject.project));
+  };
+}
+
+function restartProjectError(err, projectName) {
+  return createMessage(
+    ERROR_RESTARTING_PROJECT,
+    `There was an error restarting ${projectName}, err = ${err}`
+  );
+}
+
+function restartContainersError(err, projectName) {
+  return createMessage(
+    ERROR_RESTARTING_CONTAINERS,
+    `There was an error restarting containers for ${projectName}, err = ${err}`
+  );
+}
+
+function restartProject(err, projectName) {
+  return createMessage(
+    RESTARTED_PROJECT,
+    `${projectName} was restarted`
+  );
+}
+
+function restartContainers(project) {
+  return dispatch => {
+    const containerArray = project.containers.map(cont =>
+      docker.containerRestart(cont.machine, cont.dockerId));
+    Promise.all(containerArray)
+      .then(() => dispatch(restartProject(project.projectName)))
+      .catch(err => dispatch(restartContainersError(err, project.projectName)));
+  };
+}
+
+export function clickRestartProject(cleanName) {
+  return (dispatch, getState) => {
+    const { activeProject } = getState();
+    if (activeProject.project.projectName !== cleanName) {
+      const error =
+        `Couldn't restart ${cleanName}, ${activeProject.project.projectName} is active`;
+      return dispatch(restartProjectError(error, cleanName));
+    }
+    activeProject.watcher.close();
+    return dispatch(restartContainers(activeProject.project));
+  };
+}
+
+export function clickReMoveProject(cleanName) {
+  return (dispatch, getState) => {
+    const { activeProject } = getState();
+    if (activeProject.project.projectName !== cleanName) {
+      const error =
+        `Couldn't stop ${cleanName}, ${activeProject.project.projectName} is active`;
+      return dispatch(stopProjectError(error, cleanName));
+    }
+    return dispatch(stopProject(activeProject.project.projectName));
   };
 }
 
