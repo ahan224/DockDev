@@ -8,7 +8,7 @@ const ProjectDetail = (props) => {
 
   const uuid = props.params.uuid;
   const proj = props.projects[uuid];
-
+console.log(proj);
   const start = () => props.startProject(uuid);
   const stop = () => props.stopProject(uuid);
   const restart = () => props.restartProject(uuid);
@@ -36,7 +36,7 @@ const ProjectDetail = (props) => {
         uuid={uuid}
         delContainer={props.delContainer}
         buttons={<ProjButtons start={start} stop={stop} restart={restart} remove={remove} />}
-        deployButton={<DeployButton />}
+        deployButton={<DeployButton uuid={uuid} />}
       />
     );
   return (
