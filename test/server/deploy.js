@@ -2,20 +2,19 @@
 import { expect } from 'chai';
 import { join } from 'path';
 import * as rsync from '../../app/build/api/rsync.js';
-import { removeContainer, addContainer } from '../../app/build/api/docker.js';
-import { createDroplet } from '../../app/build/api/deploy.js';
+import * as docker from '../../app/build/api/deploy.js';
+import * as containerMgmt from '../../app/build/projLevel/containerMgmt';
 import { removeMachine } from '../../app/build/api/machine.js';
 
 const userFolder = join(__dirname, '..', 'userFolder');
 const genBasePath = (projectName) => join(userFolder, projectName);
-const DOtoken = '7b383cd4a9c6eff4bad70264a015bd5d3f9a21bfd690a2a18f80ff6dea717592';
 
 // this will test provisioning a droplet which takes significant time
 // suggest that it remain pending unless specifically modifying the function
 xdescribe('provision digitalocean droplet', function() {
   this.timeout(600000);
   const dropName = 'test';
-
+  // need to add grab token from a specified file
   after(() => removeMachine('test'));
 
   it('should provision a default droplet', () =>
@@ -27,32 +26,14 @@ xdescribe('provision digitalocean droplet', function() {
 // for speed this deploys to an already created local docker-machine
 // you need to create a virtual box machine named 'test' for these to work
 // you should also pull node, redis, and mongo
-describe('deploy a project to digital ocean', () => {
+describe('deploy containers to test machine', () => {
   const machineName = 'test';
+  const serverName = 'server1';
+  const dbName = 'mongo1';
 
-  const server = {
-    image,
-    name: 'server1',
-    HostConfig: {
-      NetworkMode: 'test',
-      PortBindings: { '3000/tcp': [{ HostPort: '3000' }] },
-    },
-    WorkingDir: '/app',
-    Cmd: ['npm', 'start'],
-    ExposedPorts: {
-      '3000/tcp': {},
-    },
-  };
+  const server = containerMgmt.setServerParams('node', serverName);
+  const deb = containerMgmt.setDbParams('mongo', dbName);
 
-  const db = {
-    image: 'mongo',
-    containerName: 'mongo1',
-    HostConfig: {
-      NetworkMode: 'test',
-    }
-  };
 
-  before((() => {
 
-  })
 });

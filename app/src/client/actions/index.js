@@ -1,7 +1,6 @@
 import { push } from 'react-router-redux';
 import moment from 'moment';
 import {
-  defaultConfig,
   appConfig,
   projConfig,
   availableImages,
@@ -29,6 +28,16 @@ export const DELETED_CONTAINER = 'DELETED_CONTAINER';
 export const ERROR_DELETING_CONTAINER = 'ERROR_DELETING_CONTAINER';
 export const ERROR_STARTING_PROJECT = 'ERROR_STARTING_PROJECT';
 export const START_PROJECT = 'START_PROJECT';
+export const UPDATE_DOTOKEN = 'UPDATE_DOTOKEN';
+export const ERROR_UPDATING_DOTOKEN = 'ERROR_UPDATING_DOTOKEN';
+
+export function redirectHome() {
+  return dispatch => dispatch(push('/'));
+}
+
+export function redirect(...args) {
+  return dispatch => dispatch(push(`/${args.join('/')}`));
+}
 
 function createMessage(type, message) {
   return {
@@ -115,7 +124,7 @@ function loadConfigError(err) {
 export function loadConfig() {
   return dispatch => {
     dispatch(requestConfig());
-    return appConfig.loadConfigFile(defaultConfig)
+    return appConfig.loadConfigFile()
       .then(response => {
         dispatch(receiveConfig(response));
         dispatch(loadProjects(response.projects));
@@ -135,13 +144,12 @@ export function addProject(path, name) {
   return dispatch => {
     dispatch(addingProject(path, name));
     return projConfig.initProject(path, name)
-      .then(response => dispatch(addedProject(response)))
+      .then(response => {
+        dispatch(addedProject(response));
+        dispatch(redirect('projects', response.cleanName));
+      })
       .catch(err => dispatch(addProjectError(err, name)));
   };
-}
-
-export function redirectHome() {
-  return dispatch => dispatch(push('/'));
 }
 
 export function loadImages(images) {
@@ -305,4 +313,25 @@ export function clickStartProject(cleanName) {
     }
     return dispatch(startProject(project));
   };
+}
+
+function updateDOToken(token) {
+  return {
+    type: UPDATE_DOTOKEN,
+    token,
+  };
+}
+
+function updateDOTokenError(err) {
+  return createMessage(
+    ERROR_UPDATING_DOTOKEN,
+    `There was an error updating the Digital Ocean token, err = ${err}`
+  );
+}
+
+export function clickUpdateDOToken(token) {
+  return dispatch =>
+    appConfig.updateDOToken(token)
+      .then(() => dispatch(updateDOToken(token)))
+      .catch(err => dispatch(updateDOTokenError(err)));
 }

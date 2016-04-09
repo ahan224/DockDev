@@ -2,11 +2,13 @@ import { join } from 'path';
 import { coroutine as co } from 'bluebird';
 import * as utils from '../utils/utils';
 import * as machine from '../dockerAPI/machine';
+import defaultConfig from './defaultConfig';
 import {
   FAILED_READ_CONFIG,
   FAILED_TO_WRITE_CONFIG,
   EEXIST,
   FAILED_TO_CREATE_CONFIG_DIR,
+  FAILED_TO_UPDATE_DOTOKEN,
 } from './errorMsgs';
 
 /**
@@ -38,7 +40,7 @@ export const checkDockerInstall = co(function *g() {
  * @param {Object} defaultConfig
  * @return {Object} configObj
  */
-export const initConfig = (defaultConfig) => ({
+export const initConfig = () => ({
   path: defaultConfig.configPath(),
   projects: [],
   userDir: process.env.HOME,
@@ -67,6 +69,7 @@ export const readConfig = (configPath) =>
 export const writeConfig = (configObj) => {
   const strObj = utils.jsonStringifyPretty(configObj);
   return utils.writeFile(configObj.path, strObj)
+    .then(() => true)
     .catch(() => {throw FAILED_TO_WRITE_CONFIG; });
 };
 
@@ -77,7 +80,7 @@ export const writeConfig = (configObj) => {
  * @param {Object} defaultConfig
  * @return {} makes a folder
  */
-const createConfigFolder = (defaultConfig) =>
+const createConfigFolder = () =>
   utils.mkdir(join(defaultConfig.defaultPath, defaultConfig.configFolder))
     .then(() => true)
     .catch(err => {
@@ -92,10 +95,10 @@ const createConfigFolder = (defaultConfig) =>
  * @param {Object} defaultConfig
  * @return {Object} config
  */
-export const loadConfigFile = co(function *g(defaultConfig) {
+export const loadConfigFile = co(function *g() {
   try {
-    if (yield createConfigFolder(defaultConfig)) {
-      const config = initConfig(defaultConfig);
+    if (yield createConfigFolder()) {
+      const config = initConfig();
       yield writeConfig(config);
       return config;
     }
@@ -104,6 +107,18 @@ export const loadConfigFile = co(function *g(defaultConfig) {
     throw e; // potentially need to additional handling here
   }
 });
+
+/**
+ * updateDOToken() update the Digital Ocean toke stored on disk, it return true or throws error
+ *
+ * @param {String} token
+ * @return {} true or throws error
+ */
+export const updateDOToken = (token) =>
+  readConfig(defaultConfig.configPath())
+    .then(config => ({ ...config, DOToken: token }))
+    .then(writeConfig)
+    .catch(() => {throw FAILED_TO_UPDATE_DOTOKEN;});
 
 /**
  * initApp() will run through several processes at app initiation. First,

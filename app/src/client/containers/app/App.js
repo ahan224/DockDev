@@ -4,6 +4,7 @@ import { loadConfig } from '../../actions/index';
 
 import NavLink from '../../components/assets/NavLink';
 import ProjectLinks from '../../components/assets/ProjectLinks';
+import TopNav from './TopNav';
 
 class App extends Component {
   componentDidMount() {
@@ -28,22 +29,7 @@ class App extends Component {
           {<ProjectLinks projects={projects} />}
         </ul>
           <div id="right-column">
-            <div className="content-top-nav">
-             <div className="btn-group top-nav-btn-group" data-toggle="buttons">
-               <label className="btn btn-primary active">
-                <input type="radio" name="options" id="option1" autoComplete="off"></input>
-                  <img src="./client/images/png/music@2x.png"></img>
-               </label>
-               <label className="btn btn-primary">
-                 <input type="radio" name="options" id="option2" autoComplete="off"></input>
-                   <img src="./client/images/png/power@2x.png"></img>
-               </label>
-               <label className="btn btn-primary">
-                 <input type="radio" name="options" id="option3" autoComplete="off"></input>
-                   <img src="./client/images/png/tool@2x.png"></img>
-               </label>
-             </div>
-            </div>
+            <TopNav />
             <div id="content">
               {children}
             </div>
@@ -64,6 +50,7 @@ App.propTypes = {
   loadConfig: PropTypes.func.isRequired,
 };
 
-export default connect(mapStateToProps, {
-  loadConfig,
-})(App);
+export default connect(
+  mapStateToProps,
+  { loadConfig }
+)(App);
