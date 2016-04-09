@@ -1,7 +1,5 @@
 import { createMachine } from '../dockerAPI/machine';
 
-const DOtoken = '7b383cd4a9c6eff4bad70264a015bd5d3f9a21bfd690a2a18f80ff6dea717592';
-
 /**
  * createDroplet() returns a promise to create a droplet on DigitalOcean
  * based on the dropletName and token.  Optional arguments are accepted.
@@ -18,6 +16,9 @@ export const createDroplet = (dropletName, token, ...args) =>
     ...args,
     dropletName
   );
+
+// export const createDockerFile = (serverContainer, )
+
 
 // /**
 //  * getDbNames() returns the images and names of all the database in the project

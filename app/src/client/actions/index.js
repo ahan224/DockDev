@@ -3,7 +3,6 @@ import moment from 'moment';
 import chokidar from 'chokidar';
 import Promise from 'bluebird';
 import {
-  defaultConfig,
   appConfig,
   projConfig,
   availableImages,
@@ -34,6 +33,8 @@ export const DELETED_CONTAINER = 'DELETED_CONTAINER';
 export const ERROR_DELETING_CONTAINER = 'ERROR_DELETING_CONTAINER';
 export const ERROR_STARTING_PROJECT = 'ERROR_STARTING_PROJECT';
 export const START_PROJECT = 'START_PROJECT';
+export const UPDATE_DOTOKEN = 'UPDATE_DOTOKEN';
+export const ERROR_UPDATING_DOTOKEN = 'ERROR_UPDATING_DOTOKEN';
 export const ERROR_STOPPING_PROJECT = 'ERROR_STOPPING_PROJECT';
 export const STOPPED_PROJECT = 'STOPPED_PROJECT';
 export const ERROR_SYNC_INFO = 'ERROR_SYNC_INFO';
@@ -43,6 +44,14 @@ export const ERROR_STARTING_CONTAINERS = 'ERROR_STARTING_CONTAINERS';
 export const ERROR_STOPPING_CONTAINERS = 'ERROR_STOPPING_CONTAINERS';
 export const ERROR_RESTARTING_CONTAINERS = 'ERROR_RESTARTING_CONTAINERS';
 export const RESTARTED_PROJECT = 'RESTARTED_PROJECT';
+
+export function redirectHome() {
+  return dispatch => dispatch(push('/'));
+}
+
+export function redirect(...args) {
+  return dispatch => dispatch(push(`/${args.join('/')}`));
+}
 
 function createMessage(type, message) {
   return {
@@ -129,7 +138,7 @@ function loadConfigError(err) {
 export function loadConfig() {
   return dispatch => {
     dispatch(requestConfig());
-    return appConfig.loadConfigFile(defaultConfig)
+    return appConfig.loadConfigFile()
       .then(response => {
         dispatch(receiveConfig(response));
         dispatch(loadProjects(response.projects));
@@ -149,13 +158,12 @@ export function addProject(path, name) {
   return dispatch => {
     dispatch(addingProject(path, name));
     return projConfig.initProject(path, name)
-      .then(response => dispatch(addedProject(response)))
+      .then(response => {
+        dispatch(addedProject(response));
+        dispatch(redirect('projects', response.cleanName));
+      })
       .catch(err => dispatch(addProjectError(err, name)));
   };
-}
-
-export function redirectHome() {
-  return dispatch => dispatch(push('/'));
 }
 
 export function loadImages(images) {
@@ -478,4 +486,25 @@ export function clickReMoveProject(cleanName) {
     }
     return dispatch(stopProject(activeProject.project.projectName));
   };
+}
+
+function updateDOToken(token) {
+  return {
+    type: UPDATE_DOTOKEN,
+    token,
+  };
+}
+
+function updateDOTokenError(err) {
+  return createMessage(
+    ERROR_UPDATING_DOTOKEN,
+    `There was an error updating the Digital Ocean token, err = ${err}`
+  );
+}
+
+export function clickUpdateDOToken(token) {
+  return dispatch =>
+    appConfig.updateDOToken(token)
+      .then(() => dispatch(updateDOToken(token)))
+      .catch(err => dispatch(updateDOTokenError(err)));
 }
