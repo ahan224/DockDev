@@ -37,8 +37,8 @@ const checkDockerInstall = co(function *g() {
  * @param {Object} defaultConfig
  * @return {Object} configObj
  */
-const initConfig = (defaultConfig) => ({
-  path: defaultConfig.configPath(),
+const initConfig = (input) => ({
+  path: input.configPath(),
   projects: [],
   userDir: process.env.HOME,
   DOtoken: '',
@@ -74,8 +74,8 @@ const writeConfig = (configObj) => {
  * @param {Object} defaultConfig
  * @return {} makes a folder
  */
-const createConfigFolder = (defaultConfig) =>
-  utils.mkdir(join(defaultConfig.defaultPath, defaultConfig.configFolder));
+const createConfigFolder = (input) =>
+  utils.mkdir(join(input.defaultPath, input.configFolder));
 
 /**
  * loadConfigFile() returns the config object from ~/.dockdevconfig or creates/writes it
@@ -84,27 +84,17 @@ const createConfigFolder = (defaultConfig) =>
  * @param {Object} defaultConfig
  * @return {Object} config
  */
-export const loadConfigFile = co(function *g(defaultConfig) {
-  let config = yield readConfig(defaultConfig.configPath());
-
-  // if config is undefined then config file does not exist
-  if (!config) {
-    try {
-      yield createConfigFolder(defaultConfig);
-    } catch (e) {
-      console.log("hi I am the error message", e);
-    }
-    config = initConfig(defaultConfig)
+export const loadConfigFile = co(function *g(input) {
+  try {
+    return yield readConfig(input.configPath());
+  } catch (e) {
+    yield rimrafProm(join(input.defaultPath, input.configFolder));
+    yield createConfigFolder(defaultConfig);
+    const config = initConfig(defaultConfig);
     yield writeConfig(config);
     return config;
   }
-
-  return config;
 });
-
-loadConfigFile(defaultConfig)
-  .then(data => console.log('data: ', data))
-  .catch(err => console.log('error: ', err));
 
 /**
  * loadPathsFile() returns a promise that a path will resolve whether or not it is good

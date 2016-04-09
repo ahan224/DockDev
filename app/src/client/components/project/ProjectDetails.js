@@ -1,17 +1,29 @@
 import React from 'react';
 import R from 'ramda';
 import Container from './assets/Container';
+import ProjButtons from './assets/ProjButtons';
+import DeployButton from './assets/DeployButton';
 
-const ProjectDetail = ({ projects, params, delContainer }) => {
-  const proj = projects[params.uuid];
+const ProjectDetail = (props) => {
+
+  const uuid = props.params.uuid;
+  const proj = props.projects[uuid];
+
+  const start = () => props.startProject(uuid);
+  const stop = () => props.stopProject(uuid);
+  const restart = () => props.restartProject(uuid);
+  const remove = () => props.removeProject(uuid);
+
   const server = R.toPairs(proj.containers)
     .filter(cont => cont[1].server)
     .map(cont =>
       <Container
         key={cont[0]}
         details={cont[1]}
-        uuid={params.uuid}
-        delContainer={delContainer}
+        uuid={uuid}
+        delContainer={props.delContainer}
+        buttons={<ProjButtons start={start} stop={stop} restart={restart} remove={remove} />}
+        deployButton={<DeployButton uuid={uuid} />}
       />
     );
 
@@ -21,8 +33,10 @@ const ProjectDetail = ({ projects, params, delContainer }) => {
       <Container
         key={cont[0]}
         details={cont[1]}
-        uuid={params.uuid}
-        delContainer={delContainer}
+        uuid={uuid}
+        delContainer={props.delContainer}
+        buttons={<ProjButtons start={start} stop={stop} restart={restart} remove={remove} />}
+        deployButton={<DeployButton uuid={uuid} />}
       />
     );
   return (
@@ -49,6 +63,10 @@ ProjectDetail.propTypes = {
   projects: React.PropTypes.object,
   params: React.PropTypes.object,
   delContainer: React.PropTypes.func,
+  startProject: React.PropTypes.func,
+  stopProject: React.PropTypes.func,
+  restartProject: React.PropTypes.func,
+  removeProject: React.PropTypes.func,
 };
 
 export default ProjectDetail;

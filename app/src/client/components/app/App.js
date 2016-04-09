@@ -189,7 +189,8 @@ class App extends React.Component {
   deployProject(uuid) {
     const DOToken = this.state.DOToken;
     const projects = this.state.projects;
-    deploy.deployToOcean(projects[uuid], DOToken);
+    // deploy.deployToOcean(projects[uuid], DOToken);
+    this.forceUpdate();
   }
 
   updateToken(e) {
