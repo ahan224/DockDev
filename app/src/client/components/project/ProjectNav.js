@@ -1,18 +1,13 @@
 import React from 'react';
-import ProjButtons from './assets/ProjButtons';
 import ProjNavLinks from './assets/ProjNavLinks';
 
 const ProjectNav = (props) => {
   const uuid = props.params.uuid;
   const proj = props.projects[uuid];
 
-  const start = () => props.startProject(uuid);
-  const stop = () => props.stopProject(uuid);
-  const restart = () => props.restartProject(uuid);
-  const remove = () => props.removeProject(uuid);
 
   return (
-    <div >
+    <div>
       <div className="proj-nav">
         <div className="col-xs-4 proj-detail-title" style={{ padding: '0px' }}>
           <h5 className="text-capitalize">
@@ -20,7 +15,6 @@ const ProjectNav = (props) => {
           </h5>
         </div>
 
-        <ProjButtons start={start} stop={stop} restart={restart} remove={remove} />
         <ProjNavLinks uuid={uuid} />
 
       </div>
@@ -35,12 +29,7 @@ ProjectNav.propTypes = {
   params: React.PropTypes.object,
   addContainer: React.PropTypes.func,
   context: React.PropTypes.object,
-  delContainer: React.PropTypes.func,
   activeProject: React.PropTypes.string,
-  startProject: React.PropTypes.func,
-  stopProject: React.PropTypes.func,
-  restartProject: React.PropTypes.func,
-  removeProject: React.PropTypes.func,
   deployProject: React.PropTypes.func,
 };
 
