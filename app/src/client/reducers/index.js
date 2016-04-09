@@ -25,6 +25,15 @@ import {
   ERROR_STARTING_PROJECT,
   ERROR_UPDATING_DOTOKEN,
   UPDATE_DOTOKEN,
+  STOPPED_PROJECT,
+  ERROR_STOPPING_PROJECT,
+  ERROR_SYNC_INFO,
+  ERROR_SYNCING_PROJECT,
+  ERROR_RESTARTING_PROJECT,
+  ERROR_STARTING_CONTAINERS,
+  ERROR_STOPPING_CONTAINERS,
+  ERROR_RESTARTING_CONTAINERS,
+  RESTARTED_PROJECT,
 } from '../actions';
 
 function config(state = { isFetching: false }, action) {
@@ -56,8 +65,17 @@ function alerts(state = [], action) {
     case ERROR_PULLING_IMAGE:
     case ERROR_CREATING_CONTAINER:
     case ERROR_DELETING_CONTAINER:
+    case ERROR_SYNC_INFO:
+    case ERROR_SYNCING_PROJECT:
     case ERROR_STARTING_PROJECT:
     case ERROR_UPDATING_DOTOKEN:
+    case ERROR_STOPPING_PROJECT:
+    case STOPPED_PROJECT:
+    case ERROR_RESTARTING_PROJECT:
+    case ERROR_STARTING_CONTAINERS:
+    case ERROR_STOPPING_CONTAINERS:
+    case RESTARTED_PROJECT:
+    case ERROR_RESTARTING_CONTAINERS:
       return [
         ...state,
         {
@@ -165,9 +183,12 @@ function activeProject(state = {}, action) {
     case START_PROJECT:
       return {
         project: action.project,
-        fileWatch: '',
-        rsync: '',
-        lastSync: '',
+        watcher: action.watcher,
+      };
+    case STOPPED_PROJECT:
+      return {
+        project: '',
+        watcher: '',
       };
     default:
       return state;
