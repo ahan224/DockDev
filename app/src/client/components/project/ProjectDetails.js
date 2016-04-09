@@ -21,9 +21,8 @@ const ProjectDetail = (props) => {
         details={cont[1]}
         uuid={uuid}
         delContainer={props.delContainer}
-      >
-        <ProjButtons start={start} stop={stop} restart={restart} remove={remove} />
-      </Container>
+        buttons={<ProjButtons start={start} stop={stop} restart={restart} remove={remove} />}
+      />
     );
 
   const dbs = R.toPairs(proj.containers)
@@ -34,6 +33,7 @@ const ProjectDetail = (props) => {
         details={cont[1]}
         uuid={uuid}
         delContainer={props.delContainer}
+        buttons={<ProjButtons start={start} stop={stop} restart={restart} remove={remove} />}
       />
     );
   return (
