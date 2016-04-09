@@ -51,7 +51,6 @@ export const checkMachineRunning = co(function *g(defaultConfig) {
  */
 export const removeMachine = (machineName) => exec(`rm -f ${machineName}`);
 
-
 /**
  * regenCerts() regenerates the certificates for the machine with force (no stdout output)
  *
@@ -67,6 +66,15 @@ export const regenCerts = (machineName) => exec(`regenerate-certs -f ${machineNa
  * @return {} returns a promise that resolves to the stdout
  */
 export const start = (machineName) => exec(`start ${machineName}`);
+
+/**
+ * restart() restarts the docker machine specified in arguments
+ *
+ * @param {String} machineName
+ * @return {} returns a promise that resolves to the stdout
+ */
+export const restart = (machineName) => exec(`restart ${machineName}`);
+
 
 /**
  * createMachine() executes 'docker-machine create' with an indeterminant number

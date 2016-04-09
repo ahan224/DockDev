@@ -1,5 +1,6 @@
-import React from 'react';
-// import { remote } from 'electron';
+import React, { PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { clickUpdateDOToken } from '../../actions/index';
 
 const Settings = ({ DOToken, updateToken }) => (
   <div>
@@ -22,12 +23,27 @@ const Settings = ({ DOToken, updateToken }) => (
       </div>
     </div>
   </div>
-
 );
 
 Settings.propTypes = {
-  updateToken: React.PropTypes.func,
-  DOToken: React.PropTypes.string,
+  updateToken: PropTypes.func,
+  DOToken: PropTypes.string,
 };
 
-export default Settings;
+function mapStateToProps(state) {
+  return {
+    DOToken: state.config.DOToken,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    updateToken: (e) => dispatch(clickUpdateDOToken(e.target.value)),
+  };
+}
+
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Settings);

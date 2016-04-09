@@ -55,10 +55,10 @@ export const setDbParams = (image, cleanName) => ({
  * @param {Object} imageObj
  * @return {Object} returns the docker configuration object to create a container
  */
-const getContainerConfig = (container, imageObj) => (
-  imageObj.server ?
-    setServerParams(imageObj.name, container.cleanName) :
-    setDbParams(imageObj.name, container.cleanName)
+const getContainerConfig = (container) => (
+  container.server ?
+    setServerParams(container.image, container.cleanName) :
+    setDbParams(container.image, container.cleanName)
 );
 
 /**
@@ -111,6 +111,7 @@ const containerObj = (cleanName, imageObj) => ({
   server: imageObj.server,
   status: 'pending',
   machine: defaultConfig.machine,
+  version: '',
 });
 
 /**
@@ -128,8 +129,9 @@ export const createContainer = co(function *g(projObj, imageObj) {
     container.status = 'pending';
   } else {
     // create the container & update the object with the docker generated id
-    container.dockerId =
-      (yield containerCreate(defaultConfig.machine, getContainerConfig(container, imageObj))).Id;
+    const dockCont = yield containerCreate(defaultConfig.machine, getContainerConfig(container));
+    console.log(dockCont);
+    container.dockerId = dockCont.Id;
     container.status = 'complete';
   }
 
@@ -149,7 +151,8 @@ export const pullImageForProject = co(function *g(container, path) {
   let newContainer;
   try {
     yield pullImage(container.machine, container.image);
-    newContainer = { ...container, status: 'complete' };
+    const dockCont = yield containerCreate(defaultConfig.machine, getContainerConfig(container));
+    newContainer = { ...container, status: 'complete', dockerId: dockCont.Id };
   } catch (e) {
     newContainer = { ...container, status: 'error' };
   }
@@ -167,37 +170,6 @@ export const pullImageForProject = co(function *g(container, path) {
  */
 export const deleteProjectContainer = (container, path) =>
   writeContainer(container, path, 'delete');
-
-/**
- * add() returns a new container object. It will first attempt to use a local image
- * but if not found it will pull an image from the docker API
- * then it will create a container and return an object with container info
- * based on the passed in uuid, image, and callbacky
- *
- * @param {String} uuid
- * @param {String} image
- * @param {Function} callback
- * @return {Object} newContainer
- */
-// export const add = co(function *g(cleanName, imageObj) {
-//   const containerConfig = server ? setServerParams(image, uuid) : setDbParams(image, uuid);
-//
-//   // check to make sure image is on the local computer
-//   if (!(yield imagesList(defaultConfig.machine, image)).length) {
-//     try {
-//       yield pullSpawn(defaultConfig.machine, image, uuid, server, containerId, callback);
-//     } catch (err) {
-//       return callback(uuid, { containerId, image, server, status: 'error', err });
-//     }
-//   }
-//
-//   const tmpContainerId = containerId;
-//   containerId = (yield containerCreate(defaultConfig.machine, containerConfig)).Id;
-//   const inspectContainer = yield containerInspect(defaultConfig.machine, containerId);
-//   const dest = inspectContainer.Mounts[0].Source;
-//
-//   return newContainer;
-// });
 
 /**
  * removeContainer() returns true after it deletes a container

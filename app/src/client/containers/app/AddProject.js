@@ -1,7 +1,7 @@
 import React from 'react';
 import { remote } from 'electron';
 import { connect } from 'react-redux';
-import { addProject, redirectHome } from '../../actions/index';
+import { addProject } from '../../actions/index';
 
 const AddProject = ({ submit }) => {
   let projectName;
@@ -50,7 +50,6 @@ const mapStateToProps = (state) => state;
 const mapDispatchToProps = (dispatch) => ({
   submit: (path, name) => {
     dispatch(addProject(path, name));
-    dispatch(redirectHome());
   },
 });
 
