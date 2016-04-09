@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Container = ({ details, delContainer, uuid, buttons }) => {
+const Container = ({ details, delContainer, uuid, buttons, deployButton }) => {
   const clickDelContainer = () => delContainer(uuid, details);
   return (
     <div className="col-xs-12 col-md-6 col-lg-4">
@@ -10,7 +10,10 @@ const Container = ({ details, delContainer, uuid, buttons }) => {
           <button onClick={clickDelContainer}>Delete</button>
             { details.image } - status: { details.status }
           </h5>
-          {buttons}
+          <div className="button-wrapper">
+            {buttons}
+            {deployButton}
+          </div>
           <p className="card-text">
             With supporting text below as a natural lead-in to additional content.
           </p>

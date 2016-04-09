@@ -445,3 +445,17 @@ ul, li {
 .activeProj {
   background-color: Green;
 }
+
+.container-player-btns, .deploy-button {
+  float: left;
+  clear: both;
+}
+
+.deploy-button > .btn-primary  {
+  padding-left: 38px;
+  padding-right: 38px;
+}
+
+.card-block p {
+  clear: both;
+}

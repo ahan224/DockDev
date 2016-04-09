@@ -2,6 +2,7 @@ import React from 'react';
 import R from 'ramda';
 import Container from './assets/Container';
 import ProjButtons from './assets/ProjButtons';
+import DeployButton from './assets/DeployButton';
 
 const ProjectDetail = (props) => {
 
@@ -22,6 +23,7 @@ const ProjectDetail = (props) => {
         uuid={uuid}
         delContainer={props.delContainer}
         buttons={<ProjButtons start={start} stop={stop} restart={restart} remove={remove} />}
+        deployButton={<DeployButton uuid={uuid} />}
       />
     );
 
@@ -34,6 +36,7 @@ const ProjectDetail = (props) => {
         uuid={uuid}
         delContainer={props.delContainer}
         buttons={<ProjButtons start={start} stop={stop} restart={restart} remove={remove} />}
+        deployButton={<DeployButton />}
       />
     );
   return (
