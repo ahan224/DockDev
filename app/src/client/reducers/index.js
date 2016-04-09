@@ -23,6 +23,8 @@ import {
   ERROR_DELETING_CONTAINER,
   START_PROJECT,
   ERROR_STARTING_PROJECT,
+  ERROR_UPDATING_DOTOKEN,
+  UPDATE_DOTOKEN,
 } from '../actions';
 
 function config(state = { isFetching: false }, action) {
@@ -35,6 +37,8 @@ function config(state = { isFetching: false }, action) {
         projects: action.projects,
         DOToken: action.DOToken,
       };
+    case UPDATE_DOTOKEN:
+      return { ...state, DOToken: action.token };
     default:
       return state;
   }
@@ -53,6 +57,7 @@ function alerts(state = [], action) {
     case ERROR_CREATING_CONTAINER:
     case ERROR_DELETING_CONTAINER:
     case ERROR_STARTING_PROJECT:
+    case ERROR_UPDATING_DOTOKEN:
       return [
         ...state,
         {

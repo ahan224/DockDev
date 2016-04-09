@@ -146,7 +146,7 @@ function dockerCommand(cmd) {
       return yield rp(config);
     } catch (e) {
       if (e === FAILED_TO_ACCESS_MACHINE) throw FAILED_TO_ACCESS_MACHINE;
-      throw error;
+      throw e;
     }
   });
 }
