@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import ProjectNav from '../../components/project/ProjectNav';
-import { clickStartProject } from '../../actions/index';
+import { clickStartProject, clickStopProject, clickRestartProject } from '../../actions/index';
 
 function mapStateToProps(state) {
   return state;
@@ -9,6 +9,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch, ownProps) {
   return {
     clickStartProject: () => dispatch(clickStartProject(ownProps.params.projectName)),
+    clickStopProject: () => dispatch(clickStopProject(ownProps.params.projectName)),
+    clickRestartProject: () => dispatch(clickRestartProject(ownProps.params.projectName)),
   };
 }
 

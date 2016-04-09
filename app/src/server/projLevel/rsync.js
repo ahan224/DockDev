@@ -71,24 +71,6 @@ export const createRsyncArgs = (source, dest, machineInfo) =>
   `-aWOl --inplace --rsh="ssh -i ${machineInfo.SSHKeyPath} -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" --delete ${source} docker@${machineInfo.IPAddress}:${dest}`;
 
 /**
- * getServerCont() returns the containerId for the container where sync is turned on
- * based on the passed in project object
- *
- * @param {Object} projObj
- * @return {String} result
- */
-export function getServerCont(projObj) {
-  let result;
-  for (const container in projObj.containers) {
-    if (projObj.containers[container].server) {
-      result = projObj.containers[container].dockerId;
-      break;
-    }
-  }
-  return result;
-}
-
-/**
  * ThrottleSync() ensures that the rsync function will run by
  * perventing multiple calls to rsync which will crash the app
  *
@@ -101,7 +83,7 @@ export function ThrottleSync(func, delay) {
   this.delay = delay;
   this.start = function() {
     if (this.last) clearTimeout(this.last);
-    this.last = setTimeout(this.func, this.delay);
+    this.last = setTimeout(this.func.bind(this), this.delay);
   };
 }
 

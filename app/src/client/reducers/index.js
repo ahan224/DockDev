@@ -28,6 +28,10 @@ import {
   ERROR_SYNC_INFO,
   ERROR_SYNCING_PROJECT,
   ERROR_RESTARTING_PROJECT,
+  ERROR_STARTING_CONTAINERS,
+  ERROR_STOPPING_CONTAINERS,
+  ERROR_RESTARTING_CONTAINERS,
+  RESTARTED_PROJECT,
 } from '../actions';
 
 function config(state = { isFetching: false }, action) {
@@ -63,6 +67,10 @@ function alerts(state = [], action) {
     case ERROR_STOPPING_PROJECT:
     case STOPPED_PROJECT:
     case ERROR_RESTARTING_PROJECT:
+    case ERROR_STARTING_CONTAINERS:
+    case ERROR_STOPPING_CONTAINERS:
+    case RESTARTED_PROJECT:
+    case ERROR_RESTARTING_CONTAINERS:
       return [
         ...state,
         {
