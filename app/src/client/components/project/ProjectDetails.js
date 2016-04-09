@@ -8,7 +8,7 @@ const ProjectDetail = (props) => {
 
   const uuid = props.params.uuid;
   const proj = props.projects[uuid];
-console.log(proj);
+
   const start = () => props.startProject(uuid);
   const stop = () => props.stopProject(uuid);
   const restart = () => props.restartProject(uuid);

@@ -452,8 +452,11 @@ ul, li {
 }
 
 .deploy-button > .btn-primary  {
+  height: 32px;
+  line-height: 18px;
   padding-left: 38px;
   padding-right: 38px;
+  border-radius: 0!important;
 }
 
 .card-block p {
