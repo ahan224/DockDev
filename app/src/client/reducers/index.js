@@ -25,6 +25,9 @@ import {
   ERROR_STARTING_PROJECT,
   STOPPED_PROJECT,
   ERROR_STOPPING_PROJECT,
+  ERROR_SYNC_INFO,
+  ERROR_SYNCING_PROJECT,
+  ERROR_RESTARTING_PROJECT,
 } from '../actions';
 
 function config(state = { isFetching: false }, action) {
@@ -54,9 +57,12 @@ function alerts(state = [], action) {
     case ERROR_PULLING_IMAGE:
     case ERROR_CREATING_CONTAINER:
     case ERROR_DELETING_CONTAINER:
+    case ERROR_SYNC_INFO:
+    case ERROR_SYNCING_PROJECT:
     case ERROR_STARTING_PROJECT:
     case ERROR_STOPPING_PROJECT:
     case STOPPED_PROJECT:
+    case ERROR_RESTARTING_PROJECT:
       return [
         ...state,
         {
@@ -164,12 +170,12 @@ function activeProject(state = {}, action) {
     case START_PROJECT:
       return {
         project: action.project,
-        fileWatch: action.watching,
+        watcher: action.watcher,
       };
     case STOPPED_PROJECT:
       return {
         project: '',
-        fileWatch: '',
+        watcher: '',
       };
     default:
       return state;
