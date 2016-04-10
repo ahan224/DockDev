@@ -1,4 +1,13 @@
 import { createMachine } from '../dockerAPI/machine';
+import { coroutine as co } from 'bluebird';
+import { writeFile } from '../utils/utils';
+import * as rsync from './rsync';
+import { inspect } from '../dockerAPI/machine';
+import defaultConfig from '../appLevel/defaultConfig';
+import {
+  FAILED_TO_CREATE_DOCKERFILE,
+  FAILED_TO_SYNC_TO_REMOTE,
+} from '../appLevel/errorMsgs';
 
 /**
  * createDroplet() returns a promise to create a droplet on DigitalOcean
@@ -17,8 +26,53 @@ export const createDroplet = (dropletName, token, ...args) =>
     dropletName
   );
 
-// export const createDockerFile = (serverContainer, )
+/**
+ * createDroplet() returns a promise to create a droplet on DigitalOcean
+ * based on the dropletName and token.  Optional arguments are accepted.
+ * See https://docs.docker.com/machine/drivers/digital-ocean/ for details.
+ *
+ * @param {String} dropletName
+ * @param {String} token
+ * @param {...String} options
+ * @return {} returns a promise to create a droplet on DigitalOcean
+ */
+export const createDockerFile = co(function *g(containers, basePath) {
+  try {
+    const server = containers.filter(cont => cont.server)[0];
+    const dockerFile =
+`From ${server.image}
+COPY . /app
+WORKDIR /app
+RUN ["npm", "install", "--production"]
+CMD ["npm", "start"]`;
+    yield writeFile(`${basePath}/Dockerfile`, dockerFile);
+    return true;
+  } catch (e) {
+    throw FAILED_TO_CREATE_DOCKERFILE;
+  }
+});
 
+/**
+ * createDroplet() returns a promise to create a droplet on DigitalOcean
+ * based on the dropletName and token.  Optional arguments are accepted.
+ * See https://docs.docker.com/machine/drivers/digital-ocean/ for details.
+ *
+ * @param {String} dropletName
+ * @param {String} token
+ * @param {...String} options
+ * @return {} returns a promise to create a droplet on DigitalOcean
+ */
+export const syncFilesToRemote = co(function *g(basePath, machineName) {
+  try {
+    const machineInfo = rsync.selectSSHandIP(yield inspect(machineName));
+    const remoteRsyncArgs =
+      rsync.createRemoteRsyncArgs(basePath, defaultConfig.remoteDest, machineInfo);
+    yield rsync.rsync(remoteRsyncArgs);
+    return true;
+  } catch (e) {
+    throw FAILED_TO_SYNC_TO_REMOTE;
+  }
+});
 
 // /**
 //  * getDbNames() returns the images and names of all the database in the project
@@ -64,9 +118,7 @@ export const createDroplet = (dropletName, token, ...args) =>
 //  */
 // const buildDockerFile = co(function *g() {
 //   // what if they deploy twice and it already exists??
-//   yield writeFile('../Dockerfile',
-//     "From node:latest\nCOPY . /app\nWORKDIR /app\nRUN ['npm', 'install']\nCMD ['npm', 'start']"
-//   );
+
 //   return true;
 // });
 //
