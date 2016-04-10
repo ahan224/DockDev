@@ -11,6 +11,7 @@ function mapDispatchToProps(dispatch, ownProps) {
     clickStartProject: () => dispatch(clickStartProject(ownProps.params.projectName)),
     clickStopProject: () => dispatch(clickStopProject(ownProps.params.projectName)),
     clickRestartProject: () => dispatch(clickRestartProject(ownProps.params.projectName)),
+    clickRemoveProject: () => dispatch(clickRestartProject(ownProps.params.projectName)),
   };
 }
 

@@ -4,8 +4,6 @@ import { Link } from 'react-router';
 const ProjectNav = (props) => {
   const projectName = props.params.projectName;
 
-  const remove = '';
-
   return (
     <div >
       <div className="proj-nav">
@@ -30,7 +28,7 @@ const ProjectNav = (props) => {
           </label>
           <label className="btn btn-primary">
             <input type="radio" name="options" id="option3" autoComplete="off" />
-              <img src="./client/images/png/arrows@2x.png" onClick={remove}></img>
+              <img src="./client/images/png/arrows@2x.png" onClick={props.clickRemoveProject}></img>
           </label>
         </div>
         <ul className="nav nav-inline">
@@ -58,6 +56,8 @@ ProjectNav.propTypes = {
   params: PropTypes.object.isRequired,
   clickStartProject: PropTypes.func.isRequired,
   clickStopProject: PropTypes.func.isRequired,
+  clickRestartProject: PropTypes.func.isRequired,
+  clickRemoveProject: PropTypes.func.isRequired,
 };
 
 export default ProjectNav;
