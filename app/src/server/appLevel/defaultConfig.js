@@ -44,6 +44,7 @@ const config = {
   workDir: '/app',
   port: 3000,
   serverCmd: ['npm', 'start'],
+  remoteDest: '/root',
 };
 
 export default config;

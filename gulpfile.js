@@ -20,7 +20,7 @@ function handleErrors() {
 gulp.task('default', ['server', 'react', 'main', 'css', 'images', 'html', 'bower', 'watch']);
 
 gulp.task('server', () => {
-  return gulp.src('./app/src/server/**/**')
+  return gulp.src('./app/src/server/**/*')
     .pipe(babel( {plugins: [
         'transform-es2015-modules-commonjs',
         'transform-es2015-shorthand-properties',
@@ -98,7 +98,7 @@ gulp.task('bower', () => {
 })
 
 gulp.task('watch', function() {
-  gulp.watch(['./app/src/server/**/*.js',], ['server']);
+  gulp.watch(['./app/src/server/**/*',], ['server']);
   gulp.watch('./app/src/main.js', ['main']);
   gulp.watch(['app/src/client/**/*.js'], ['react']);
   gulp.watch('./app/src/client/css/**/*', ['css']);

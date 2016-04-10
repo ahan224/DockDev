@@ -93,6 +93,13 @@ function alerts(state = [], action) {
   }
 }
 
+function remote(state = {}, action) {
+  switch (action.type) {
+    default:
+      return state;
+  }
+}
+
 function container(state = {}, action) {
   switch (action.type) {
     case ADDED_CONTAINER:

@@ -40,8 +40,7 @@ export const find = (array) => {
  */
 export const jsonStringifyPretty = (obj) => JSON.stringify(obj, null, 2);
 
-export const cleanName = (str) => str.split(' ').join('_');
-export const uncleanName = (str) => str.split('_').join(' ');
+export const cleanName = (str) => str.replace(/[\W_]+/g, '');
 
 export const projectsObjToArray = (obj) => {
   const result = [];
