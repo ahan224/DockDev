@@ -34,6 +34,9 @@ import {
   ERROR_STOPPING_CONTAINERS,
   ERROR_RESTARTING_CONTAINERS,
   RESTARTED_PROJECT,
+  ERROR_REMOVING_PROJECT,
+  ERROR_REMOVING_CONTAINERS,
+  REMOVED_PROJECT,
 } from '../actions';
 
 function config(state = { isFetching: false }, action) {
@@ -76,6 +79,7 @@ function alerts(state = [], action) {
     case ERROR_STOPPING_CONTAINERS:
     case RESTARTED_PROJECT:
     case ERROR_RESTARTING_CONTAINERS:
+    case ERROR_REMOVING_CONTAINERS:
       return [
         ...state,
         {
