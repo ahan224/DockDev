@@ -42,13 +42,25 @@ describe('deploy containers to test machine', () => {
         image: 'node',
       },
     ];
-    return deploy.createDockerFile(containers, projectPath)
+    return deploy.createDockerfile(containers, projectPath)
       .then(res => expect(res).to.be.true);
   });
 
 
   it('should sync files to remote machine', () =>
-    deploy.syncFilesToRemote(projectPath, 'TestSync2')
+    deploy.syncFilesToRemote(projectPath, 'test2', true)
       .then(res => expect(res).to.be.true)
   );
+
+  it('should build the image on the remote machine', function build(done) {
+    this.timeout(600000);
+    return deploy.buildServerImage('proj2', {
+      machine: 'test2',
+      counter: 0,
+    })
+    .then(res => {
+      done();
+      return expect(res).to.be.true;
+    });
+  });
 });

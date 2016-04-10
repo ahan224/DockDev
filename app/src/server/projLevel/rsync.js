@@ -68,7 +68,9 @@ export const selectSSHandIP = R.compose(
  * @return {String}
  */
 export const createRsyncArgs = (source, dest, machineInfo) =>
-  `-aWOl --inplace --rsh="ssh -i ${machineInfo.SSHKeyPath} -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" --delete ${source} docker@${machineInfo.IPAddress}:${dest}`;
+  `-aWOl --inplace --rsh="ssh -i ${machineInfo.SSHKeyPath} ` +
+  '-o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" ' +
+  `--delete ${source} docker@${machineInfo.IPAddress}:${dest}`;
 
 /**
  * createRemoteRsyncArgs() returns the string of arguments for rsync to run
@@ -79,8 +81,11 @@ export const createRsyncArgs = (source, dest, machineInfo) =>
  * @param {String} machineInfo
  * @return {String}
  */
-export const createRemoteRsyncArgs = (source, dest, machineInfo) =>
-  `-aWOl --inplace --rsh="ssh -i ${machineInfo.SSHKeyPath} -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" --delete --exclude 'node_modules' ${source} root@${machineInfo.IPAddress}:${dest}`;
+export const createRemoteRsyncArgs = (source, dest, machineInfo, local = false) =>
+  `-aWOl --inplace --rsh="ssh -i ${machineInfo.SSHKeyPath} ` +
+  '-o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" ' +
+  '--delete --exclude "node_modules/" ' +
+  `${source} ${local ? 'docker' : 'root'}@${machineInfo.IPAddress}:${dest}`;
 
 /**
  * ThrottleSync() ensures that the rsync function will run by
