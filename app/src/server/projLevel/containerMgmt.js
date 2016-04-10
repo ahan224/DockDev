@@ -111,7 +111,6 @@ const containerObj = (cleanName, imageObj) => ({
   server: imageObj.server,
   status: 'pending',
   machine: defaultConfig.machine,
-  version: '',
 });
 
 /**

@@ -1,4 +1,14 @@
 import { createMachine } from '../dockerAPI/machine';
+import { coroutine as co } from 'bluebird';
+import { writeFile } from '../utils/utils';
+import * as rsync from './rsync';
+import { inspect, ssh } from '../dockerAPI/machine';
+import defaultConfig from '../appLevel/defaultConfig';
+import {
+  FAILED_TO_CREATE_DOCKERFILE,
+  FAILED_TO_SYNC_TO_REMOTE,
+  FAILED_TO_BUILD_SERVER_IMAGE,
+} from '../appLevel/errorMsgs';
 
 /**
  * createDroplet() returns a promise to create a droplet on DigitalOcean
@@ -17,8 +27,53 @@ export const createDroplet = (dropletName, token, ...args) =>
     dropletName
   );
 
-// export const createDockerFile = (serverContainer, )
+/**
+ * createDockerfile() creates a Dockerfile in the project base path
+ *
+ * @param {Object} containers
+ * @param {String} basePath
+ * @return {} returns a promise that is either true or throws an error
+ */
+export const createDockerfile = co(function *g(containers, basePath) {
+  try {
+    const server = containers.filter(cont => cont.server)[0];
+    const dockerFile =
+      `From ${server.image}\n` +
+      'COPY . /app\n' +
+      'WORKDIR /app\n' +
+      'RUN ["npm", "install", "--production"]\n' +
+      'CMD ["npm", "start"]';
+    yield writeFile(`${basePath}/Dockerfile`, dockerFile);
+    return true;
+  } catch (e) {
+    throw FAILED_TO_CREATE_DOCKERFILE;
+  }
+});
 
+/**
+ * syncFilesToRemote() syncs the project directory to the remote machine
+ *
+ * @param {String} basePath
+ * @param {String} machineName
+ * @return {} returns a promise that is either true or throws an error
+ */
+export const syncFilesToRemote = co(function *g(basePath, machineName, local = false) {
+  const dest = local ? '/home/docker' : defaultConfig.remoteDest;
+  try {
+    const machineInfo = rsync.selectSSHandIP(yield inspect(machineName));
+    const remoteRsyncArgs =
+      rsync.createRsyncArgs(`${basePath}/*`, dest, machineInfo);
+    yield rsync.rsync(remoteRsyncArgs);
+    return true;
+  } catch (e) {
+    throw FAILED_TO_SYNC_TO_REMOTE;
+  }
+});
+
+export const buildServerImage = (cleanName, remoteObj) =>
+  ssh(remoteObj.machine, `docker build -t dockdev/${cleanName}:${remoteObj.counter} .`)
+    .then(() => true)
+    .catch(() => {throw FAILED_TO_BUILD_SERVER_IMAGE;});
 
 // /**
 //  * getDbNames() returns the images and names of all the database in the project
@@ -64,9 +119,7 @@ export const createDroplet = (dropletName, token, ...args) =>
 //  */
 // const buildDockerFile = co(function *g() {
 //   // what if they deploy twice and it already exists??
-//   yield writeFile('../Dockerfile',
-//     "From node:latest\nCOPY . /app\nWORKDIR /app\nRUN ['npm', 'install']\nCMD ['npm', 'start']"
-//   );
+
 //   return true;
 // });
 //
