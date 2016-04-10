@@ -44,6 +44,8 @@ export const ERROR_STARTING_CONTAINERS = 'ERROR_STARTING_CONTAINERS';
 export const ERROR_STOPPING_CONTAINERS = 'ERROR_STOPPING_CONTAINERS';
 export const ERROR_RESTARTING_CONTAINERS = 'ERROR_RESTARTING_CONTAINERS';
 export const RESTARTED_PROJECT = 'RESTARTED_PROJECT';
+export const ERROR_REMOVING_CONTAINERS = 'ERROR_REMOVING_CONTAINERS';
+export const REMOVED_PROJECT = 'REMOVED_PROJECT';
 
 export function redirectHome() {
   return dispatch => dispatch(push('/'));
@@ -412,7 +414,8 @@ function stopProject(projectName) {
 function stopContainers(project) {
   return dispatch => {
     const containerArray = project.containers.map(cont =>
-      docker.containerStop(cont.machine, cont.dockerId));
+      docker.containerStop(cont.machine, cont.dockerId))
+        .catch(console.log);
     Promise.all(containerArray)
       .then(() => dispatch(stopProject(project.projectName)))
       .catch(err => dispatch(stopContainersError(err, project.projectName)));
@@ -422,9 +425,9 @@ function stopContainers(project) {
 export function clickStopProject(cleanName) {
   return (dispatch, getState) => {
     const { activeProject } = getState();
-    if (activeProject.project.projectName !== cleanName) {
+    if (activeProject.project.cleanName !== cleanName) {
       const error =
-        `Couldn't stop ${cleanName}, ${activeProject.project.projectName} is active`;
+        `Couldn't stop ${cleanName}, ${activeProject.project.cleanName} is active`;
       return dispatch(stopProjectError(error, cleanName));
     }
     activeProject.watcher.close();
@@ -446,7 +449,7 @@ function restartContainersError(err, projectName) {
   );
 }
 
-function restartProject(err, projectName) {
+function restartProject(projectName) {
   return createMessage(
     RESTARTED_PROJECT,
     `${projectName} was restarted`
@@ -466,9 +469,9 @@ function restartContainers(project) {
 export function clickRestartProject(cleanName) {
   return (dispatch, getState) => {
     const { activeProject } = getState();
-    if (activeProject.project.projectName !== cleanName) {
+    if (activeProject.project.cleanName !== cleanName) {
       const error =
-        `Couldn't restart ${cleanName}, ${activeProject.project.projectName} is active`;
+        `Couldn't restart ${cleanName}, ${activeProject.project.cleanName} is active`;
       return dispatch(restartProjectError(error, cleanName));
     }
     activeProject.watcher.close();
@@ -476,15 +479,38 @@ export function clickRestartProject(cleanName) {
   };
 }
 
-export function clickReMoveProject(cleanName) {
+function removeContainersError(err, projectName) {
+  return createMessage(
+    ERROR_REMOVING_CONTAINERS,
+    `There was an error removing containers for ${projectName}, err = ${err}`
+  );
+}
+
+function removeProject(projectName) {
+  return createMessage(
+    REMOVED_PROJECT,
+    `${projectName} was removed`
+  );
+}
+
+function removeContainers(project) {
+  return dispatch => {
+    const containerArray = project.containers.map(cont =>
+      docker.containerRemove(cont.machine, cont.dockerId));
+    Promise.all(containerArray)
+      .then(() => dispatch(removeProject(project.projectName)))
+      .catch(err => dispatch(removeContainersError(err, project.projectName)));
+  };
+}
+
+export function clickRemoveProject(cleanName) {
   return (dispatch, getState) => {
     const { activeProject } = getState();
-    if (activeProject.project.projectName !== cleanName) {
-      const error =
-        `Couldn't stop ${cleanName}, ${activeProject.project.projectName} is active`;
-      return dispatch(stopProjectError(error, cleanName));
+    if (activeProject.project.cleanName === cleanName) {
+      activeProject.watcher.close();
+      dispatch(removeActive(cleanName));
     }
-    return dispatch(stopProject(activeProject.project.projectName));
+    return dispatch(removeContainers(cleanName));
   };
 }
 
