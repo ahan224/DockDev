@@ -71,6 +71,18 @@ export const createRsyncArgs = (source, dest, machineInfo) =>
   `-aWOl --inplace --rsh="ssh -i ${machineInfo.SSHKeyPath} -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" --delete ${source} docker@${machineInfo.IPAddress}:${dest}`;
 
 /**
+ * createRemoteRsyncArgs() returns the string of arguments for rsync to run
+ * based on the passed in source, destination, and machine information
+ *
+ * @param {String} source
+ * @param {String} dest
+ * @param {String} machineInfo
+ * @return {String}
+ */
+export const createRemoteRsyncArgs = (source, dest, machineInfo) =>
+  `-aWOl --inplace --rsh="ssh -i ${machineInfo.SSHKeyPath} -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" --delete --exclude 'node_modules' ${source} root@${machineInfo.IPAddress}:${dest}`;
+
+/**
  * ThrottleSync() ensures that the rsync function will run by
  * perventing multiple calls to rsync which will crash the app
  *
@@ -86,29 +98,3 @@ export function ThrottleSync(func, delay) {
     this.last = setTimeout(this.func.bind(this), this.delay);
   };
 }
-
-// /**
-//  * generateRsync() returns a promise to run the rsync terminal command
-//  * initially, it calls a helper function which gathers the arguments for rsync
-//  * it then runs the rsync terminal command with the given arguments
-//  * based on the passed in project object
-//  *
-//  * @param {Object} projObj
-//  * @return {} returns a promise to run the rsync terminal command
-//  */
-// export function generateRsync(projObj, destMachine) {
-//   const getArgs = co(function *g() {
-//     const machineInfo = selectSSHandIP(yield machine.inspect(projObj[destMachine]));
-//     const targetContainerId = getServerCont(projObj);
-//     const dest = projObj.containers[targetContainerId].dest;
-//     const cleanPath = cleanFilePath(projObj.basePath);
-//
-//     return createRsyncArgs(`${cleanPath}/`, dest, machineInfo);
-//   });
-//
-//   const args = getArgs();
-//
-//   return co(function *g() {
-//     return yield rsync(yield args);
-//   });
-// }

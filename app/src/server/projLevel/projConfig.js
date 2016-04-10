@@ -28,7 +28,12 @@ export const createProj = (basePath, projectName) => ({
   basePath,
   containers: [],
   machine: defaultConfig.machine,
-  remoteMachine: '',
+  remote: {
+    machine: '',
+    containers: [],
+    ipAddress: '',
+    counter: 0,
+  },
 });
 
 /**
