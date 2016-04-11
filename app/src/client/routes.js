@@ -14,8 +14,8 @@ import Settings from './containers/app/Settings';
 import Notifications from './components/app/Notifications';
 
 export default (
+  <div>
   <Route path="/" component={App} >
-    <Route path="/init" component={Init} />
     <IndexRoute component={Home} />
     <Route path="/addProject" component={AddProject} />
     <Route path="/settings" component={Settings} />
@@ -26,6 +26,8 @@ export default (
       <Route path="/projects/:projectName/deploy" component={ProjectDeploy} />
     </Route>
   </Route>
+  <Route path="/init/:id" component={Init} />
+  </div>
 );
 
 //
