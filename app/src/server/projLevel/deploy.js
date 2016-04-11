@@ -209,8 +209,8 @@ export const remoteServerObj = (remoteObj) => ({
   machine: remoteObj.machine,
 });
 
-const getRemoteConfig = (container, remoteObj) => {
-  if (container.server) return setRemoteServerParams(remoteObj);
+const getRemoteConfig = (container) => {
+  if (container.server) return setRemoteServerParams(container);
   if (container.nginx) return setProxyParams(container);
   return setRemoteDbs(container);
 };
