@@ -69,7 +69,7 @@ export const setProxyParams = (container) => ({
   name: container.name,
   HostConfig: {
     Binds: ['/var/run/docker.sock:/tmp/docker.sock:ro'],
-    PortBindings: { ['80/tcp']: [{ HostPort: 80 }] },
+    PortBindings: { ['80/tcp']: [{ HostPort: '80' }] },
   },
   ExposedPorts: {
     ['80/tcp']: {},
