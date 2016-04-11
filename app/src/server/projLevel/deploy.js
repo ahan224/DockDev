@@ -1,3 +1,4 @@
+import { join } from 'path';
 import { createMachine } from '../dockerAPI/machine';
 import { coroutine as co } from 'bluebird';
 import { writeFile } from '../utils/utils';
@@ -58,17 +59,24 @@ export const createDockerfile = co(function *g(containers, basePath) {
  * @return {} returns a promise that is either true or throws an error
  */
 export const syncFilesToRemote = co(function *g(basePath, machineName, local = false) {
+  const cleanPath = rsync.cleanFilePath(basePath);
   const dest = local ? '/home/docker' : defaultConfig.remoteDest;
   try {
     const machineInfo = rsync.selectSSHandIP(yield inspect(machineName));
     const remoteRsyncArgs =
-      rsync.createRsyncArgs(`${basePath}/*`, dest, machineInfo);
+      rsync.createRemoteRsyncArgs(`${cleanPath}/*`, dest, machineInfo, local);
     yield rsync.rsync(remoteRsyncArgs);
     return true;
   } catch (e) {
     throw FAILED_TO_SYNC_TO_REMOTE;
   }
 });
+
+const basePath = join(__dirname, '..', '..', '..', '..', 'example-deploy', 'deploy');
+
+syncFilesToRemote(basePath, 'test2', true)
+  .then(val => console.log(val))
+  .catch(err => console.log(err));
 
 export const buildServerImage = (cleanName, remoteObj) =>
   ssh(remoteObj.machine, `docker build -t dockdev/${cleanName}:${remoteObj.counter} .`)

@@ -34,7 +34,6 @@ const config = {
   // projects config
   projFolder: '.dockdev',
   projFile: 'dockdev.json',
-  projWriteParams: ['cleanName', 'projectName', 'containers', 'machine', 'remoteMachine'],
   projPath() {
     return join(this.projFolder, this.projFile);
   },
