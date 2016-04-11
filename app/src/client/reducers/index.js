@@ -168,7 +168,7 @@ function projects(state = {}, action) {
         [action.containerObj.cleanName]: project(state[action.containerObj.cleanName], action),
       };
     case REMOVED_PROJECT: {
-      const newProj = { ...state.projects };
+      const newProj = { ...state };
       delete newProj[action.project.cleanName];
       return {
         ...newProj,
