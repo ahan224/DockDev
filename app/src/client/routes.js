@@ -11,12 +11,14 @@ import ProjectNavPage from './containers/project/ProjectNavPage';
 import AddContainerPage from './containers/project/AddContainerPage';
 // import Init from './components/app/Init';
 import Settings from './containers/app/Settings';
+import Notifications from './components/app/Notifications';
 
 export default (
   <Route path="/" component={App} >
     <IndexRoute component={Home} />
     <Route path="/addProject" component={AddProject} />
     <Route path="/settings" component={Settings} />
+    <Route path="/notifications" component={Notifications} />
     <Route path="/projects/:projectName" component={ProjectNavPage} >
       <IndexRoute component={ProjectDetails} />
       <Route path="/projects/:projectName/container" component={AddContainerPage} />
