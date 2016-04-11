@@ -4,6 +4,7 @@ import chokidar from 'chokidar';
 import Promise from 'bluebird';
 import {
   appConfig,
+  defaultConfig,
   projConfig,
   availableImages,
   containerMgmt,
@@ -46,6 +47,7 @@ export const ERROR_RESTARTING_CONTAINERS = 'ERROR_RESTARTING_CONTAINERS';
 export const RESTARTED_PROJECT = 'RESTARTED_PROJECT';
 export const ERROR_REMOVING_CONTAINERS = 'ERROR_REMOVING_CONTAINERS';
 export const REMOVED_PROJECT = 'REMOVED_PROJECT';
+export const MACHINE_RESTARTING = 'MACHINE_RESTARTING';
 
 export function redirectHome() {
   return dispatch => dispatch(push('/'));
@@ -61,6 +63,53 @@ function createMessage(type, message) {
     message,
     time: moment(),
     timestamp: moment().format('MM-D-YYYY, h:mm:ss a'),
+  };
+}
+
+// function machineRestarting() {
+//   return createMessage(
+//     MACHINE_RESTARTING,
+//     `${defaultConfig.machine} is restarting`
+//   );
+// }
+
+function checkDockDevMachine() {
+  return dispatch => {
+    const machineList = machine.list();
+    return machineList.then(list => {
+      if (list.indexOf(defaultConfig.machine) === -1) {
+        machine.createVirtualBox(defaultConfig.machine);
+        dispatch(redirect('init'));
+      }
+      // else {
+        // it doesn't like the regenCerts command here
+        // machine.regenCerts(defaultConfig.machine);
+
+        // this makes it hard for me to use the app at first but it works
+        // machine.restart(defaultConfig.machine);
+        // dispatch(machineRestarting());
+      // }
+    });
+  };
+}
+
+function checkDocker() {
+  return dispatch => {
+    appConfig.checkDockerInstall()
+      .then(res => {
+        if (!res) return dispatch(redirect('init'));
+        return dispatch(checkDockDevMachine());
+      });
+  };
+}
+
+export function appInitiation() {
+  return dispatch => {
+    appConfig.checkDockerMachineInstalled()
+      .then(res => {
+        if (!res) return dispatch(redirect('init'));
+        return dispatch(checkDocker());
+      });
   };
 }
 
@@ -420,11 +469,11 @@ function stopContainers(project, del) {
         })
       );
     Promise.all(containerArray)
-      .then(() => dispatch(stopProject(project.cleanName)))
+      .then(() => dispatch(stopProject(project.projectName)))
       .then(() => {
         if (del) dispatch(clickRemoveProject(project.cleanName));
       })
-      .catch(err => dispatch(stopContainersError(err, project.cleanName)));
+      .catch(err => dispatch(stopContainersError(err, project.projectName)));
   };
 }
 
@@ -508,7 +557,7 @@ function removeContainers(cleanName) {
     Promise.all(containerArray)
       .then(() => projConfig.undoInitProject(project))
       .then(() => dispatch(removeProject(project)))
-      .catch(err => dispatch(removeContainersError(err)));
+      .catch(err => dispatch(removeContainersError(err, project.projectName)));
   };
 }
 

@@ -9,12 +9,13 @@ import ProjectDetails from './containers/project/ProjectDetails';
 import ProjectDeploy from './components/project/ProjectDeploy';
 import ProjectNavPage from './containers/project/ProjectNavPage';
 import AddContainerPage from './containers/project/AddContainerPage';
-// import Init from './components/app/Init';
+import Init from './components/app/Init';
 import Settings from './containers/app/Settings';
 import Notifications from './components/app/Notifications';
 
 export default (
   <Route path="/" component={App} >
+    <Route path="/init" component={Init} />
     <IndexRoute component={Home} />
     <Route path="/addProject" component={AddProject} />
     <Route path="/settings" component={Settings} />
@@ -27,7 +28,6 @@ export default (
   </Route>
 );
 
-// <Route path="/init/:id" component={Init} />
 //
 //   <Route path="/projects/:projectName/settings" component={ProjectSettings} />
 //
