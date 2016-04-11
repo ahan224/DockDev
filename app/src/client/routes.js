@@ -6,7 +6,7 @@ import Home from './components/app/Home';
 import AddProject from './containers/app/AddProject';
 import ProjectDetails from './containers/project/ProjectDetails';
 // import ProjectSettings from './components/project/ProjectSettings';
-import ProjectDeploy from './components/project/ProjectDeploy';
+import ProjectDeploy from './containers/project/ProjectDeploy';
 import ProjectNavPage from './containers/project/ProjectNavPage';
 import AddContainerPage from './containers/project/AddContainerPage';
 import Init from './components/app/Init';

@@ -28,12 +28,7 @@ export const createProj = (basePath, projectName) => ({
   basePath,
   containers: [],
   machine: defaultConfig.machine,
-  remote: {
-    machine: '',
-    containers: [],
-    ipAddress: '',
-    counter: 0,
-  },
+  remote: {},
 });
 
 /**
@@ -140,6 +135,19 @@ export const writeContainer = co(function *g(container, path, action) {
     }
   }
 
+  return yield writeProj(projObj);
+});
+
+/**
+ * writeRemote() adds the specified container to the dockdev.json file for the project
+ *
+ * @param {Object} remoteObj
+ * @param {String} path
+ * @return {} writes (or overwrites) the project file (dockdev.json)
+ */
+export const writeRemote = co(function *g(remoteObj, path) {
+  const projObj = yield loadProject(path);
+  projObj.remote = remoteObj;
   return yield writeProj(projObj);
 });
 
