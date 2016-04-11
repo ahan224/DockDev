@@ -1,5 +1,6 @@
 import R from 'ramda';
 import { exec } from '../utils/utils';
+import { join } from 'path';
 
 /**
 * cleanFilePath() accepts a string file path and returns a string file path with any
@@ -84,8 +85,8 @@ export const createRsyncArgs = (source, dest, machineInfo) =>
 export const createRemoteRsyncArgs = (source, dest, machineInfo, local = false) =>
   `-aWOl --inplace --rsh="ssh -i ${machineInfo.SSHKeyPath} ` +
   '-o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" ' +
-  '--delete --exclude "node_modules/" ' +
-  `${source} ${local ? 'docker' : 'root'}@${machineInfo.IPAddress}:${dest}`;
+  '--exclude=node_modules ' +
+  `--delete ${source} ${local ? 'docker' : 'root'}@${machineInfo.IPAddress}:${dest}`;
 
 /**
  * ThrottleSync() ensures that the rsync function will run by

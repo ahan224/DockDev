@@ -215,7 +215,7 @@ export const removeProjFromConfig = co(function *g(projObj) {
  * @param {Object} projObj
  * @return {} if reversal is successful it will return true, else throw specific error
  */
-const undoInitProject = co(function *g(projObj) {
+export const undoInitProject = co(function *g(projObj) {
   yield removeProjFromConfig(projObj);
   yield utils.rimrafProm(join(projObj.basePath, defaultConfig.projFolder));
   yield deleteProjectNetwork(projObj, true);

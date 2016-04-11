@@ -365,7 +365,7 @@ function fileWatching(project, syncArgs) {
 function rsyncProj(project) {
   return dispatch => {
     const basePath = rsync.cleanFilePath(project.basePath);
-    const server = project.containers.filter(cont => cont.server);
+    const server = project.containers.filter(cont => cont.server)[0];
     const destPath = server.dest;
     return machine.inspect(project.machine)
       .then(rsync.selectSSHandIP)
@@ -424,7 +424,7 @@ function stopContainers(project, del) {
       .then(() => {
         if (del) dispatch(clickRemoveProject(project.cleanName));
       })
-      .catch(err  => dispatch(stopContainersError(err, project.cleanName)));
+      .catch(err => dispatch(stopContainersError(err, project.cleanName)));
   };
 }
 
@@ -506,8 +506,9 @@ function removeContainers(cleanName) {
     const containerArray = project.containers.map(cont =>
       docker.containerRemove(cont.machine, cont.dockerId));
     Promise.all(containerArray)
-      .then(() => dispatch(removeProject(project.projectName)))
-      .catch(err => dispatch(removeContainersError(err, project.projectName)));
+      .then(() => projConfig.undoInitProject(project))
+      .then(() => dispatch(removeProject(project)))
+      .catch(err => dispatch(removeContainersError(err)));
   };
 }
 
