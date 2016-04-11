@@ -2,36 +2,54 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { redirect } from '../../actions/index';
 
-const TopNav = ({ settings }) => (
-  <div className="content-top-nav">
-   <div className="btn-group top-nav-btn-group" data-toggle="buttons">
-     <label className="btn btn-primary active">
-      <input type="radio" name="options" id="option1" autoComplete="off"></input>
-        <img src="./client/images/png/music@2x.png"></img>
-     </label>
-     <label className="btn btn-primary">
-       <input type="radio" name="options" id="option2" autoComplete="off"></input>
-         <img src="./client/images/png/power@2x.png"></img>
-     </label>
-     <label className="btn btn-primary" onClick={settings}>
-       <input type="radio" name="options" id="option3" autoComplete="off"></input>
-         <img src="./client/images/png/tool@2x.png"></img>
-     </label>
-   </div>
-  </div>
-);
+const TopNav = ({ clickSettings, active, activeProject, projectName }) => {
+  let clickActive = () => active('');
+  if (activeProject.project) {
+    clickActive = () => active('projects', activeProject.project.cleanName);
+  }
 
-TopNav.propTypes = {
-  settings: PropTypes.func.isRequired,
+  return (
+    <div className="content-top-nav">
+    {projectName}
+     <div className="btn-group top-nav-btn-group" data-toggle="buttons">
+
+       <label className="btn btn-primary active">
+        <input type="radio" name="options" id="option1" autoComplete="off"></input>
+          <img src="./client/images/png/sound.png"></img>
+       </label>
+
+       <label className="btn btn-primary" onClick={clickActive}>
+         <input type="radio" name="options" id="option2" autoComplete="off"></input>
+           <img src="./client/images/png/circle.png"></img>
+       </label>
+
+       <label className="btn btn-primary" onClick={clickSettings}>
+         <input type="radio" name="options" id="option3" autoComplete="off"></input>
+           <img src="./client/images/png/gear.png"></img>
+       </label>
+     </div>
+    </div>
+  );
 };
 
-function mapStateToProps(state) {
-  return state;
+TopNav.propTypes = {
+  clickSettings: PropTypes.func.isRequired,
+  active: PropTypes.func.isRequired,
+  activeProject: PropTypes.object.isRequired,
+  projectName: PropTypes.string,
+};
+
+function mapStateToProps(state, ownProps) {
+  const { activeProject, projects } = state;
+  const proj = ownProps.params.projectName;
+  const projectName = proj ? projects[proj].projectName : '';
+  return { activeProject, projectName };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    settings: () => dispatch(redirect('settings')),
+    active: (...args) => dispatch(redirect(...args)),
+    clickSettings: () => dispatch(redirect('settings')),
   };
 }
 

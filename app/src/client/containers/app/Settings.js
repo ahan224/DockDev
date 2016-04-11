@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import { clickUpdateDOToken } from '../../actions/index';
 
 const Settings = ({ DOToken, updateToken }) => (
-  <div>
-    <div className="col-sm-8">
+  <div className="full-page">
+    <div className="settings-content">
       <h5>Root Path</h5>
       <div className="col-xs-12 form-input-spacing">
         <label className="file width-12">
