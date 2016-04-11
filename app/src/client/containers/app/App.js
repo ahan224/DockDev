@@ -26,15 +26,15 @@ class App extends Component {
               <img src="./client/images/png/addIcon@2x.png"></img>
             </NavLink>
           </li>
-          {<ProjectLinks projects={projects} />}
+          <ProjectLinks projects={projects} />
         </ul>
-          <div id="right-column">
-            <TopNav />
-            <div id="content">
-              {children}
-            </div>
+        <TopNav params={this.props.params} />
+        <div id="right-column">
+          <div id="content">
+            {children}
           </div>
         </div>
+      </div>
     );
   }
 }
@@ -48,6 +48,7 @@ App.propTypes = {
   children: PropTypes.object,
   projects: PropTypes.object,
   loadConfig: PropTypes.func.isRequired,
+  params: PropTypes.object,
 };
 
 export default connect(
