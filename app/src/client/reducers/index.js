@@ -37,6 +37,17 @@ import {
   ERROR_REMOVING_CONTAINERS,
   REMOVED_PROJECT,
   MACHINE_RESTARTING,
+  ADDING_REMOTE,
+  ADDED_REMOTE,
+  STARTED_SYNC_TO_REMOTE,
+  COMPLETED_SYNC_TO_REMOTE,
+  START_SERVER_IMAGE_BUILD,
+  COMPLETED_SERVER_IMAGE_BUILD,
+  PULLING_REMOTE_IMAGES,
+  PULLED_REMOTE_IMAGES,
+  CREATING_REMOTE_CONTAINERS,
+  CREATED_REMOTE_CONTAINERS,
+  STARTED_REMOTE_CONTAINERS,
 } from '../actions';
 
 function config(state = { isFetching: false }, action) {
@@ -81,6 +92,15 @@ function alerts(state = [], action) {
     case ERROR_RESTARTING_CONTAINERS:
     case ERROR_REMOVING_CONTAINERS:
     case MACHINE_RESTARTING:
+    case ADDING_REMOTE:
+    case STARTED_SYNC_TO_REMOTE:
+    case COMPLETED_SYNC_TO_REMOTE:
+    case START_SERVER_IMAGE_BUILD:
+    case COMPLETED_SERVER_IMAGE_BUILD:
+    case PULLING_REMOTE_IMAGES:
+    case PULLED_REMOTE_IMAGES:
+    case CREATING_REMOTE_CONTAINERS:
+    case CREATED_REMOTE_CONTAINERS:
       return [
         ...state,
         {
@@ -96,6 +116,26 @@ function alerts(state = [], action) {
 
 function remote(state = {}, action) {
   switch (action.type) {
+    case ADDED_REMOTE:
+      return {
+        ...action.remoteObj,
+      };
+    case COMPLETED_SYNC_TO_REMOTE:
+    case CREATING_REMOTE_CONTAINERS:
+    case CREATED_REMOTE_CONTAINERS:
+    case STARTED_REMOTE_CONTAINERS:
+      return {
+        ...state,
+        status: action.remoteObj.status,
+      };
+    case COMPLETED_SERVER_IMAGE_BUILD:
+    case PULLED_REMOTE_IMAGES:
+      return {
+        ...state,
+        status: action.remoteObj.status,
+        containers: [...action.remoteObj.containers],
+        counter: action.remoteObj.counter,
+      };
     default:
       return state;
   }
@@ -150,6 +190,17 @@ function project(state = {}, action) {
         ...state,
         containers: containers(state.containers, action),
       };
+    case ADDED_REMOTE:
+    case COMPLETED_SYNC_TO_REMOTE:
+    case COMPLETED_SERVER_IMAGE_BUILD:
+    case PULLED_REMOTE_IMAGES:
+    case CREATING_REMOTE_CONTAINERS:
+    case CREATED_REMOTE_CONTAINERS:
+    case STARTED_REMOTE_CONTAINERS:
+      return {
+        ...state,
+        remote: remote(state.remote, action),
+      };
     default:
       return state;
   }
@@ -175,6 +226,16 @@ function projects(state = {}, action) {
         ...newProj,
       };
     }
+    case ADDED_REMOTE:
+    case COMPLETED_SYNC_TO_REMOTE:
+    case COMPLETED_SERVER_IMAGE_BUILD:
+    case PULLED_REMOTE_IMAGES:
+    case CREATING_REMOTE_CONTAINERS:
+    case CREATED_REMOTE_CONTAINERS:
+    case STARTED_REMOTE_CONTAINERS:
+      return { ...state,
+        [action.remoteObj.cleanName]: project(state[action.remoteObj.cleanName], action),
+      };
     default:
       return state;
   }
