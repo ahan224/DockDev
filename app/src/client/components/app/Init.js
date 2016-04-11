@@ -1,7 +1,6 @@
 import React from 'react';
-import {Link} from 'react-router';
 
-const initPage = ({ params, context }) => (
+const InitPage = ({ }) => (
 
 <div className="loader-wrapper">
   <main>
@@ -13,15 +12,18 @@ const initPage = ({ params, context }) => (
 
       </aside>
       <aside className="aside aside-2-loader load-text">
-       ..Checking for Docker config files
+       There was a problem setting up our application on your Mac.
+       Please check to make sure that you have docker installed:
+       <a href="https://www.docker.com/products/docker-toolbox">Install Docker</a>
+       After installing docker, or if you already have Docker installed, Please
       </aside>
     </div>
   </main>
 </div>
 );
 
-initPage.propTypes = {
+InitPage.propTypes = {
   params: React.PropTypes.object,
 };
 
-export default initPage;
+export default InitPage;

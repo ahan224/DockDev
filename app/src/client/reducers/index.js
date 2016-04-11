@@ -34,9 +34,9 @@ import {
   ERROR_STOPPING_CONTAINERS,
   ERROR_RESTARTING_CONTAINERS,
   RESTARTED_PROJECT,
-  ERROR_REMOVING_PROJECT,
   ERROR_REMOVING_CONTAINERS,
   REMOVED_PROJECT,
+  MACHINE_RESTARTING,
 } from '../actions';
 
 function config(state = { isFetching: false }, action) {
@@ -80,6 +80,7 @@ function alerts(state = [], action) {
     case RESTARTED_PROJECT:
     case ERROR_RESTARTING_CONTAINERS:
     case ERROR_REMOVING_CONTAINERS:
+    case MACHINE_RESTARTING:
       return [
         ...state,
         {
@@ -168,7 +169,7 @@ function projects(state = {}, action) {
         [action.containerObj.cleanName]: project(state[action.containerObj.cleanName], action),
       };
     case REMOVED_PROJECT: {
-      const newProj = { ...state.projects };
+      const newProj = { ...state };
       delete newProj[action.project.cleanName];
       return {
         ...newProj,
