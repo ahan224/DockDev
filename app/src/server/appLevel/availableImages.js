@@ -16,9 +16,24 @@ const dbs = [
   'rethinkdb',
   'cassandra',
   'couchbase',
-  'busybox',
-  'blahablada',
 ];
+
+export const logo = {
+  redis: 'client/images/png/container-logos/redisdb.jpg',
+  mysql: 'client/images/png/container-logos/mysqldb.jpg',
+  mongo: 'client/images/png/container-logos/mongodb.jpg',
+  postgres: 'client/images/png/container-logos/postgresqldb.jpg',
+  elasticsearch: 'client/images/png/container-logos/elasticdb.jpg',
+  mariadb: 'client/images/png/container-logos/mariadb.jpg',
+  memcached: 'client/images/png/container-logos/memcachdb.jpg',
+  neo4j: 'client/images/png/container-logos/neo4jdb.jpg',
+  rethinkdb: 'client/images/png/container-logos/rethinkdb.jpg',
+  cassandra: 'client/images/png/container-logos/cassandradb.jpg',
+  couchbase: 'client/images/png/container-logos/couchbasedb.jpg',
+  node: 'client/images/png/container-logos/nodedb.jpg',
+  python: 'client/images/png/container-logos/pythondb.jpg',
+  go: 'client/images/png/container-logos/godb.jpg',
+};
 
 /**
 * @param {Object} ImageObj has the name of the image and it's available versions

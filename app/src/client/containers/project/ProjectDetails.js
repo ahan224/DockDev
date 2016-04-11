@@ -1,7 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Container from '../../components/assets/Container';
+import ServerDetails from '../../components/assets/ServerDetails';
 import { clickDelContainer } from '../../actions/index';
+import { availableImages } from './server/main';
+import NavLink from '../../components/assets/NavLink';
 
 const ProjectDetail = (props) => {
   const server = props.project.containers
@@ -9,10 +12,11 @@ const ProjectDetail = (props) => {
     .map(cont => {
       const onClick = () => props.clickDelContainer(cont);
       return (
-        <Container
+        <ServerDetails
           key={cont.name}
-          container={cont}
+          details={cont}
           onClick={onClick}
+          logo={availableImages.logo[cont.image]}
         />
       );
     });
@@ -24,8 +28,9 @@ const ProjectDetail = (props) => {
       return (
         <Container
           key={cont.name}
-          container={cont}
+          details={cont}
           onClick={onClick}
+          logo={availableImages.logo[cont.image]}
         />
       );
     });
@@ -35,6 +40,11 @@ const ProjectDetail = (props) => {
         <div className="row">
           <div className="col-xs-12" id="servers">
             <h5>Servers</h5>
+            <NavLink to={`/projects/${props.project.cleanName}/container`}
+              className="add-proj-wrapper add-proj-icon"
+            >
+            Add
+            </NavLink>
             <div className="divider"></div>
           </div>
           {server}

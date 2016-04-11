@@ -5,11 +5,11 @@
   "containers": [
     {
       "cleanName": "Example",
-      "image": "node",
-      "dockerId": "7ac05820a1a4d0599c07594e9a3b2e118e807522f36d7248d1902d2b735a9f21",
-      "name": "Example_node",
-      "dest": "/home/docker/tmp",
-      "server": true,
+      "image": "mongo",
+      "dockerId": "47dd668f3c496714be0044c756c3b6302415f3abf828a434a2fb5206e01a8a70",
+      "name": "Example_mongo",
+      "dest": "",
+      "server": false,
       "status": "complete",
       "machine": "dockdev"
     }

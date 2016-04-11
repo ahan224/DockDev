@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import DockerImage from '../assets/DockerImage';
+import { availableImages as images } from './server/main';
 
 class AddContainer extends Component {
   componentDidMount() {
@@ -13,8 +14,8 @@ class AddContainer extends Component {
       .map((image, idx) => {
         const style = {};
         if (image.selected) {
-          style.color = 'white';
-          style.backgroundColor = '#286090';
+          style.color = '';
+          style.backgroundColor = 'black';
           style.borderRadius = '6px';
           style.borderColor = '#286090';
         }
@@ -22,7 +23,7 @@ class AddContainer extends Component {
 
         return (
           <DockerImage key={idx} style={style} className="col-xs-6"
-            name={image.name} handler={onClick}
+            handler={onClick} logo={images.logo[image.name]}
           />
         );
       });
@@ -40,7 +41,7 @@ class AddContainer extends Component {
 
         return (
           <DockerImage key={idx} style={style} className="col-xs-6"
-            name={image.name} handler={onClick}
+            handler={onClick} logo={images.logo[image.name]}
           />
         );
       });
@@ -52,21 +53,17 @@ class AddContainer extends Component {
               Add Container
             </h5>
           </div>
-          <div className="col-xs-12" >
+          <div className="col-xs-12">
             <h5>Servers</h5>
-            <button className="btn btn-sm btn-primary-outline container-save"
-              onClick={clickAdd}
-            >
+            <button className="btn btn-sm btn-primary-outline container-save" onClick={clickAdd}>
               Save
             </button>
-            <div className="divider"></div>
-              {servers}
           </div>
+          {servers}
           <div className="col-xs-12" id="databases">
             <h5>Databases</h5>
-            <div className="divider"></div>
-              {dbs}
           </div>
+          {dbs}
       </div>
     );
   }
