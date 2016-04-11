@@ -432,7 +432,7 @@ function rsyncProj(project) {
       .then(rsync.selectSSHandIP)
       .then(machineInfo =>
         dispatch(
-          fileWatching(project, rsync.createRsyncArgs(`${basePath}/`, destPath, machineInfo)))
+          fileWatching(project, rsync.createRsyncArgs(`${basePath}/*`, destPath, machineInfo)))
         )
       .catch(err => dispatch(rsyncInfoError(err, project)));
   };
@@ -640,7 +640,11 @@ function createRemoteContainers(remoteObj) {
     const containerArray = remoteObj.containers.map(cont =>
       deploy.createRemoteContainer(cont, remoteObj));
     Promise.all(containerArray)
-      .then(() => dispatch(startingRemoteContainers({ ...remoteObj, status: 5 })));
+      .then(res => dispatch(startingRemoteContainers({
+        ...remoteObj,
+        containers: [...res],
+        status: 5,
+      })));
   };
 }
 

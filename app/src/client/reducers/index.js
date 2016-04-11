@@ -122,7 +122,6 @@ function remote(state = {}, action) {
       };
     case COMPLETED_SYNC_TO_REMOTE:
     case CREATING_REMOTE_CONTAINERS:
-    case CREATED_REMOTE_CONTAINERS:
     case STARTED_REMOTE_CONTAINERS:
       return {
         ...state,
@@ -130,6 +129,7 @@ function remote(state = {}, action) {
       };
     case COMPLETED_SERVER_IMAGE_BUILD:
     case PULLED_REMOTE_IMAGES:
+    case CREATED_REMOTE_CONTAINERS:
       return {
         ...state,
         status: action.remoteObj.status,
