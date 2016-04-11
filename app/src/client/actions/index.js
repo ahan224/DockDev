@@ -640,7 +640,11 @@ function createRemoteContainers(remoteObj) {
     const containerArray = remoteObj.containers.map(cont =>
       deploy.createRemoteContainer(cont, remoteObj));
     Promise.all(containerArray)
-      .then(() => dispatch(startingRemoteContainers({ ...remoteObj, status: 5 })));
+      .then(res => dispatch(startingRemoteContainers({
+        ...remoteObj,
+        containers: [...res],
+        status: 5,
+      })));
   };
 }
 
