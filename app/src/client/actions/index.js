@@ -57,7 +57,7 @@ export const PULLING_REMOTE_IMAGES = 'PULLING_REMOTE_IMAGES';
 export const PULLED_REMOTE_IMAGES = 'PULLED_REMOTE_IMAGES';
 export const CREATING_REMOTE_CONTAINERS = 'CREATING_REMOTE_CONTAINERS';
 export const CREATED_REMOTE_CONTAINERS = 'CREATED_REMOTE_CONTAINERS';
-export const ADD_NGINX_CONTAINER = 'ADD_NGINX_CONTAINER';
+export const STARTED_REMOTE_CONTAINERS = 'STARTED_REMOTE_CONTAINERS';
 
 export function redirectHome() {
   return dispatch => dispatch(push('/'));
@@ -555,14 +555,44 @@ export function clickUpdateDOToken(token) {
       .catch(err => dispatch(updateDOTokenError(err)));
 }
 
+function startedRemoteContainers(remoteObj) {
+  return {
+    type: STARTED_REMOTE_CONTAINERS,
+    remoteObj,
+  };
+}
+
+function startingRemoteContainers(remoteObj) {
+  return dispatch => {
+    dispatch(
+      { ...createMessage(
+        CREATED_REMOTE_CONTAINERS,
+        `Created remote containers for ${remoteObj.cleanName}`
+        ),
+        remoteObj,
+      }
+    );
+    const containerArray = remoteObj.containers.map(cont =>
+      docker.containerStart(cont.machine, cont.dockerId));
+    Promise.all(containerArray)
+      .then(dispatch(startedRemoteContainers({ ...remoteObj, status: 6 })));
+  };
+}
+
 function createRemoteContainers(remoteObj) {
   return dispatch => {
     dispatch(
       { ...createMessage(
-
-      )}
-    )
-  }
+        CREATING_REMOTE_CONTAINERS,
+        `Creating remote containers for ${remoteObj.cleanName}`
+        ),
+        remoteObj,
+      });
+    const containerArray = remoteObj.containers.map(cont =>
+      deploy.createRemoteContainer(cont, remoteObj));
+    Promise.all(containerArray)
+      .then(() => dispatch(startingRemoteContainers({ ...remoteObj, status: 5 })));
+  };
 }
 
 function pulledRemoteImages(remoteObj) {
@@ -592,13 +622,18 @@ function completedServerImageBuild(remoteObj) {
       `Started pulling images on remote machine for ${remoteObj.cleanName}`
     ));
     const project = getState().projects[remoteObj.cleanName];
-    const dbs = project.containers.filter(cont => !cont.server);
-    const pullDbs = dbs.map(cont => docker.pullImage(cont.image));
+    const dbs =
+      deploy.addNginxContainer(project.containers.filter(cont => !cont.server), remoteObj);
+    const pullDbs = dbs.map(cont => docker.pullImage(remoteObj.machine, cont.image));
     Promise.all(pullDbs)
       .then(() => {
-        const newRemoteObj = { ...remoteObj, containers: [...dbs], status: 3 };
-        projConfig.writeRemote(newRemoteObj, project.basePath);
-        dispatch(pulledRemoteImages(newRemoteObj));
+        const newRemoteObj = {
+          ...remoteObj,
+          containers: [...remoteObj.containers, ...dbs],
+          status: 3,
+        };
+        projConfig.writeRemote(newRemoteObj, project.basePath)
+          .then(() => dispatch(pulledRemoteImages(newRemoteObj)));
       });
   };
 }
@@ -615,7 +650,13 @@ function startServerImageBuild(remoteObj, isPush = false) {
     ));
     return deploy.buildServerImage(remoteObj)
       .then(() => {
-        const newRemoteObj = { ...remoteObj, counter: remoteObj.counter + 1, status: 2 };
+        const serverObj = deploy.remoteServerObj(remoteObj);
+        const newRemoteObj = {
+          ...remoteObj,
+          containers: [serverObj],
+          counter: remoteObj.counter + 1,
+          status: 2,
+        };
         if (isPush) return dispatch(completedPushImageBuild(remoteObj));
         return dispatch(completedServerImageBuild(newRemoteObj));
       });
@@ -641,7 +682,7 @@ function syncingToRemote(remoteObj, isPush = false) {
       STARTED_SYNC_TO_REMOTE,
       `Started syncing ${remoteObj.cleanName}`
     ));
-    return deploy.syncingToRemote(remoteObj.path, remoteObj.machine)
+    return deploy.syncFilesToRemote(remoteObj)
       .then(() => dispatch(syncedToRemote({ ...remoteObj, status: 1 }, isPush)));
   };
 }
