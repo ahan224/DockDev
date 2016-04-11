@@ -83,6 +83,16 @@ export const createProjectNetwork = (projObj) =>
     .then(() => true);
 
 /**
+ * createRemoteNetwork() creates a new network for the project
+ *
+ * @param {Object} projObj
+ * @return {Promise} returns true or throws an error if unable to create the network
+ */
+export const createRemoteNetwork = (remoteObj) =>
+  networkCreate(remoteObj.machine, setNetworkParams(remoteObj.cleanName))
+    .then(() => true);
+
+/**
  * deleteProjectNetwork() creates a new network for the project
  *
  * @param {Object} projObj
@@ -102,7 +112,7 @@ export const deleteProjectNetwork = (projObj, ignoreErrors) =>
  * @param {Object} imageObj
  * @return {Object} returns a baseline container object
  */
-const containerObj = (cleanName, imageObj) => ({
+export const containerObj = (cleanName, imageObj) => ({
   cleanName,
   image: imageObj.name,
   dockerId: '',
