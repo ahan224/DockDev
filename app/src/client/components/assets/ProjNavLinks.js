@@ -1,7 +1,9 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
+import { connect } from 'react-redux';
+import { clickRemoveProject } from '../../actions/index';
 
-const ProjNavLinks = ({ cleanName }) => (
+const ProjNavLinks = ({ cleanName, remove }) => (
   <div className="btn-group">
     <button type="button" className="btn btn-info-outline dropdown-toggle"
       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
@@ -21,13 +23,28 @@ const ProjNavLinks = ({ cleanName }) => (
         </li>
       </ul>
       <div className="dropdown-divider"></div>
-      <a className="dropdown-item" href="#">Delete</a>
+      <button className="dropdown-item" onClick={remove}>Delete</button>
     </div>
   </div>
 );
 
 ProjNavLinks.propTypes = {
-  cleanName: PropTypes.string,
+  cleanName: PropTypes.string.isRequired,
+  remove: PropTypes.func.isRequired,
 };
 
-export default ProjNavLinks;
+function mapStateToProps(state) {
+  return state;
+}
+
+function mapDispatchToProps(dispatch, ownProps) {
+  const { cleanName } = ownProps;
+  return {
+    remove: () => dispatch(clickRemoveProject(cleanName)),
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ProjNavLinks);
