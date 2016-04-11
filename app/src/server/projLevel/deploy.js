@@ -1,12 +1,12 @@
-import { createMachine } from '../dockerAPI/machine';
+import { createMachine, inspect, ssh } from '../dockerAPI/machine';
 import { coroutine as co } from 'bluebird';
 import { writeFile } from '../utils/utils';
+import { containerCreate } from '../dockerAPI/docker';
 import * as rsync from './rsync';
-import { inspect, ssh } from '../dockerAPI/machine';
 import defaultConfig from '../appLevel/defaultConfig';
 import { readConfig } from '../appLevel/appConfig';
-import { loadProject, writeProj, createRemoteNetwork } from './projConfig';
-import { containerObj } from './containerMgmt';
+import { loadProject, writeProj } from './projConfig';
+import { containerObj, createRemoteNetwork } from './containerMgmt';
 import {
   FAILED_TO_CREATE_DOCKERFILE,
   FAILED_TO_SYNC_TO_REMOTE,
@@ -33,11 +33,46 @@ const createRemoteObj = (cleanName, basePath) => ({
  * @param {String} uuid
  * @return {Object} returns an object with the image, project path, network mode, and working dir
  */
-export const setServerRemoteParams = (image, cleanName) => ({
-  image,
-  name: `${cleanName}_${image}`,
+export const setRemoteServerParams = (container) => ({
+  image: container.image,
+  name: container.name,
   HostConfig: {
-    NetworkMode: cleanName,
+    NetworkMode: container.cleanName,
+  },
+});
+
+/**
+ * setDbParams() returns an object with the networkMode
+ * based on the passed in image and project uuid
+ *
+ * @param {String} image
+ * @param {String} uuid
+ * @return {Object} returns an object with the networkMode
+ */
+export const setRemoteDbs = (container) => ({
+  image: container.image,
+  name: container.name,
+  HostConfig: {
+    NetworkMode: container.cleanName,
+  },
+});
+
+/**
+ * setProxyParams() returns an object with the appropriate volume commands
+ *
+ * @param {String} image
+ * @param {String} uuid
+ * @return {Object} returns an object
+ */
+export const setProxyParams = (container) => ({
+  image: container.image,
+  name: container.name,
+  HostConfig: {
+    Binds: ['/var/run/docker.sock:/tmp/docker.sock:ro'],
+    PortBindings: { ['80/tcp']: [{ HostPort: 80 }] },
+  },
+  ExposedPorts: {
+    ['80/tcp']: {},
   },
 });
 
@@ -89,15 +124,15 @@ export const createDockerfile = co(function *g(containers, basePath) {
  * @param {String} machineName
  * @return {} returns a promise that is either true or throws an error
  */
-export const syncFilesToRemote = co(function *g(basePath, machineName, local = false) {
-  const cleanPath = rsync.cleanFilePath(basePath);
+export const syncFilesToRemote = co(function *g(remoteObj, local = false) {
+  const cleanPath = rsync.cleanFilePath(remoteObj.basePath);
   const dest = local ? '/home/docker' : defaultConfig.remoteDest;
   try {
-    const machineInfo = rsync.selectSSHandIP(yield inspect(machineName));
+    const machineInfo = rsync.selectSSHandIP(yield inspect(remoteObj.machine));
     const remoteRsyncArgs =
       rsync.createRemoteRsyncArgs(`${cleanPath}/*`, dest, machineInfo, local);
     yield rsync.rsync(remoteRsyncArgs);
-    return true;
+    return { ...remoteObj, ipAddress: machineInfo.IPAddress };
   } catch (e) {
     throw FAILED_TO_SYNC_TO_REMOTE;
   }
@@ -111,8 +146,8 @@ export const syncFilesToRemote = co(function *g(basePath, machineName, local = f
  */
 export const buildServerImage = (remoteObj) =>
   ssh(remoteObj.machine, `docker build -t dockdev/${remoteObj.cleanName}:${remoteObj.counter} .`)
-    .then(() => true)
-    .catch(() => {throw FAILED_TO_BUILD_SERVER_IMAGE;});
+    .then(() => true);
+    // .catch(() => {throw FAILED_TO_BUILD_SERVER_IMAGE;});
 
 /**
  * initRemote() provisions the droplet, creates a network, and returns the base remoteObj
@@ -139,14 +174,53 @@ export const initRemote = co(function *g(cleanName, path) {
   return remoteObj;
 });
 
+
+/**
+ * addNginxContainer() pushes the appopriate nginx container to the array so that is is pulled
+ *
+ * @param {Array} containers
+ * @param {Object} remoteObj
+ * @return {} returns a new version of the container array with nginx included
+ */
 export const addNginxContainer = (containers, remoteObj) => {
-  const nginx = containerMgmt.containerObj(remoteObj.cleanName, {
+  const nginx = containerObj(remoteObj.cleanName, {
     name: 'jwilder/nginx-proxy',
-    server: false
+    server: false,
   });
   nginx.nginx = true;
-  nginx.machine = remoteObj.machine
-}
+  nginx.name = 'proxy';
+  return [...containers, nginx];
+};
+
+/**
+ * remoteServerObj() returns the base object for the remote server container
+ *
+ * @param {String} cleanName
+ * @param {Object} imageObj
+ * @return {Object} returns a baseline container object
+ */
+export const remoteServerObj = (remoteObj) => ({
+  cleanName: remoteObj.cleanName,
+  image: `dockdev/${remoteObj.cleanName}:${remoteObj.counter}`,
+  dockerId: '',
+  name: `server${remoteObj.counter}`,
+  server: true,
+  status: 'pending',
+  machine: remoteObj.machine,
+});
+
+const getRemoteConfig = (container, remoteObj) => {
+  if (container.server) return setRemoteServerParams(remoteObj);
+  if (container.nginx) return setProxyParams(container);
+  return setRemoteDbs(container);
+};
+
+export const createRemoteContainer = co(function *g(container, remoteObj) {
+  const config = getRemoteConfig(container);
+  const dockCont = yield containerCreate(remoteObj.machine, config);
+  return { ...container, dockerId: dockCont.Id, machine: remoteObj.machine };
+});
+
 
 // const basePath = join(__dirname, '..', '..', '..', '..', 'example-deploy', 'deploy');
 //
