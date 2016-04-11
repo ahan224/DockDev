@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
-import { clickRemoveProject } from '../../actions/index';
+import { clickRemoveProject, redirect } from '../../actions/index';
 
 const ProjNavLinks = ({ cleanName, remove }) => (
   <div className="btn-group">
@@ -40,7 +40,10 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch, ownProps) {
   const { cleanName } = ownProps;
   return {
-    remove: () => dispatch(clickRemoveProject(cleanName)),
+    remove: () => {
+      dispatch(clickRemoveProject(cleanName));
+      return dispatch(redirect(''));
+    },
   };
 }
 

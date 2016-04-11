@@ -22,7 +22,7 @@ export const setServerParams = (image, cleanName) => ({
   image,
   name: `${cleanName}_${image}`,
   HostConfig: {
-    Binds: [`${defaultConfig.dest}:${defaultConfig.workDir}`],
+    Binds: [`${defaultConfig.dest}:${defaultConfig.workDir}:ro`],
     NetworkMode: cleanName,
     PortBindings: { [`${defaultConfig.port}/tcp`]: [{ HostPort: `${defaultConfig.port}` }] },
   },
@@ -129,7 +129,6 @@ export const createContainer = co(function *g(projObj, imageObj) {
   } else {
     // create the container & update the object with the docker generated id
     const dockCont = yield containerCreate(defaultConfig.machine, getContainerConfig(container));
-    console.log(dockCont);
     container.dockerId = dockCont.Id;
     container.status = 'complete';
   }
@@ -167,21 +166,10 @@ export const pullImageForProject = co(function *g(container, path) {
  * @param {String} path
  * @return {Object} returns true or throws an error
  */
-export const deleteProjectContainer = (container, path) =>
-  writeContainer(container, path, 'delete');
-
-/**
- * removeContainer() returns true after it deletes a container
- * and removes it from the projcet object
- * based on the passed in project object and containerId
- *
- * @param {Object} projObj
- * @param {String} containerId
- * @return {Boolean} true
- */
-export const removeContainer = co(function *g(projObj, containerId) {
-  if (projObj.containers[containerId].status === 'complete') {
-    yield containerRemove(projObj.machine, containerId);
+export const deleteProjectContainer = co(function *g(container, path) {
+  if (container.status === 'complete') {
+    yield containerRemove(container.machine, container.dockerId);
   }
+  yield writeContainer(container, path, 'delete');
   return true;
 });

@@ -4,6 +4,7 @@ import chokidar from 'chokidar';
 import Promise from 'bluebird';
 import {
   appConfig,
+  defaultConfig,
   projConfig,
   availableImages,
   containerMgmt,
@@ -46,6 +47,7 @@ export const ERROR_RESTARTING_CONTAINERS = 'ERROR_RESTARTING_CONTAINERS';
 export const RESTARTED_PROJECT = 'RESTARTED_PROJECT';
 export const ERROR_REMOVING_CONTAINERS = 'ERROR_REMOVING_CONTAINERS';
 export const REMOVED_PROJECT = 'REMOVED_PROJECT';
+export const MACHINE_RESTARTING = 'MACHINE_RESTARTING';
 
 export function redirectHome() {
   return dispatch => dispatch(push('/'));
@@ -55,16 +57,59 @@ export function redirect(...args) {
   return dispatch => dispatch(push(`/${args.join('/')}`));
 }
 
-export function appInitDocker() {
-  
-}
-
 function createMessage(type, message) {
   return {
     type,
     message,
     time: moment(),
     timestamp: moment().format('MM-D-YYYY, h:mm:ss a'),
+  };
+}
+
+// function machineRestarting() {
+//   return createMessage(
+//     MACHINE_RESTARTING,
+//     `${defaultConfig.machine} is restarting`
+//   );
+// }
+
+function checkDockDevMachine() {
+  return dispatch => {
+    const machineList = machine.list();
+    return machineList.then(list => {
+      if (list.indexOf(defaultConfig.machine) === -1) {
+        machine.createVirtualBox(defaultConfig.machine);
+        dispatch(redirect('init'));
+      }
+      // else {
+        // it doesn't like the regenCerts command here
+        // machine.regenCerts(defaultConfig.machine);
+
+        // this makes it hard for me to use the app at first but it works
+        // machine.restart(defaultConfig.machine);
+        // dispatch(machineRestarting());
+      // }
+    });
+  };
+}
+
+function checkDocker() {
+  return dispatch => {
+    appConfig.checkDockerInstall()
+      .then(res => {
+        if (!res) return dispatch(redirect('init'));
+        return dispatch(checkDockDevMachine());
+      });
+  };
+}
+
+export function appInitiation() {
+  return dispatch => {
+    appConfig.checkDockerMachineInstalled()
+      .then(res => {
+        if (!res) return dispatch(redirect('init'));
+        return dispatch(checkDocker());
+      });
   };
 }
 
@@ -369,7 +414,7 @@ function fileWatching(project, syncArgs) {
 function rsyncProj(project) {
   return dispatch => {
     const basePath = rsync.cleanFilePath(project.basePath);
-    const server = project.containers.filter(cont => cont.server);
+    const server = project.containers.filter(cont => cont.server)[0];
     const destPath = server.dest;
     return machine.inspect(project.machine)
       .then(rsync.selectSSHandIP)
