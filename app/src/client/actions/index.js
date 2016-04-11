@@ -683,7 +683,7 @@ function syncingToRemote(remoteObj, isPush = false) {
       `Started syncing ${remoteObj.cleanName}`
     ));
     return deploy.syncFilesToRemote(remoteObj)
-      .then(() => dispatch(syncedToRemote({ ...remoteObj, status: 1 }, isPush)));
+      .then(res => dispatch(syncedToRemote({ ...res, status: 1 }, isPush)));
   };
 }
 
