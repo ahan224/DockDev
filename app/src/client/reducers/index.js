@@ -132,7 +132,7 @@ function remote(state = {}, action) {
       return {
         ...state,
         status: action.remoteObj.status,
-        containers: [...state.containers, ...action.remoteObj.containers],
+        containers: [...action.remoteObj.containers],
         counter: action.remoteObj.counter,
       };
     default:
