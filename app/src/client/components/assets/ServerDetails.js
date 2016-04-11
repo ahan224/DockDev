@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import ContainerControls from './ProjButtons';
+import ContainerControls from './ContainerControls';
 import ProjNavLinks from './projNavLinks';
 
 const ServerDetailContainer = ({ details, logo }) => {
@@ -15,7 +15,7 @@ const ServerDetailContainer = ({ details, logo }) => {
             <img className="card-img-top" src={logo} alt="Card image cap" />
             <ul className="list-group list-group-flush controler-wrapper">
               <li className="list-group-item">
-               <ContainerControls />
+               <ContainerControls cleanName={details.cleanName} />
               </li>
             </ul>
           </div>
@@ -46,7 +46,7 @@ const ServerDetailContainer = ({ details, logo }) => {
 };
 
 ServerDetailContainer.propTypes = {
-  details: PropTypes.object,
+  details: PropTypes.object.isRequired,
   logo: PropTypes.string,
 };
 
