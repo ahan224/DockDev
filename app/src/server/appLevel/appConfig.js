@@ -22,6 +22,7 @@ export const checkDockerMachineInstalled = co(function *g() {
   return result.substr(0, 6) === 'docker';
 });
 
+
 /**
  * checkDockerInstall() returns true if docker is installed or false if not
  * based on running docker in the command line and checking the resulting output

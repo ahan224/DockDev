@@ -55,6 +55,10 @@ export function redirect(...args) {
   return dispatch => dispatch(push(`/${args.join('/')}`));
 }
 
+export function appInitDocker() {
+  
+}
+
 function createMessage(type, message) {
   return {
     type,
@@ -420,11 +424,11 @@ function stopContainers(project, del) {
         })
       );
     Promise.all(containerArray)
-      .then(() => dispatch(stopProject(project.cleanName)))
+      .then(() => dispatch(stopProject(project.projectName)))
       .then(() => {
         if (del) dispatch(clickRemoveProject(project.cleanName));
       })
-      .catch(err  => dispatch(stopContainersError(err, project.cleanName)));
+      .catch(err => dispatch(stopContainersError(err, project.projectName)));
   };
 }
 
@@ -506,7 +510,8 @@ function removeContainers(cleanName) {
     const containerArray = project.containers.map(cont =>
       docker.containerRemove(cont.machine, cont.dockerId));
     Promise.all(containerArray)
-      .then(() => dispatch(removeProject(project.projectName)))
+      .then(() => projConfig.undoInitProject(project))
+      .then(() => dispatch(removeProject(project)))
       .catch(err => dispatch(removeContainersError(err, project.projectName)));
   };
 }

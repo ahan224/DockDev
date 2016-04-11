@@ -89,7 +89,7 @@ export const createProjectNetwork = (projObj) =>
  * @return {Promise} returns true or throws an error if unable to delete the network
  */
 export const deleteProjectNetwork = (projObj, ignoreErrors) =>
-  networkDelete(defaultConfig.machine, setNetworkParams(projObj.cleanName))
+  networkDelete(defaultConfig.machine, projObj.cleanName)
     .then(() => true)
     .catch(err => {
       if (!ignoreErrors) throw err;
