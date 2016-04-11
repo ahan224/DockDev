@@ -432,7 +432,7 @@ function rsyncProj(project) {
       .then(rsync.selectSSHandIP)
       .then(machineInfo =>
         dispatch(
-          fileWatching(project, rsync.createRsyncArgs(`${basePath}/`, destPath, machineInfo)))
+          fileWatching(project, rsync.createRsyncArgs(`${basePath}/*`, destPath, machineInfo)))
         )
       .catch(err => dispatch(rsyncInfoError(err, project)));
   };
