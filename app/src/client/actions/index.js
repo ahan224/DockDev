@@ -47,7 +47,8 @@ export const ERROR_RESTARTING_CONTAINERS = 'ERROR_RESTARTING_CONTAINERS';
 export const RESTARTED_PROJECT = 'RESTARTED_PROJECT';
 export const ERROR_REMOVING_CONTAINERS = 'ERROR_REMOVING_CONTAINERS';
 export const REMOVED_PROJECT = 'REMOVED_PROJECT';
-export const MACHINE_RESTARTING = 'MACHINE_RESTARTING';
+export const MACHINE_RESTARTED = 'MACHINE_RESTARTED';
+export const MACHINE_CREATED = 'MACHINE_CREATED';
 
 export function redirectHome() {
   return dispatch => dispatch(push('/'));
@@ -66,29 +67,48 @@ function createMessage(type, message) {
   };
 }
 
-// function machineRestarting() {
-//   return createMessage(
-//     MACHINE_RESTARTING,
-//     `${defaultConfig.machine} is restarting`
-//   );
-// }
+function machineRestarting() {
+  return createMessage(
+    MACHINE_RESTARTED,
+    `${defaultConfig.machine} has restarted`
+  );
+}
+
+function machineCreated() {
+  return createMessage(
+    MACHINE_CREATED,
+    `${defaultConfig.machine} has been created`
+  );
+}
 
 function checkDockDevMachine() {
   return dispatch => {
     const machineList = machine.list();
     return machineList.then(list => {
       if (list.indexOf(defaultConfig.machine) === -1) {
-        machine.createVirtualBox(defaultConfig.machine);
-        dispatch(redirect('init'));
+        dispatch(redirect('init', 2));
+        machine.createVirtualBox(defaultConfig.machine)
+          .then(() => {
+            dispatch(machineCreated());
+            dispatch(redirectHome());
+          })
+          .catch(() => {
+            dispatch(redirect('init', 4));
+          });
+      } else {
+        machine.regenCerts(defaultConfig.machine);
+        machine.checkMachineRunning(defaultConfig)
+          .then(result => {
+            if (result) {
+              dispatch(redirect('init', 3));
+              machine.restart(defaultConfig.machine)
+                .then(() => {
+                  dispatch(machineRestarting());
+                  dispatch(redirectHome());
+                });
+            }
+          });
       }
-      // else {
-        // it doesn't like the regenCerts command here
-        // machine.regenCerts(defaultConfig.machine);
-
-        // this makes it hard for me to use the app at first but it works
-        // machine.restart(defaultConfig.machine);
-        // dispatch(machineRestarting());
-      // }
     });
   };
 }
@@ -97,7 +117,7 @@ function checkDocker() {
   return dispatch => {
     appConfig.checkDockerInstall()
       .then(res => {
-        if (!res) return dispatch(redirect('init'));
+        if (!res) return dispatch(redirect('init', 1));
         return dispatch(checkDockDevMachine());
       });
   };
@@ -107,7 +127,7 @@ export function appInitiation() {
   return dispatch => {
     appConfig.checkDockerMachineInstalled()
       .then(res => {
-        if (!res) return dispatch(redirect('init'));
+        if (!res) return dispatch(redirect('init', 1));
         return dispatch(checkDocker());
       });
   };
