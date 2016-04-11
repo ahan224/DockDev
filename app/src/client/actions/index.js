@@ -11,6 +11,7 @@ import {
   rsync,
   docker,
   machine,
+  deploy,
 } from './server/main';
 
 export const REQUEST_CONFIG = 'REQUEST_CONFIG';
@@ -48,6 +49,17 @@ export const RESTARTED_PROJECT = 'RESTARTED_PROJECT';
 export const ERROR_REMOVING_CONTAINERS = 'ERROR_REMOVING_CONTAINERS';
 export const REMOVED_PROJECT = 'REMOVED_PROJECT';
 export const MACHINE_RESTARTING = 'MACHINE_RESTARTING';
+export const ADDING_REMOTE = 'ADDING_REMOTE';
+export const ADDED_REMOTE = 'ADDED_REMOTE';
+export const STARTED_SYNC_TO_REMOTE = 'STARTED_SYNC_TO_REMOTE';
+export const COMPLETED_SYNC_TO_REMOTE = 'COMPLETED_SYNC_TO_REMOTE';
+export const START_SERVER_IMAGE_BUILD = 'START_SERVER_IMAGE_BUILD';
+export const COMPLETED_SERVER_IMAGE_BUILD = 'COMPLETED_SERVER_IMAGE_BUILD';
+export const PULLING_REMOTE_IMAGES = 'PULLING_REMOTE_IMAGES';
+export const PULLED_REMOTE_IMAGES = 'PULLED_REMOTE_IMAGES';
+export const CREATING_REMOTE_CONTAINERS = 'CREATING_REMOTE_CONTAINERS';
+export const CREATED_REMOTE_CONTAINERS = 'CREATED_REMOTE_CONTAINERS';
+export const STARTED_REMOTE_CONTAINERS = 'STARTED_REMOTE_CONTAINERS';
 
 export function redirectHome() {
   return dispatch => dispatch(push('/'));
@@ -590,4 +602,170 @@ export function clickUpdateDOToken(token) {
     appConfig.updateDOToken(token)
       .then(() => dispatch(updateDOToken(token)))
       .catch(err => dispatch(updateDOTokenError(err)));
+}
+
+function startedRemoteContainers(remoteObj) {
+  return {
+    type: STARTED_REMOTE_CONTAINERS,
+    remoteObj,
+  };
+}
+
+function startingRemoteContainers(remoteObj) {
+  return dispatch => {
+    dispatch(
+      { ...createMessage(
+        CREATED_REMOTE_CONTAINERS,
+        `Created remote containers for ${remoteObj.cleanName}`
+        ),
+        remoteObj,
+      }
+    );
+    const containerArray = remoteObj.containers.map(cont =>
+      docker.containerStart(cont.machine, cont.dockerId));
+    Promise.all(containerArray)
+      .then(dispatch(startedRemoteContainers({ ...remoteObj, status: 6 })));
+  };
+}
+
+function createRemoteContainers(remoteObj) {
+  return dispatch => {
+    dispatch(
+      { ...createMessage(
+        CREATING_REMOTE_CONTAINERS,
+        `Creating remote containers for ${remoteObj.cleanName}`
+        ),
+        remoteObj,
+      });
+    const containerArray = remoteObj.containers.map(cont =>
+      deploy.createRemoteContainer(cont, remoteObj));
+    Promise.all(containerArray)
+      .then(() => dispatch(startingRemoteContainers({ ...remoteObj, status: 5 })));
+  };
+}
+
+function pulledRemoteImages(remoteObj) {
+  return dispatch => {
+    dispatch(
+      { ...createMessage(
+          PULLED_REMOTE_IMAGES,
+          `Pulled images on remote for ${remoteObj.cleanName}`
+        ),
+        remoteObj,
+      });
+    dispatch(createRemoteContainers({ ...remoteObj, status: 4 }));
+  };
+}
+
+function completedServerImageBuild(remoteObj) {
+  return (dispatch, getState) => {
+    dispatch(
+      { ...createMessage(
+          COMPLETED_SERVER_IMAGE_BUILD,
+          `Completed server image build for ${remoteObj.cleanName}`
+        ),
+        remoteObj,
+      });
+    dispatch(createMessage(
+      PULLING_REMOTE_IMAGES,
+      `Started pulling images on remote machine for ${remoteObj.cleanName}`
+    ));
+    const project = getState().projects[remoteObj.cleanName];
+    const dbs =
+      deploy.addNginxContainer(project.containers.filter(cont => !cont.server), remoteObj);
+    const pullDbs = dbs.map(cont => docker.pullImage(remoteObj.machine, cont.image));
+    Promise.all(pullDbs)
+      .then(() => {
+        const newRemoteObj = {
+          ...remoteObj,
+          containers: [...remoteObj.containers, ...dbs],
+          status: 3,
+        };
+        projConfig.writeRemote(newRemoteObj, project.basePath)
+          .then(() => dispatch(pulledRemoteImages(newRemoteObj)));
+      });
+  };
+}
+
+function completedPushImageBuild() {
+  return;
+}
+
+function startServerImageBuild(remoteObj, isPush = false) {
+  return dispatch => {
+    dispatch(createMessage(
+      START_SERVER_IMAGE_BUILD,
+      `Started building server image for ${remoteObj.cleanName}`
+    ));
+    return deploy.buildServerImage(remoteObj)
+      .then(() => {
+        const serverObj = deploy.remoteServerObj(remoteObj);
+        const newRemoteObj = {
+          ...remoteObj,
+          containers: [serverObj],
+          counter: remoteObj.counter + 1,
+          status: 2,
+        };
+        if (isPush) return dispatch(completedPushImageBuild(remoteObj));
+        return dispatch(completedServerImageBuild(newRemoteObj));
+      });
+  };
+}
+
+function syncedToRemote(remoteObj, isPush = false) {
+  return dispatch => {
+    dispatch(
+      { ...createMessage(
+          COMPLETED_SYNC_TO_REMOTE,
+          `Completed sync to remote for ${remoteObj.cleanName}`
+        ),
+        remoteObj,
+      });
+    return dispatch(startServerImageBuild(remoteObj, isPush));
+  };
+}
+
+function syncingToRemote(remoteObj, isPush = false) {
+  return dispatch => {
+    dispatch(createMessage(
+      STARTED_SYNC_TO_REMOTE,
+      `Started syncing ${remoteObj.cleanName}`
+    ));
+    return deploy.syncFilesToRemote(remoteObj)
+      .then(res => dispatch(syncedToRemote({ ...res, status: 1 }, isPush)));
+  };
+}
+
+function createDockerfile(remoteObj, isPush = false) {
+  return (dispatch, getState) => {
+    const project = getState().projects[remoteObj.cleanName];
+    return deploy.createDockerfile(project.containers, remoteObj.basePath)
+      .then(() => dispatch(syncingToRemote(remoteObj, isPush)));
+  };
+}
+
+function addingRemote(project) {
+  return createMessage(
+    ADDING_REMOTE,
+    `Starting deploy of ${project.projectName} to Digital Ocean`
+  );
+}
+
+function addedRemote(remoteObj) {
+  return dispatch => {
+    dispatch({
+      type: ADDED_REMOTE,
+      remoteObj,
+    });
+    return dispatch(createDockerfile(remoteObj));
+  };
+}
+
+export function clickDeployRemote(cleanName) {
+  return (dispatch, getState) => {
+    const project = getState().projects[cleanName];
+    dispatch(addingRemote(project));
+    return deploy.initRemote(cleanName, project.basePath)
+      .then(res => dispatch(addedRemote(res)));
+  };
 }

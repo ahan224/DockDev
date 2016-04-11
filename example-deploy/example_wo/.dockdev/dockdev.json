@@ -1,24 +1,48 @@
 {
-  "projectName": "Example",
-  "cleanName": "Example",
+  "projectName": "Deploy10",
+  "cleanName": "deploy10",
   "basePath": "/Users/samhagan/dev/codesmith/DockDev/example-deploy/example_wo",
   "containers": [
     {
-      "cleanName": "Example",
-      "image": "mongo",
-      "dockerId": "47dd668f3c496714be0044c756c3b6302415f3abf828a434a2fb5206e01a8a70",
-      "name": "Example_mongo",
-      "dest": "",
-      "server": false,
+      "cleanName": "deploy10",
+      "image": "node",
+      "dockerId": "404c12d020f1cf0e74b59decc483784b0b3c4d553a66e55deb87356102496f7c",
+      "name": "deploy10_node",
+      "dest": "/home/docker/tmp",
+      "server": true,
       "status": "complete",
       "machine": "dockdev"
     }
   ],
   "machine": "dockdev",
   "remote": {
-    "machine": "",
-    "containers": [],
+    "cleanName": "deploy10",
+    "basePath": "/Users/samhagan/dev/codesmith/DockDev/example-deploy/example_wo",
+    "machine": "dockdev-deploy10",
     "ipAddress": "",
-    "counter": 0
+    "containers": [
+      {
+        "cleanName": "deploy10",
+        "image": "dockdev/deploy10:0",
+        "dockerId": "",
+        "name": "serverNaN",
+        "server": true,
+        "status": "pending",
+        "machine": "dockdev-deploy10"
+      },
+      {
+        "cleanName": "deploy10",
+        "image": "jwilder/nginx-proxy",
+        "dockerId": "",
+        "name": "proxy",
+        "dest": "",
+        "server": false,
+        "status": "pending",
+        "machine": "dockdev",
+        "nginx": true
+      }
+    ],
+    "counter": 1,
+    "status": 3
   }
 }
