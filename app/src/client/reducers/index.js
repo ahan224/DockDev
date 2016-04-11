@@ -167,6 +167,13 @@ function projects(state = {}, action) {
       return { ...state,
         [action.containerObj.cleanName]: project(state[action.containerObj.cleanName], action),
       };
+    case REMOVED_PROJECT: {
+      const newProj = { ...state.projects };
+      delete newProj[action.project.cleanName];
+      return {
+        ...newProj,
+      };
+    }
     default:
       return state;
   }
@@ -197,10 +204,7 @@ function activeProject(state = {}, action) {
         watcher: action.watcher,
       };
     case STOPPED_PROJECT:
-      return {
-        project: '',
-        watcher: '',
-      };
+      return {};
     default:
       return state;
   }
