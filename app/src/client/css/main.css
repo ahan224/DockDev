@@ -356,6 +356,7 @@ button.btn.btn-sm.btn-primary-outline.container-save {
 
 .add-proj-icon img {
   width: 100%;
+  max-width: 32px;
   /*border: 1px dashed;*/
   /*margin-top: -23px;*/
   /*width: 18px;*/

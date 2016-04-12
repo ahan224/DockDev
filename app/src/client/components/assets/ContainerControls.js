@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import {
   clickStartProject,
@@ -6,7 +7,7 @@ import {
   clickRestartProject,
 } from '../../actions/index';
 
-const ContainerControls = ({ start, stop, restart }) => (
+const ContainerControls = ({ start, stop, restart, cleanName }) => (
   <div className="btn-group btn-group-sm container-controls"
     role="group" aria-label="Container Controls"
   >
@@ -18,6 +19,9 @@ const ContainerControls = ({ start, stop, restart }) => (
     </button>
     <button type="button" onClick={restart} className="btn btn-secondary btn-info-outline">
       Restart
+    </button>
+    <button type="button" className="btn btn-secondary btn-info-outline" style={{ width: '100%' }}>
+      <Link className="nav-link" to={`/projects/${cleanName}/deploy`}>Deploy</Link>
     </button>
   </div>
 

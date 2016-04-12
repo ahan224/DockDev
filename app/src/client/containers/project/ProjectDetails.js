@@ -43,7 +43,7 @@ const ProjectDetail = (props) => {
             <NavLink to={`/projects/${props.project.cleanName}/container`}
               className="add-proj-wrapper add-proj-icon"
             >
-            Add
+              <img src="./client/images/png/Add-01.png"></img>
             </NavLink>
             <div className="divider"></div>
           </div>
