@@ -13,14 +13,39 @@ const ProjNavLinks = ({ cleanName, remove }) => (
     <div className="dropdown-menu">
       <ul>
         <li>
-          <Link className="nav-link" to={`/projects/${cleanName}`}>Home</Link>
+          <div className="row">
+            <div className="col-xs-4">
+              <div className="placeholder-icon"></div>
+            </div>
+            <div className="col-xs-8">
+              <button className="dropdown-item">
+                <Link className="nav-link" to={`/projects/${cleanName}`}>Home</Link>
+              </button>
+            </div>
+          </div>
         </li>
         <li>
-          <Link className="nav-link" to={`/projects/${cleanName}/container`}>Add</Link>
+          <div className="row">
+            <div className="col-xs-4">
+              <div className="placeholder-icon"></div>
+            </div>
+            <div className="col-xs-8">
+              <button className="dropdown-item">
+                <Link className="nav-link" to={`/projects/${cleanName}/container`}>Add</Link>
+              </button>
+            </div>
+          </div>
         </li>
       </ul>
       <div className="dropdown-divider"></div>
-      <button className="dropdown-item" onClick={remove}>Delete</button>
+      <div className="row">
+        <div className="col-xs-4">
+          <div className="placeholder-icon"></div>
+        </div>
+        <div className="col-xs-8">
+          <button className="dropdown-item" onClick={remove}>Delete</button>
+        </div>
+      </div>
     </div>
   </div>
 );

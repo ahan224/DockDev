@@ -115,7 +115,7 @@ h1 {
 }
 
 #projectMenu li {
-  /*border-left: 2px solid #71A0D7;*/
+  /*border-left: 2px solid #00AEEF;*/
 }
 
 #projectMenu a {
@@ -127,13 +127,13 @@ h1 {
 
 li.nav-item {
     padding: 6px;
-    /*border-left: border: 2px dashed #71A0D7;*/
+    /*border-left: border: 2px dashed #00AEEF;*/
 }
 
 .btn-primary-outline:hover {
     color: #fff;
-    background-color: #71A0D7!important;
-    border-color: #71A0D7!important;
+    background-color: #00AEEF!important;
+    border-color: #00AEEF!important;
 }
 
 .proj-content {
@@ -506,6 +506,7 @@ button.btn.btn-sm.btn-primary-outline.container-save {
 
 ul, li {
   list-style-type: none;
+  padding: 0;
   /*border-left: 2px solid white;*/
 }
 
@@ -919,4 +920,30 @@ label.btn.btn-primary.active {
 
 a.list-group-item.active, .notification-content list-item {
     border-radius: 0px;
+}
+
+.nav-link {
+  color: #5bc0de;
+}
+
+/*.btn-info-outline > Link:hover {
+  color: white;
+}*/
+
+.placeholder-icon {
+  position: relative;
+  left: 80%;
+  margin-top: 10px;
+  height: 20px;
+  width: 20px;
+  background-color: red;
+}
+
+/*.dropdown-item button {
+  color: #5bc0de;
+}*/
+
+.container-add {
+  top: 10px;
+  right: -83px;
 }

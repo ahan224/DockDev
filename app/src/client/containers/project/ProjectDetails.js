@@ -41,9 +41,11 @@ const ProjectDetail = (props) => {
           <div className="col-xs-12" id="servers">
             <h5>Servers</h5>
             <NavLink to={`/projects/${props.project.cleanName}/container`}
-              className="add-proj-wrapper add-proj-icon"
+              className="add-proj-wrapper"
             >
-              <img src="./client/images/png/Add-01.png"></img>
+              <button className="btn btn-sm btn-primary-outline container-add">
+                Add Container
+              </button>
             </NavLink>
             <div className="divider"></div>
           </div>
