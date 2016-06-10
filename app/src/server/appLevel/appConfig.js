@@ -1,12 +1,15 @@
 import { join } from 'path';
-import Promise, { coroutine as co } from 'bluebird';
+import { coroutine as co } from 'bluebird';
 import * as utils from '../utils/utils';
 import * as machine from '../dockerAPI/machine';
-import fs from 'fs';
-import rimraf from 'rimraf';
-import defaultConfig from '../appLevel/defaultConfig';
-
-const rimrafProm = Promise.promisify(rimraf);
+import defaultConfig from './defaultConfig';
+import {
+  FAILED_READ_CONFIG,
+  FAILED_TO_WRITE_CONFIG,
+  EEXIST,
+  FAILED_TO_CREATE_CONFIG_DIR,
+  FAILED_TO_UPDATE_DOTOKEN,
+} from './errorMsgs';
 
 /**
  * checkDockerMachineInstalled() returns true if docker machine is installed or false if not
@@ -14,7 +17,7 @@ const rimrafProm = Promise.promisify(rimraf);
  *
  * @return {Boolean} returns true or false
  */
-const checkDockerMachineInstalled = co(function *g() {
+export const checkDockerMachineInstalled = co(function *g() {
   const result = yield machine.version();
   return result.substr(0, 6) === 'docker';
 });
@@ -25,7 +28,7 @@ const checkDockerMachineInstalled = co(function *g() {
  *
  * @return {Boolean} returns true or false
  */
-const checkDockerInstall = co(function *g() {
+export const checkDockerInstall = co(function *g() {
   const result = yield utils.exec('docker');
   return result.split('\n').length > 1;
 });
@@ -37,11 +40,11 @@ const checkDockerInstall = co(function *g() {
  * @param {Object} defaultConfig
  * @return {Object} configObj
  */
-const initConfig = (defaultConfig) => ({
+export const initConfig = () => ({
   path: defaultConfig.configPath(),
   projects: [],
   userDir: process.env.HOME,
-  DOtoken: '',
+  DOToken: '',
 });
 
 /**
@@ -51,9 +54,10 @@ const initConfig = (defaultConfig) => ({
  * @param {String} configPath
  * @return {Object} configObj
  */
-const readConfig = (configPath) =>
+export const readConfig = (configPath) =>
   utils.readFile(configPath)
-    .then(JSON.parse);
+    .then(JSON.parse)
+    .catch(() => {throw FAILED_READ_CONFIG;});
 
 /**
  * writeConfig() return a promise to write the initial config file
@@ -62,9 +66,11 @@ const readConfig = (configPath) =>
  * @param {Object} configObj
  * @return {} writes config file
  */
-const writeConfig = (configObj) => {
+export const writeConfig = (configObj) => {
   const strObj = utils.jsonStringifyPretty(configObj);
-  return utils.writeFile(configObj.path, strObj);
+  return utils.writeFile(configObj.path, strObj)
+    .then(() => true)
+    .catch(() => {throw FAILED_TO_WRITE_CONFIG; });
 };
 
 /**
@@ -74,8 +80,13 @@ const writeConfig = (configObj) => {
  * @param {Object} defaultConfig
  * @return {} makes a folder
  */
-const createConfigFolder = (defaultConfig) =>
-  utils.mkdir(join(defaultConfig.defaultPath, defaultConfig.configFolder));
+const createConfigFolder = () =>
+  utils.mkdir(join(defaultConfig.defaultPath, defaultConfig.configFolder))
+    .then(() => true)
+    .catch(err => {
+      if (err.code !== EEXIST) throw FAILED_TO_CREATE_CONFIG_DIR;
+      return false;
+    });
 
 /**
  * loadConfigFile() returns the config object from ~/.dockdevconfig or creates/writes it
@@ -84,97 +95,30 @@ const createConfigFolder = (defaultConfig) =>
  * @param {Object} defaultConfig
  * @return {Object} config
  */
-export const loadConfigFile = co(function *g(defaultConfig) {
-  let config = yield readConfig(defaultConfig.configPath());
-
-  // if config is undefined then config file does not exist
-  if (!config) {
-    try {
-      yield createConfigFolder(defaultConfig);
-    } catch (e) {
-      console.log("hi I am the error message", e);
+export const loadConfigFile = co(function *g() {
+  try {
+    if (yield createConfigFolder()) {
+      const config = initConfig();
+      yield writeConfig(config);
+      return config;
     }
-    config = initConfig(defaultConfig)
-    yield writeConfig(config);
-    return config;
+    return yield readConfig(defaultConfig.configPath());
+  } catch (e) {
+    throw e; // potentially need to additional handling here
   }
-
-  return config;
-});
-
-loadConfigFile(defaultConfig)
-  .then(data => console.log('data: ', data))
-  .catch(err => console.log('error: ', err));
-
-/**
- * loadPathsFile() returns a promise that a path will resolve whether or not it is good
- * based on the passed in path
- *
- * @param {String} basePath
- * @return {} promise to resolve 'ERROR' or the projet object
- */
-const loadPathsFile = (path, defaultConfig) =>
-  new Promise((resolve) => {
-    fs.readFile(join(path, defaultConfig.projPath()), (err, result) => {
-      if (err) return resolve('ERROR');
-      const proj = JSON.parse(result.toString());
-      proj.basePath = path;
-      return resolve(proj);
-    });
-  });
-
-/**
- * loadPaths() will load all the paths for every project and if a project fails to load
- * it will run a callback on those failed paths
- *
- * @param {Object} configObj
- * @param {Object} defaultConfig
- * @param {Function} callback
- * @return {}
- */
-export const loadPaths = (configObj, defaultConfig, callback) => {
-  const goodPaths = [];
-
-  configObj.projects.forEach(path => {
-    goodPaths.push(loadPathsFile(path, defaultConfig)
-      .then(data => {
-        if (data !== 'ERROR') callback(data);
-      }));
-  });
-};
-
-/**
- * addProjToConfig() will add a project's path to the main config file
- * based on the passed in project base path and the default config object
- *
- * @param {String} basePath
- * @param {Object} defaultConfig
- * @return {}
- */
-export const addProjToConfig = co(function *g(basePath, defaultConfig) {
-  const configPath = defaultConfig.configPath();
-  const readConfigFile = yield readConfig(configPath);
-  console.log("Am I defined?", readConfigFile);
-  readConfigFile.projects.push(basePath);
-  yield writeConfig(readConfigFile);
 });
 
 /**
- * removeProjFromConfig() will delete a project's path to the main config file
- * based on the passed in project base path and the default config object
+ * updateDOToken() update the Digital Ocean toke stored on disk, it return true or throws error
  *
- * @param {String} basePath
- * @param {Object} defaultConfig
- * @return {}
+ * @param {String} token
+ * @return {} true or throws error
  */
-export const removeProjFromConfig = co(function *g(projObj, defaultConfig) {
-  const configPath = defaultConfig.configPath();
-  const readConfigFile = yield readConfig(configPath);
-  readConfigFile.projects = readConfigFile.projects.filter(path => path !== projObj.basePath);
-  yield utils.writeFile(configPath, utils.jsonStringifyPretty(readConfigFile));
-  yield rimrafProm(join(projObj.basePath, defaultConfig.projFolder));
-  return true;
-});
+export const updateDOToken = (token) =>
+  readConfig(defaultConfig.configPath())
+    .then(config => ({ ...config, DOToken: token }))
+    .then(writeConfig)
+    .catch(() => {throw FAILED_TO_UPDATE_DOTOKEN;});
 
 /**
  * initApp() will run through several processes at app initiation. First,
@@ -189,34 +133,34 @@ export const removeProjFromConfig = co(function *g(projObj, defaultConfig) {
  * @param {Function} addProject
  * @return {Boolean} true
  */
-export const initApp = co(function *g(defaultConfig, router, addConfig, addProject) {
-  try {
-    yield checkDockerMachineInstalled();
-  } catch (e) {
-    router.replace('/init/1');
-    return false;
-  }
-
-  try {
-    yield checkDockerInstall();
-  } catch (e) {
-    router.replace('/init/2');
-    return false;
-  }
-
-  const checkDockDevMachine = yield machine.list();
-  if (checkDockDevMachine.indexOf('dockdev') === -1) {
-    router.replace('/init/3');
-    yield machine.createVirtualBox(defaultConfig.machine);
-  }
-
-  router.replace('/');
-
-  const config = yield loadConfigFile(defaultConfig);
-
-  addConfig(config);
-
-  loadPaths(config, defaultConfig, addProject);
-
-  return true;
-});
+// export const initApp = co(function *g(defaultConfig, router, addConfig, addProject) {
+//   try {
+//     yield checkDockerMachineInstalled();
+//   } catch (e) {
+//     router.replace('/init/1');
+//     return false;
+//   }
+//
+//   try {
+//     yield checkDockerInstall();
+//   } catch (e) {
+//     router.replace('/init/2');
+//     return false;
+//   }
+//
+//   const checkDockDevMachine = yield machine.list();
+//   if (checkDockDevMachine.indexOf('dockdev') === -1) {
+//     router.replace('/init/3');
+//     yield machine.createVirtualBox(defaultConfig.machine);
+//   }
+//
+//   router.replace('/');
+//
+//   const config = yield loadConfigFile(defaultConfig);
+//
+//   addConfig(config);
+//
+//   loadPaths(config, defaultConfig, addProject);
+//
+//   return true;
+// });
