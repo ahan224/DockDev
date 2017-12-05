@@ -3,11 +3,10 @@ import { join } from 'path';
 
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
-<<<<<<< HEAD
+
 // const ipcMain = electron.ipcMain;
-=======
+
 const Menu = electron.Menu;
->>>>>>> 75042be059afddb19b997394565bed048ceecef6
 
 let mainWindow = null;
 
@@ -20,8 +19,6 @@ app.on('ready', () => {
   mainWindow.on('close', () => {
     mainWindow = null;
   });
-<<<<<<< HEAD
-=======
 
   const template = [{
     label: 'Application',
@@ -43,5 +40,4 @@ app.on('ready', () => {
     ];
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
->>>>>>> 75042be059afddb19b997394565bed048ceecef6
 });
